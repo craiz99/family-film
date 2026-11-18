@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Movie Night — Family Film</title>
-  <meta name="description" content="A cozy, cartoon-style animated movie night scene with a suave fox, an excited purple bat, and a clumsy skunk with popcorn." />
+  <title>Movie Night — Sunny Fox, Luna Bat & PoppyDash</title>
+  <meta name="description" content="An interactive cartoon movie night animation starring Sunny Fox, Luna Bat, and PoppyDash with character voices and physical comedy." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -41,10 +41,10 @@
 
     .stage-wrapper {
       width: 100%;
-      max-width: 1060px;
+      max-width: 1080px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .header-bar {
@@ -74,6 +74,7 @@
     .controls {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
@@ -83,7 +84,7 @@
       background: var(--cream);
       color: var(--ink);
       font-family: 'Fredoka', system-ui, sans-serif;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       font-weight: 600;
       padding: 7px 14px;
       border-radius: 999px;
@@ -105,6 +106,19 @@
 
     .btn.primary {
       background: var(--gold);
+    }
+
+    .btn.accent {
+      background: #ff8fa3;
+    }
+
+    .btn.accent:hover {
+      background: #ff758f;
+    }
+
+    .btn.muted {
+      background: #d8d4ea;
+      color: #4b4668;
     }
 
     .scene-card {
@@ -150,28 +164,78 @@
       }
     }
 
+    /* Start Sound Banner (unlocks browser SpeechSynthesis + WebAudio cleanly) */
+    .start-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 24px;
+      background: linear-gradient(to top, rgba(15, 13, 30, 0.65) 0%, transparent 45%);
+      z-index: 5;
+      transition: opacity 0.25s ease;
+    }
+
+    .start-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .start-cta {
+      appearance: none;
+      border: 3.5px solid var(--ink);
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Fredoka', system-ui, sans-serif;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--ink), 0 12px 28px rgba(0, 0, 0, 0.45);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      animation: ctaPulse 2.2s ease-in-out infinite;
+    }
+
+    .start-cta:hover {
+      transform: translateY(-2px) scale(1.03);
+      background: #ffe08a;
+    }
+
+    .start-cta:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 var(--ink);
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.035); }
+    }
+
     /* Speech Bubbles Layer */
     .bubbles-layer {
       position: absolute;
       inset: 0;
       pointer-events: none;
+      z-index: 3;
     }
 
     .speech-bubble {
       position: absolute;
-      max-width: min(260px, 28%);
+      max-width: min(275px, 30%);
       background: #ffffff;
       color: var(--ink);
       border: 3px solid var(--ink);
       border-radius: 18px;
       padding: 10px 14px;
-      font-size: clamp(0.72rem, 1.35vw, 0.95rem);
+      font-size: clamp(0.72rem, 1.35vw, 0.94rem);
       font-weight: 700;
       line-height: 1.32;
       box-shadow: 0 5px 0 rgba(30, 27, 46, 0.9);
       opacity: 0;
       transform: translate(-50%, -8px) scale(0.86);
-      transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.4s ease, left 0.4s ease;
       pointer-events: auto;
       cursor: pointer;
     }
@@ -205,11 +269,13 @@
     }
 
     .speaker-tag {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       font-family: 'Fredoka', system-ui, sans-serif;
-      font-size: 0.72em;
+      font-size: 0.74em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       margin-bottom: 2px;
     }
 
@@ -217,20 +283,28 @@
     .speaker-bat { color: #7b2cbf; }
     .speaker-skunk { color: #d62828; }
 
-    #bubble-fox { left: 26%; top: 24%; }
-    #bubble-bat { left: 53%; top: 10%; }
-    #bubble-skunk { left: 76%; top: 25%; }
+    #bubble-fox { left: 27%; top: 18%; }
+    #bubble-bat { left: 52%; top: 7%; }
+    #bubble-skunk { left: 75%; top: 20%; }
+    #bubble-skunk.low-pose { left: 77%; top: 44%; }
 
     .dialogue-progress {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
       font-size: 0.85rem;
       color: #bdb6de;
       padding: 0 4px;
     }
 
-    /* SVG Character & Scene Animations */
+    .voice-Cast {
+      font-size: 0.8rem;
+      color: #9e97c4;
+    }
+
+    /* ==================== SCENE & CHARACTER ANIMATIONS ==================== */
     .fairy-bulb {
       animation: twinkle 2.4s ease-in-out infinite alternate;
     }
@@ -242,24 +316,43 @@
       50% { opacity: 1; filter: brightness(1.3); }
     }
 
-    /* Fox Animations */
+    /* Talking Mouths */
+    .mouth-talking { display: none; }
+    .is-talking .mouth-idle { display: none; }
+    .is-talking .mouth-talking {
+      display: block;
+      animation: mouthChatter 0.24s ease-in-out infinite alternate;
+    }
+    @keyframes mouthChatter {
+      0% { transform: scaleY(0.55); }
+      100% { transform: scaleY(1.15); }
+    }
+
+    /* ---------- SUNNY FOX (WOMAN) ---------- */
     .fox-group {
       cursor: pointer;
-      transform-origin: 315px 470px;
+      transform-origin: 330px 490px;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .fox-group.state-peek {
+      transform: translate(24px, 6px) rotate(9deg);
+    }
+    .fox-group.state-wave {
+      transform: translate(-4px, -4px) rotate(-2deg);
     }
     .fox-group.react {
       animation: charPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .fox-tail {
-      transform-origin: 235px 485px;
-      animation: foxTailSway 3.6s ease-in-out infinite;
+      transform-origin: 252px 482px;
+      animation: foxTailSway 3.4s ease-in-out infinite;
     }
     @keyframes foxTailSway {
       0%, 100% { transform: rotate(-4deg); }
-      50% { transform: rotate(8deg); }
+      50% { transform: rotate(9deg); }
     }
     .fox-ear-r {
-      transform-origin: 345px 318px;
+      transform-origin: 356px 312px;
       animation: earTwitch 5s ease-in-out infinite;
     }
     @keyframes earTwitch {
@@ -268,105 +361,261 @@
       92% { transform: rotate(-3deg); }
     }
     .fox-wink-eye {
-      transform-origin: 335px 358px;
-      animation: foxWink 5.5s ease-in-out infinite;
+      transform-origin: 354px 352px;
+      animation: foxWink 5.2s ease-in-out infinite;
     }
     @keyframes foxWink {
       0%, 74%, 84%, 100% { transform: scaleY(1); }
       79% { transform: scaleY(0.12); }
     }
+    .fox-gesture-arm {
+      transform-origin: 368px 426px;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .fox-group.is-talking .fox-gesture-arm,
+    .fox-group.state-wave .fox-gesture-arm {
+      animation: foxArmGesture 0.85s ease-in-out infinite alternate;
+    }
+    @keyframes foxArmGesture {
+      0% { transform: rotate(-4deg); }
+      100% { transform: rotate(-22deg) translateY(-4px); }
+    }
+    .fox-mouth-talk-origin { transform-origin: 332px 390px; }
 
-    /* Bat Animations */
+    /* ---------- LUNA BAT (GIRL — EXTRA CUTE) ---------- */
     .bat-group {
       cursor: pointer;
-      animation: batFlight 4.2s ease-in-out infinite;
+      transform-origin: 605px 235px;
+      animation: batSwoopIdle 4.8s ease-in-out infinite;
     }
-    @keyframes batFlight {
-      0%, 100% { transform: translate(0px, 0px) rotate(-2deg); }
-      25% { transform: translate(18px, -22px) rotate(4deg); }
-      50% { transform: translate(0px, -10px) rotate(1deg); }
-      75% { transform: translate(-20px, -24px) rotate(-5deg); }
+    .bat-group.state-chase {
+      animation: batChasePopcorn 2.2s ease-in-out infinite;
     }
-    .bat-wing-l {
-      transform-origin: 575px 258px;
-      animation: wingFlapL 0.42s ease-in-out infinite alternate;
+    .bat-group.state-flip {
+      animation: batHappyFlip 1.15s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .bat-wing-r {
-      transform-origin: 635px 258px;
-      animation: wingFlapR 0.42s ease-in-out infinite alternate;
-    }
-    @keyframes wingFlapL {
-      0% { transform: rotate(-14deg) scaleX(0.95); }
-      100% { transform: rotate(22deg) scaleX(1.04); }
-    }
-    @keyframes wingFlapR {
-      0% { transform: rotate(14deg) scaleX(0.95); }
-      100% { transform: rotate(-22deg) scaleX(1.04); }
-    }
-    .bat-eyes {
-      transform-origin: 605px 248px;
-      animation: blinkEyes 4.6s ease-in-out infinite;
+    .bat-group.state-perch {
+      animation: batPerchBounce 1.8s ease-in-out infinite;
     }
 
-    /* Skunk & Popcorn Animations */
+    @keyframes batSwoopIdle {
+      0%, 100% { transform: translate(0px, 0px) rotate(-3deg); }
+      25% { transform: translate(42px, -24px) rotate(6deg); }
+      50% { transform: translate(8px, 8px) rotate(-1deg); }
+      75% { transform: translate(-44px, -20px) rotate(-7deg); }
+    }
+    @keyframes batChasePopcorn {
+      0%, 100% { transform: translate(40px, 16px) rotate(6deg) scale(1.04); }
+      35% { transform: translate(135px, 68px) rotate(-12deg) scale(1.08); }
+      70% { transform: translate(75px, -14px) rotate(10deg) scale(1); }
+    }
+    @keyframes batHappyFlip {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      45% { transform: translate(18px, -36px) rotate(195deg) scale(1.12); }
+      100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+    }
+    @keyframes batPerchBounce {
+      0%, 100% { transform: translate(-18px, 84px) rotate(0deg); }
+      50% { transform: translate(-18px, 70px) rotate(3deg); }
+    }
+
+    .bat-wing-l {
+      transform-origin: 572px 248px;
+      animation: wingFlapL 0.36s ease-in-out infinite alternate;
+    }
+    .bat-wing-r {
+      transform-origin: 638px 248px;
+      animation: wingFlapR 0.36s ease-in-out infinite alternate;
+    }
+    @keyframes wingFlapL {
+      0% { transform: rotate(-16deg) scaleX(0.95); }
+      100% { transform: rotate(24deg) scaleX(1.05); }
+    }
+    @keyframes wingFlapR {
+      0% { transform: rotate(16deg) scaleX(0.95); }
+      100% { transform: rotate(-24deg) scaleX(1.05); }
+    }
+    .bat-eyes {
+      transform-origin: 605px 226px;
+      animation: blinkEyes 4.4s ease-in-out infinite;
+    }
+    .bat-feet {
+      transform-origin: 605px 282px;
+      animation: feetKick 0.7s ease-in-out infinite alternate;
+    }
+    @keyframes feetKick {
+      0% { transform: rotate(-6deg); }
+      100% { transform: rotate(7deg); }
+    }
+    .bat-mouth-talk-origin { transform-origin: 605px 248px; }
+
+    /* ---------- POPPYDASH THE SKUNK (MAN — PHYSICAL COMEDY) ---------- */
     .skunk-group {
       cursor: pointer;
-      transform-origin: 865px 470px;
+      transform-origin: 855px 465px;
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .skunk-group.state-wobble {
+      animation: skunkPanicWobble 0.65s ease-in-out infinite;
+    }
+    @keyframes skunkPanicWobble {
+      0%, 100% { transform: rotate(-5deg) translateX(-4px); }
+      50% { transform: rotate(8deg) translateX(8px) translateY(-4px); }
+    }
+    .skunk-group.state-fall {
+      transform: translate(32px, 152px) rotate(-102deg);
+      transition: transform 0.58s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+    .skunk-group.state-recover {
+      transform: translate(12px, 84px) rotate(-6deg) scale(0.96);
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .skunk-group.react {
       animation: charPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+
     .skunk-tail {
-      transform-origin: 930px 475px;
-      animation: skunkTailBob 2.8s ease-in-out infinite;
+      transform-origin: 906px 476px;
+      animation: skunkTailBob 2.6s ease-in-out infinite;
     }
     @keyframes skunkTailBob {
       0%, 100% { transform: rotate(-3deg); }
-      50% { transform: rotate(6deg); }
+      50% { transform: rotate(7deg); }
     }
     .skunk-eyes {
-      transform-origin: 855px 362px;
+      transform-origin: 854px 356px;
       animation: blinkEyes 3.9s ease-in-out infinite;
     }
-    .popcorn-juggle {
-      transform-origin: 830px 475px;
-      animation: popcornWobble 2.6s ease-in-out infinite;
+    .skunk-mouth-talk-origin { transform-origin: 854px 388px; }
+
+    /* Dizzy stars & nose kernel during/after fall */
+    .dizzy-stars {
+      opacity: 0;
+      transform-origin: 854px 295px;
+      transition: opacity 0.25s ease;
     }
+    .skunk-group.state-fall .dizzy-stars {
+      opacity: 1;
+      animation: spinStars 1.4s linear infinite;
+    }
+    @keyframes spinStars {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .nose-kernel {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .skunk-group.state-recover .nose-kernel {
+      opacity: 1;
+    }
+
+    /* Popcorn Bucket & Spill Physics */
+    .popcorn-juggle {
+      transform-origin: 825px 465px;
+      animation: popcornWobble 2.2s ease-in-out infinite;
+      transition: transform 0.5s ease, opacity 0.35s ease;
+    }
+    .skunk-group.state-wobble .popcorn-juggle {
+      animation: popcornWildWobble 0.45s ease-in-out infinite alternate;
+    }
+    .skunk-group.state-fall .popcorn-juggle {
+      animation: none;
+      transform: translate(-115px, -65px) rotate(-145deg);
+    }
+    .skunk-group.state-recover .popcorn-juggle {
+      animation: none;
+      opacity: 0.25;
+      transform: translate(-30px, 75px) rotate(-20deg) scale(0.8);
+    }
+
     @keyframes popcornWobble {
       0%, 100% { transform: rotate(-3deg) translateY(0px); }
-      30% { transform: rotate(5deg) translateY(-5px); }
-      55% { transform: rotate(-11deg) translateY(3px); }
-      75% { transform: rotate(8deg) translateY(-6px); }
+      50% { transform: rotate(6deg) translateY(-5px); }
+    }
+    @keyframes popcornWildWobble {
+      0% { transform: rotate(-16deg) translate(-6px, -4px); }
+      100% { transform: rotate(18deg) translate(8px, -10px); }
     }
 
-    .kernel-1 { animation: kernelArc1 2.6s ease-in-out infinite; }
-    .kernel-2 { animation: kernelArc2 2.6s ease-in-out infinite 0.35s; }
-    .kernel-3 { animation: kernelArc3 2.6s ease-in-out infinite 0.7s; }
+    /* Big Popcorn Shower FX */
+    .spill-shower {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .spill-shower.active {
+      opacity: 1;
+    }
+    .spill-shower.active .shower-k {
+      animation-duration: 1.45s;
+      animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+      animation-fill-mode: forwards;
+    }
+    .spill-shower.active .sk1 { animation-name: showerFly1; }
+    .spill-shower.active .sk2 { animation-name: showerFly2; }
+    .spill-shower.active .sk3 { animation-name: showerFly3; }
+    .spill-shower.active .sk4 { animation-name: showerFly4; }
+    .spill-shower.active .sk5 { animation-name: showerFly5; }
+    .spill-shower.active .sk6 { animation-name: showerFly6; }
+    .spill-shower.active .sk7 { animation-name: showerFly7; }
+    .spill-shower.active .sk8 { animation-name: showerFly8; }
+    .spill-shower.active .sk9 { animation-name: showerFly9; }
+    .spill-shower.active .sk10 { animation-name: showerFly10; }
 
-    @keyframes kernelArc1 {
-      0%, 20% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-      30% { opacity: 1; }
-      65% { transform: translate(-45px, -68px) rotate(160deg); opacity: 1; }
-      92% { transform: translate(-75px, 65px) rotate(310deg); opacity: 1; }
-      100% { transform: translate(-80px, 72px) rotate(330deg); opacity: 0; }
+    @keyframes showerFly1 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(-155px, -170px) rotate(180deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(-245px, 165px) rotate(360deg) scale(1); opacity: 1; }
     }
-    @keyframes kernelArc2 {
-      0%, 20% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-      30% { opacity: 1; }
-      60% { transform: translate(28px, -78px) rotate(-140deg); opacity: 1; }
-      92% { transform: translate(48px, 68px) rotate(-290deg); opacity: 1; }
-      100% { transform: translate(52px, 74px) rotate(-310deg); opacity: 0; }
+    @keyframes showerFly2 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(-95px, -210px) rotate(-150deg) scale(1.15); opacity: 1; }
+      100% { transform: translate(-140px, 180px) rotate(-320deg) scale(1); opacity: 1; }
     }
-    @keyframes kernelArc3 {
-      0%, 25% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-      35% { opacity: 1; }
-      65% { transform: translate(-12px, -88px) rotate(120deg); opacity: 1; }
-      95% { transform: translate(-22px, 54px) rotate(240deg); opacity: 1; }
-      100% { transform: translate(-24px, 60px) rotate(260deg); opacity: 0; }
+    @keyframes showerFly3 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(-35px, -230px) rotate(120deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(-55px, 195px) rotate(280deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly4 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(35px, -195px) rotate(-140deg) scale(1.15); opacity: 1; }
+      100% { transform: translate(65px, 210px) rotate(-300deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly5 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(115px, -165px) rotate(200deg) scale(1.05); opacity: 1; }
+      100% { transform: translate(170px, 200px) rotate(380deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly6 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(-215px, -125px) rotate(-180deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(-340px, 145px) rotate(-350deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly7 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(-120px, -150px) rotate(140deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(-185px, 75px) rotate(290deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly8 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(10px, -140px) rotate(-110deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(20px, 90px) rotate(-250deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly9 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(90px, -130px) rotate(160deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(120px, 130px) rotate(320deg) scale(1); opacity: 1; }
+    }
+    @keyframes showerFly10 {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+      45% { transform: translate(-295px, -145px) rotate(170deg) scale(1.1); opacity: 1; }
+      100% { transform: translate(-420px, 125px) rotate(340deg) scale(1); opacity: 1; }
     }
 
     .sweat-drop {
-      animation: sweatPulse 2.6s ease-in-out infinite;
+      animation: sweatPulse 2.4s ease-in-out infinite;
     }
     @keyframes sweatPulse {
       0%, 40%, 100% { opacity: 0; transform: translateY(-4px); }
@@ -386,14 +635,15 @@
 
     @media (max-width: 640px) {
       .speech-bubble {
-        max-width: 36%;
+        max-width: 38%;
         padding: 7px 10px;
         border-width: 2px;
         border-radius: 13px;
       }
-      #bubble-fox { left: 24%; top: 18%; }
-      #bubble-bat { left: 52%; top: 6%; }
-      #bubble-skunk { left: 77%; top: 18%; }
+      #bubble-fox { left: 25%; top: 15%; }
+      #bubble-bat { left: 52%; top: 5%; }
+      #bubble-skunk { left: 76%; top: 15%; }
+      #bubble-skunk.low-pose { left: 76%; top: 42%; }
     }
   </style>
 </head>
@@ -402,11 +652,13 @@
     <header class="header-bar">
       <div class="title-group">
         <h1>Movie Night!</h1>
-        <p>Click any character or use the controls to follow their movie-night banter.</p>
+        <p>Starring Sunny Fox, Luna Bat &amp; PoppyDash — click any character or trigger the popcorn spill!</p>
       </div>
       <div class="controls">
         <button id="btn-prev" class="btn" type="button">Prev</button>
         <button id="btn-next" class="btn primary" type="button">Next Line</button>
+        <button id="btn-spill" class="btn accent" type="button">Spill Popcorn!</button>
+        <button id="btn-voice" class="btn" type="button">Voices: On</button>
         <button id="btn-toggle" class="btn" type="button">Pause</button>
         <button id="btn-replay" class="btn" type="button">Replay</button>
       </div>
@@ -427,8 +679,16 @@
             <stop offset="0%" stop-color="#2ec4b6" />
             <stop offset="100%" stop-color="#1b9aaa" />
           </linearGradient>
+          <linearGradient id="foxFurGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff8c42" />
+            <stop offset="100%" stop-color="#f26419" />
+          </linearGradient>
+          <linearGradient id="batWingGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#9b5de5" />
+            <stop offset="100%" stop-color="#6a1b9a" />
+          </linearGradient>
           <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#ffd166" stop-opacity="0.55" />
+            <stop offset="0%" stop-color="#ffd166" stop-opacity="0.58" />
             <stop offset="100%" stop-color="#ffd166" stop-opacity="0" />
           </radialGradient>
         </defs>
@@ -437,7 +697,6 @@
         <rect x="0" y="0" width="1200" height="530" fill="url(#wallGrad)" />
         <rect x="0" y="518" width="1200" height="16" fill="#2c204a" stroke="#1e1b2e" stroke-width="4" />
         <rect x="0" y="534" width="1200" height="206" fill="url(#floorGrad)" />
-        <!-- Floorboard lines -->
         <g stroke="#3a2214" stroke-width="3" opacity="0.55">
           <line x1="0" y1="585" x2="1200" y2="585" />
           <line x1="0" y1="645" x2="1200" y2="645" />
@@ -464,12 +723,10 @@
         <!-- Wall Shelf & Plant (Right) -->
         <g transform="translate(940, 145)">
           <rect x="0" y="65" width="170" height="18" rx="7" fill="#d48c46" stroke="#1e1b2e" stroke-width="4" />
-          <!-- Potted Plant -->
           <path d="M26,65 L34,26 L68,26 L76,65 Z" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3.5" />
           <path d="M51,26 C35,5 20,14 34,28" fill="#52b788" stroke="#1e1b2e" stroke-width="3.5" />
           <path d="M51,26 C52,0 72,2 64,26" fill="#74c69d" stroke="#1e1b2e" stroke-width="3.5" />
           <path d="M51,26 C68,12 85,22 68,32" fill="#40916c" stroke="#1e1b2e" stroke-width="3.5" />
-          <!-- Film Reel -->
           <circle cx="128" cy="36" r="28" fill="#adb5bd" stroke="#1e1b2e" stroke-width="3.5" />
           <circle cx="128" cy="36" r="8" fill="#1e1b2e" />
           <circle cx="128" cy="18" r="5" fill="#2b2248" />
@@ -497,187 +754,282 @@
         <ellipse cx="98" cy="576" rx="34" ry="11" fill="#3a3356" stroke="#1e1b2e" stroke-width="4" />
         <polygon points="56,374 140,374 124,310 72,310" fill="#ffd166" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
 
-        <!-- Plush Living Room Couch (Backrest & Cushions) -->
+        <!-- Plush Living Room Couch (Back, Cushions & Armrests) -->
         <g id="couch">
-          <!-- Wooden legs -->
           <rect x="212" y="574" width="22" height="32" rx="6" fill="#5c3721" stroke="#1e1b2e" stroke-width="4" />
           <rect x="966" y="574" width="22" height="32" rx="6" fill="#5c3721" stroke="#1e1b2e" stroke-width="4" />
           <!-- Backrest -->
-          <rect x="195" y="348" width="810" height="175" rx="44" fill="url(#sofaGrad)" stroke="#1e1b2e" stroke-width="5" />
-          <!-- Backrest seam -->
-          <line x1="600" y1="364" x2="600" y2="486" stroke="#157a85" stroke-width="4" stroke-linecap="round" />
-          <!-- Throw Pillow (Left) -->
-          <rect x="235" y="405" width="76" height="72" rx="18" transform="rotate(-10 273 441)" fill="#ffd166" stroke="#1e1b2e" stroke-width="4" />
-          <!-- Throw Pillow (Center) -->
-          <rect x="556" y="408" width="74" height="68" rx="18" transform="rotate(7 593 442)" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="4" />
-        </g>
-
-        <!-- ==================== CHARACTER 1: SUAVE FOX ==================== -->
-        <g id="char-fox" class="fox-group">
-          <!-- Bushy Swaying Tail -->
-          <g class="fox-tail">
-            <path d="M242,486 C168,462 146,385 198,354 C232,334 256,382 252,440 Z" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <path d="M174,384 C178,360 198,350 218,358 C222,374 206,392 184,394 Z" fill="#fff3df" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
-          </g>
-
-          <!-- Fox Body (lounging confidently) -->
-          <path d="M262,488 C258,425 288,392 332,394 C376,396 394,435 388,494 Z" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- Cream Chest -->
-          <path d="M302,402 C328,402 350,425 352,486 L296,486 C292,445 294,415 302,402 Z" fill="#fff3df" stroke="#1e1b2e" stroke-width="3.5" />
-          <!-- Relaxed Arm on Cushion -->
-          <path d="M276,435 C255,442 246,466 266,474 C284,480 296,465 295,448" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" stroke-linecap="round" />
-          <path d="M364,432 C388,442 406,464 388,478 C374,488 358,474 358,456" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" stroke-linecap="round" />
-
-          <!-- Fox Head -->
-          <g>
-            <!-- Left Ear -->
-            <polygon points="282,334 268,266 322,304" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <polygon points="286,322 278,282 312,306" fill="#2e243d" />
-            <!-- Right Ear (twitches) -->
-            <g class="fox-ear-r">
-              <polygon points="342,304 390,264 378,334" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-              <polygon points="348,306 380,280 372,322" fill="#2e243d" />
-            </g>
-            <!-- Head Shape -->
-            <path d="M268,354 C268,310 302,294 332,294 C362,294 394,310 394,354 C394,394 356,412 332,412 C308,412 268,394 268,354 Z" fill="#ff7a2f" stroke="#1e1b2e" stroke-width="4.5" />
-            <!-- Cream Cheeks -->
-            <path d="M270,360 C292,356 312,374 332,410 C298,410 272,390 270,360 Z" fill="#fff3df" stroke="#1e1b2e" stroke-width="3.5" />
-            <path d="M392,360 C370,356 350,374 332,410 C366,410 390,390 392,360 Z" fill="#fff3df" stroke="#1e1b2e" stroke-width="3.5" />
-            <!-- Suave Eyes & Brows -->
-            <path d="M294,344 L314,348" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
-            <path d="M348,348 L368,342" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
-            <circle cx="306" cy="360" r="8" fill="#1e1b2e" />
-            <circle cx="308" cy="357" r="2.8" fill="#ffffff" />
-            <g class="fox-wink-eye">
-              <circle cx="356" cy="360" r="8" fill="#1e1b2e" />
-              <circle cx="358" cy="357" r="2.8" fill="#ffffff" />
-            </g>
-            <!-- Nose & Cool Half-Smile -->
-            <ellipse cx="332" cy="382" rx="8" ry="6" fill="#1e1b2e" />
-            <path d="M322,394 Q336,401 350,390" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
-          </g>
-        </g>
-
-        <!-- ==================== CHARACTER 2: EXCITED PURPLE BAT ==================== -->
-        <g id="char-bat" class="bat-group">
-          <!-- Left Wing -->
-          <g class="bat-wing-l">
-            <path d="M582,255 C540,218 492,226 488,266 C506,264 516,274 522,286 C536,276 548,282 554,294 C568,282 578,278 584,274 Z" fill="#7b2cbf" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          </g>
-          <!-- Right Wing -->
-          <g class="bat-wing-r">
-            <path d="M628,255 C670,218 718,226 722,266 C704,264 694,274 688,286 C674,276 662,282 656,294 C642,282 632,278 626,274 Z" fill="#7b2cbf" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          </g>
-          <!-- Bat Ears -->
-          <polygon points="576,228 564,184 598,212" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          <polygon points="579,222 572,195 593,213" fill="#f497da" />
-          <polygon points="634,228 646,184 612,212" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          <polygon points="631,222 638,195 617,213" fill="#f497da" />
-          <!-- Bat Chubby Body -->
-          <ellipse cx="605" cy="260" rx="34" ry="38" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" />
-          <ellipse cx="605" cy="272" rx="20" ry="20" fill="#c77dff" />
-          <!-- Cute Feet -->
-          <path d="M590,295 L584,307 M596,296 L596,308 M614,296 L614,308 M620,295 L626,307" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
-          <!-- Wide Excited Eyes -->
-          <g class="bat-eyes">
-            <circle cx="590" cy="248" r="11" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="592" cy="248" r="6" fill="#1e1b2e" />
-            <circle cx="594" cy="245" r="2.5" fill="#ffffff" />
-            <circle cx="620" cy="248" r="11" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="618" cy="248" r="6" fill="#1e1b2e" />
-            <circle cx="620" cy="245" r="2.5" fill="#ffffff" />
-          </g>
-          <!-- Rosy Cheeks & Happy Fang Smile -->
-          <ellipse cx="576" cy="260" rx="6" ry="3.5" fill="#ff70a6" opacity="0.75" />
-          <ellipse cx="634" cy="260" rx="6" ry="3.5" fill="#ff70a6" opacity="0.75" />
-          <path d="M593,266 Q605,279 617,266 Z" fill="#1e1b2e" stroke="#1e1b2e" stroke-width="2" />
-          <polygon points="597,267 600,273 603,267" fill="#ffffff" />
-          <polygon points="607,267 610,273 613,267" fill="#ffffff" />
-        </g>
-
-        <!-- ==================== CHARACTER 3: CLUMSY SKUNK WITH POPCORN ==================== -->
-        <g id="char-skunk" class="skunk-group">
-          <!-- Fluffy Striped Tail -->
-          <g class="skunk-tail">
-            <path d="M908,484 C974,475 1012,415 992,356 C978,318 932,318 918,358 C904,398 920,445 900,478 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <path d="M956,334 C974,344 982,374 966,412 C950,448 930,466 914,474 C926,442 930,390 956,334 Z" fill="#fafafa" />
-          </g>
-
-          <!-- Skunk Body -->
-          <path d="M792,492 C788,430 818,396 862,396 C906,396 924,435 918,494 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" />
-          <ellipse cx="855" cy="450" rx="24" ry="36" fill="#fafafa" />
-
-          <!-- Skunk Head -->
-          <circle cx="812" cy="332" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-          <circle cx="896" cy="332" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-          <ellipse cx="854" cy="362" rx="48" ry="44" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- White Nose Stripe -->
-          <path d="M854,318 C840,322 838,356 832,376 C844,386 864,386 876,376 C870,356 868,322 854,318 Z" fill="#fafafa" />
-          <!-- Nervous / Goofy Eyes -->
-          <g class="skunk-eyes">
-            <circle cx="834" cy="360" r="10" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="836" cy="362" r="4.8" fill="#1e1b2e" />
-            <circle cx="874" cy="360" r="10" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="872" cy="358" r="4.8" fill="#1e1b2e" />
-          </g>
-          <!-- Nervous Brows & Sheepish Mouth -->
-          <path d="M822,344 Q834,339 842,345" fill="none" stroke="#fafafa" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M866,345 Q874,339 886,344" fill="none" stroke="#fafafa" stroke-width="3.5" stroke-linecap="round" />
-          <ellipse cx="854" cy="378" rx="7" ry="5" fill="#ff70a6" stroke="#1e1b2e" stroke-width="2.5" />
-          <path d="M843,391 Q854,386 865,392" fill="none" stroke="#fafafa" stroke-width="3.2" stroke-linecap="round" />
-          <!-- Sheepish Blush & Sweat Drop -->
-          <ellipse cx="822" cy="376" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
-          <ellipse cx="886" cy="376" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
-          <path class="sweat-drop" d="M897,340 C904,352 904,360 897,360 C890,360 890,352 897,340 Z" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2.5" />
-
-          <!-- Juggled Popcorn Bucket -->
-          <g class="popcorn-juggle">
-            <!-- Flying Popcorn Kernels -->
-            <g class="kernel-1">
-              <circle cx="820" cy="435" r="8" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
-              <circle cx="826" cy="431" r="6" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" />
-            </g>
-            <g class="kernel-2">
-              <circle cx="848" cy="432" r="8" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
-              <circle cx="842" cy="428" r="6" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" />
-            </g>
-            <g class="kernel-3">
-              <circle cx="834" cy="428" r="7" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" />
-            </g>
-
-            <!-- Popcorn Mound -->
-            <circle cx="810" cy="442" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="832" cy="434" r="16" fill="#ffd166" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="854" cy="442" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="822" cy="448" r="13" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
-            <circle cx="844" cy="448" r="13" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
-
-            <!-- Red & White Striped Bucket -->
-            <polygon points="794,450 870,450 858,522 806,522" fill="#fafafa" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <polygon points="808,450 822,450 818,522 808,522" fill="#ef233c" />
-            <polygon points="840,450 854,450 848,522 836,522" fill="#ef233c" />
-            <polygon points="794,450 870,450 858,522 806,522" fill="none" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <!-- Clumsy Paws Holding Bucket -->
-            <ellipse cx="794" cy="482" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-            <ellipse cx="870" cy="476" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-          </g>
-        </g>
-
-        <!-- Couch Seat Cushions & Armrests (Foreground) -->
-        <g id="couch-foreground">
+          <rect x="195" y="346" width="810" height="175" rx="44" fill="url(#sofaGrad)" stroke="#1e1b2e" stroke-width="5" />
+          <line x1="600" y1="362" x2="600" y2="484" stroke="#157a85" stroke-width="4" stroke-linecap="round" />
+          <!-- Seat Cushions -->
           <rect x="218" y="484" width="382" height="72" rx="22" fill="#38d4c5" stroke="#1e1b2e" stroke-width="4.5" />
           <rect x="600" y="484" width="382" height="72" rx="22" fill="#38d4c5" stroke="#1e1b2e" stroke-width="4.5" />
+          <!-- Armrests & Base -->
           <rect x="176" y="418" width="64" height="156" rx="28" fill="#2ec4b6" stroke="#1e1b2e" stroke-width="5" />
           <rect x="960" y="418" width="64" height="156" rx="28" fill="#2ec4b6" stroke="#1e1b2e" stroke-width="5" />
           <rect x="195" y="544" width="810" height="36" rx="14" fill="#1b9aaa" stroke="#1e1b2e" stroke-width="4.5" />
+          <!-- Throw Pillows -->
+          <rect x="236" y="412" width="76" height="70" rx="18" transform="rotate(-12 274 447)" fill="#ffd166" stroke="#1e1b2e" stroke-width="4" />
+          <rect x="556" y="412" width="74" height="68" rx="18" transform="rotate(7 593 446)" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="4" />
+          <!-- Contact Shadows on Cushions -->
+          <ellipse cx="330" cy="510" rx="68" ry="12" fill="#136f79" opacity="0.45" />
+          <ellipse cx="855" cy="510" rx="66" ry="12" fill="#136f79" opacity="0.45" />
         </g>
 
-        <!-- Stray Fallen Popcorn Kernels on Couch & Floor -->
-        <g>
-          <circle cx="715" cy="524" r="7" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
-          <circle cx="722" cy="521" r="5" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" />
-          <circle cx="745" cy="635" r="7" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" />
-          <circle cx="785" cy="652" r="6" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
+        <!-- ==================== CHARACTER 1: SUNNY FOX (WOMAN) ==================== -->
+        <g id="char-fox" class="fox-group">
+          <!-- Lush Multi-Tone Swaying Tail -->
+          <g class="fox-tail">
+            <path d="M262,492 C176,472 140,388 192,348 C228,322 262,368 258,438 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M174,382 C176,354 198,342 222,350 C226,370 208,392 182,394 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
+            <!-- Fur highlight arc -->
+            <path d="M188,434 C180,414 184,394 196,382" fill="none" stroke="#ffad69" stroke-width="5" stroke-linecap="round" opacity="0.7" />
+          </g>
+
+          <!-- Seated Legs & Paws on Cushion -->
+          <ellipse cx="304" cy="498" rx="22" ry="14" fill="#2e243d" stroke="#1e1b2e" stroke-width="4" />
+          <ellipse cx="362" cy="498" rx="22" ry="14" fill="#2e243d" stroke="#1e1b2e" stroke-width="4" />
+          <circle cx="298" cy="500" r="3" fill="#ffad69" />
+          <circle cx="306" cy="500" r="3" fill="#ffad69" />
+          <circle cx="358" cy="500" r="3" fill="#ffad69" />
+          <circle cx="366" cy="500" r="3" fill="#ffad69" />
+
+          <!-- Sleek Body & Cozy Berry Cardigan -->
+          <path d="M272,496 C270,432 296,396 332,396 C368,396 394,432 390,496 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" />
+          <!-- Fluffy Cream Chest Ruff -->
+          <path d="M308,402 C328,400 346,418 346,478 L314,478 C306,450 304,420 308,402 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" />
+          <!-- Stylish Plum Cardigan Lapels -->
+          <path d="M286,404 C272,424 270,468 274,494 L308,494 C304,458 302,424 306,402 Z" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
+          <path d="M376,404 C390,424 392,468 388,494 L354,494 C358,458 360,424 356,402 Z" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
+          <!-- Golden Sun Lapel Pin -->
+          <circle cx="292" cy="434" r="7" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
+
+          <!-- Left Relaxed Arm -->
+          <path d="M278,426 C252,442 252,470 274,476 C288,480 298,468 295,452" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
+          <circle cx="276" cy="470" r="10" fill="#2e243d" stroke="#1e1b2e" stroke-width="3.5" />
+
+          <!-- Right Expressive Gesture Arm -->
+          <g class="fox-gesture-arm">
+            <path d="M378,424 C402,436 410,458 394,470 C382,478 368,466 368,450" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
+            <circle cx="394" cy="462" r="10" fill="#2e243d" stroke="#1e1b2e" stroke-width="3.5" />
+          </g>
+
+          <!-- Sunny Fox Head -->
+          <g>
+            <!-- Left Ear + Gold Ear Stud -->
+            <polygon points="282,332 266,260 322,302" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <polygon points="287,320 276,276 314,304" fill="#2e243d" />
+            <path d="M286,314 Q295,302 304,312" fill="none" stroke="#fff5e4" stroke-width="3" stroke-linecap="round" />
+            <circle cx="272" cy="304" r="4.5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+
+            <!-- Right Ear (Twitches) -->
+            <g class="fox-ear-r">
+              <polygon points="342,302 394,258 380,332" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <polygon points="348,304 384,274 374,320" fill="#2e243d" />
+              <path d="M358,312 Q367,302 374,314" fill="none" stroke="#fff5e4" stroke-width="3" stroke-linecap="round" />
+            </g>
+
+            <!-- Head Contour with Cheek Fur Tufts -->
+            <path d="M266,352 C264,310 298,292 332,292 C366,292 400,310 398,352 L408,360 L394,370 C386,396 356,412 332,412 C308,412 278,396 270,370 L256,360 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <!-- Cream Cheek Fur -->
+            <path d="M262,360 C288,354 312,372 332,410 C296,410 272,390 262,360 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" stroke-linejoin="round" />
+            <path d="M402,360 C376,354 352,372 332,410 C368,410 392,390 402,360 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" stroke-linejoin="round" />
+            <!-- Rosy Cheek Blush -->
+            <ellipse cx="290" cy="376" rx="8" ry="4.5" fill="#ff758f" opacity="0.5" />
+            <ellipse cx="374" cy="376" rx="8" ry="4.5" fill="#ff758f" opacity="0.5" />
+
+            <!-- Expressive Woman Eyes with Eyelashes, Warm Upper Lid & Catchlights -->
+            <path d="M291,337 Q305,330 318,337" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+            <path d="M346,337 Q359,330 373,337" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+            <!-- Left Eye -->
+            <ellipse cx="306" cy="354" rx="10" ry="8.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="308" cy="354" r="5.5" fill="#1b9aaa" />
+            <circle cx="308" cy="354" r="3.2" fill="#1e1b2e" />
+            <circle cx="310" cy="351" r="2" fill="#ffffff" />
+            <path d="M294,350 Q306,343 317,350" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+            <path d="M294,349 L288,343 M297,346 L293,340" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+            <!-- Right Eye (Winks) -->
+            <g class="fox-wink-eye">
+              <ellipse cx="358" cy="354" rx="10" ry="8.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="356" cy="354" r="5.5" fill="#1b9aaa" />
+              <circle cx="356" cy="354" r="3.2" fill="#1e1b2e" />
+              <circle cx="358" cy="351" r="2" fill="#ffffff" />
+              <path d="M347,350 Q358,343 370,350" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+              <path d="M370,349 L376,343 M367,346 L371,340" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+            </g>
+
+            <!-- Nose & Animated Speaking Mouth -->
+            <ellipse cx="332" cy="376" rx="7.5" ry="5.5" fill="#1e1b2e" />
+            <ellipse cx="330" cy="374.5" rx="2.5" ry="1.5" fill="#ffffff" opacity="0.7" />
+            <path class="mouth-idle" d="M320,388 Q334,398 349,386" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+            <ellipse class="mouth-talking fox-mouth-talk-origin" cx="332" cy="390" rx="7" ry="5.5" fill="#9e2a2b" stroke="#1e1b2e" stroke-width="3" />
+          </g>
+        </g>
+
+        <!-- ==================== CHARACTER 2: LUNA BAT (GIRL — EXTRA CUTE) ==================== -->
+        <g id="char-bat" class="bat-group">
+          <!-- Left Wing (Scalloped & Highlighted) -->
+          <g class="bat-wing-l">
+            <path d="M572,248 C528,208 476,220 478,262 C496,258 506,268 514,282 C528,270 542,276 548,288 C562,276 572,272 578,266 Z" fill="url(#batWingGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M566,252 C536,226 502,232 496,254" fill="none" stroke="#c77dff" stroke-width="3.5" stroke-linecap="round" opacity="0.75" />
+          </g>
+          <!-- Right Wing -->
+          <g class="bat-wing-r">
+            <path d="M638,248 C682,208 734,220 732,262 C714,258 704,268 696,282 C682,270 668,276 662,288 C648,276 638,272 632,266 Z" fill="url(#batWingGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M644,252 C674,226 708,232 714,254" fill="none" stroke="#c77dff" stroke-width="3.5" stroke-linecap="round" opacity="0.75" />
+          </g>
+
+          <!-- Cute Little Feet -->
+          <g class="bat-feet">
+            <path d="M590,282 L584,296 M595,283 L595,297 M615,283 L615,297 M620,282 L626,296" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
+          </g>
+
+          <!-- Chibi Plump Torso & Fluffy Collar Ruff -->
+          <ellipse cx="605" cy="260" rx="28" ry="26" fill="#8b46d9" stroke="#1e1b2e" stroke-width="4.5" />
+          <ellipse cx="605" cy="265" rx="17" ry="15" fill="#e0aaff" />
+          <!-- Fluffy Neck Ruff -->
+          <path d="M578,245 Q588,260 598,248 Q605,262 612,248 Q622,260 632,245 Z" fill="#fff0fb" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
+          <!-- Tiny Cute Waving Paws -->
+          <circle cx="578" cy="262" r="7" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" />
+          <circle cx="632" cy="262" r="7" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" />
+
+          <!-- Big Fuzzy Ears + Coral-Pink Hair Bow -->
+          <path d="M570,206 Q550,158 556,156 Q562,154 596,188 Z" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+          <path d="M573,200 Q560,168 563,166 Q566,164 590,190 Z" fill="#ff9ebb" />
+          <path d="M640,206 Q660,158 654,156 Q648,154 614,188 Z" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+          <path d="M637,200 Q650,168 647,166 Q644,164 620,190 Z" fill="#ff9ebb" />
+
+          <!-- Cute Coral-Pink Bow on Right Ear -->
+          <g transform="translate(632, 184) rotate(16)">
+            <path d="M0,0 L-15,-9 L-14,9 Z" fill="#ff6b9d" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
+            <path d="M0,0 L15,-9 L14,9 Z" fill="#ff6b9d" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
+            <circle cx="0" cy="0" r="5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
+          </g>
+
+          <!-- Big Round Chibi Head -->
+          <ellipse cx="605" cy="222" rx="42" ry="37" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" />
+          <!-- Forehead Cute Hair Tuft -->
+          <path d="M598,186 Q605,174 612,186" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+
+          <!-- Huge Sparkly Chibi Eyes -->
+          <g class="bat-eyes">
+            <!-- Left Eye -->
+            <circle cx="586" cy="222" r="14" fill="#1e1b2e" />
+            <circle cx="586" cy="224" r="10.5" fill="#5a189a" />
+            <circle cx="586" cy="222" r="7" fill="#1e1b2e" />
+            <circle cx="582" cy="217" r="4.5" fill="#ffffff" />
+            <circle cx="591" cy="227" r="2.2" fill="#ffffff" />
+            <path d="M572,216 L567,211" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+            <!-- Right Eye -->
+            <circle cx="624" cy="222" r="14" fill="#1e1b2e" />
+            <circle cx="624" cy="224" r="10.5" fill="#5a189a" />
+            <circle cx="624" cy="222" r="7" fill="#1e1b2e" />
+            <circle cx="620" cy="217" r="4.5" fill="#ffffff" />
+            <circle cx="629" cy="227" r="2.2" fill="#ffffff" />
+            <path d="M638,216 L643,211" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+          </g>
+
+          <!-- Soft Rosy Cheeks & Cute Button Nose -->
+          <ellipse cx="569" cy="236" rx="7.5" ry="4.5" fill="#ff75a0" opacity="0.8" />
+          <ellipse cx="641" cy="236" rx="7.5" ry="4.5" fill="#ff75a0" opacity="0.8" />
+          <ellipse cx="605" cy="233" rx="4.5" ry="3.2" fill="#ff8fab" stroke="#1e1b2e" stroke-width="2" />
+
+          <!-- Cute :3 Idle Smile & Talking Fang Mouth -->
+          <path class="mouth-idle" d="M594,242 Q600,248 605,241 Q610,248 616,242" fill="none" stroke="#1e1b2e" stroke-width="3" stroke-linecap="round" />
+          <g class="mouth-talking bat-mouth-talk-origin">
+            <path d="M593,242 Q605,258 617,242 Z" fill="#ff4d6d" stroke="#1e1b2e" stroke-width="2.8" stroke-linejoin="round" />
+            <polygon points="597,243 600,249 603,243" fill="#ffffff" />
+            <polygon points="607,243 610,249 613,243" fill="#ffffff" />
+          </g>
+        </g>
+
+        <!-- ==================== CHARACTER 3: POPPYDASH (SKUNK, MAN) ==================== -->
+        <g id="char-skunk" class="skunk-group">
+          <!-- Fluffy Two-Tone Tail -->
+          <g class="skunk-tail">
+            <path d="M908,484 C980,474 1020,408 996,346 C980,306 930,310 916,354 C902,398 920,445 900,478 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M956,326 C978,338 986,372 968,412 C952,448 932,466 914,474 C926,442 930,388 956,326 Z" fill="#fafafa" />
+          </g>
+
+          <!-- Legs & Paws (Kickable during fall!) -->
+          <ellipse cx="825" cy="500" rx="22" ry="13" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+          <ellipse cx="885" cy="500" rx="22" ry="13" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+
+          <!-- Body & Cozy Striped Lounge Shirt -->
+          <path d="M794,494 C790,428 820,396 862,396 C904,396 926,432 920,494 Z" fill="#3a5a9b" stroke="#1e1b2e" stroke-width="4.5" />
+          <!-- Shirt Stripes (neatly fitted inside torso) -->
+          <path d="M804,432 Q858,440 912,432 L916,440 Q858,448 801,440 Z" fill="#ffd166" />
+          <path d="M797,458 Q858,466 920,458 L921,466 Q858,474 795,466 Z" fill="#ffd166" />
+          <!-- Re-outline torso cleanly -->
+          <path d="M794,494 C790,428 820,396 862,396 C904,396 926,432 920,494 Z" fill="none" stroke="#1e1b2e" stroke-width="4.5" />
+          <!-- White Collar Trim -->
+          <path d="M832,398 Q856,416 882,398" fill="none" stroke="#fafafa" stroke-width="5" stroke-linecap="round" />
+
+          <!-- Head & Fur Tufts -->
+          <circle cx="812" cy="330" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+          <circle cx="812" cy="330" r="7" fill="#ff9ebb" opacity="0.65" />
+          <circle cx="896" cy="330" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+          <circle cx="896" cy="330" r="7" fill="#ff9ebb" opacity="0.65" />
+
+          <path d="M804,360 C804,328 826,314 854,314 C882,314 904,328 904,360 L912,368 L900,376 C892,398 874,408 854,408 C834,408 816,398 808,376 L796,368 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+          <!-- Bold White Nose Stripe -->
+          <path d="M854,316 C838,320 836,354 830,376 C842,388 866,388 878,376 C872,354 870,320 854,316 Z" fill="#fafafa" />
+
+          <!-- Expressive Goofy Eyes -->
+          <g class="skunk-eyes">
+            <circle cx="834" cy="356" r="10.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="836" cy="358" r="5" fill="#1e1b2e" />
+            <circle cx="838" cy="355" r="2" fill="#ffffff" />
+            <circle cx="874" cy="356" r="10.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="872" cy="354" r="5" fill="#1e1b2e" />
+            <circle cx="874" cy="351" r="2" fill="#ffffff" />
+          </g>
+
+          <!-- Thick Expressive Brows -->
+          <path d="M820,340 Q834,334 844,342" fill="none" stroke="#fafafa" stroke-width="4" stroke-linecap="round" />
+          <path d="M864,342 Q874,334 888,340" fill="none" stroke="#fafafa" stroke-width="4" stroke-linecap="round" />
+
+          <!-- Nose, Blush, Sweat Drop & Animated Mouth -->
+          <ellipse cx="854" cy="374" rx="7" ry="5" fill="#ff70a6" stroke="#1e1b2e" stroke-width="2.5" />
+          <ellipse cx="820" cy="374" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
+          <ellipse cx="888" cy="374" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
+          <path class="sweat-drop" d="M899,338 C906,350 906,358 899,358 C892,358 892,350 899,338 Z" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2.5" />
+
+          <path class="mouth-idle" d="M842,388 Q854,397 866,388" fill="none" stroke="#fafafa" stroke-width="3.5" stroke-linecap="round" />
+          <g class="mouth-talking skunk-mouth-talk-origin">
+            <ellipse cx="854" cy="390" rx="10" ry="7" fill="#d62828" stroke="#fafafa" stroke-width="2.5" />
+            <rect x="850" y="384" width="8" height="4" rx="1" fill="#ffffff" />
+          </g>
+
+          <!-- Stray Popcorn Kernel Perched on Nose during Recovery -->
+          <g class="nose-kernel" transform="translate(854, 366)">
+            <circle cx="-4" cy="0" r="6" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+            <circle cx="3" cy="-2" r="5" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" />
+          </g>
+
+          <!-- Dizzy Spinning Stars during Fall -->
+          <g class="dizzy-stars">
+            <polygon points="815,295 819,303 828,304 821,310 823,319 815,314 807,319 809,310 802,304 811,303" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+            <polygon points="888,288 891,294 898,295 893,299 894,306 888,302 882,306 883,299 878,295 885,294" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2" />
+            <polygon points="855,274 858,280 865,281 860,285 861,292 855,288 849,292 850,285 845,281 852,280" fill="#ff758f" stroke="#1e1b2e" stroke-width="2" />
+          </g>
+
+          <!-- Juggled Striped Popcorn Bucket -->
+          <g class="popcorn-juggle">
+            <circle cx="806" cy="436" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="830" cy="428" r="16" fill="#ffd166" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="854" cy="436" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="820" cy="444" r="13" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="844" cy="444" r="13" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
+
+            <polygon points="790,446 870,446 858,520 802,520" fill="#fafafa" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <polygon points="806,446 820,446 816,520 806,520" fill="#ef233c" />
+            <polygon points="838,446 852,446 846,520 834,520" fill="#ef233c" />
+            <polygon points="790,446 870,446 858,520 802,520" fill="none" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <!-- Clumsy Paws Holding Bucket -->
+            <ellipse cx="790" cy="478" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+            <ellipse cx="870" cy="472" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+          </g>
         </g>
 
         <!-- Coffee Table & Movie Snacks -->
@@ -699,6 +1051,20 @@
           <circle cx="304" cy="22" r="3" fill="#ffd166" />
           <circle cx="318" cy="22" r="3" fill="#5ce1e6" />
         </g>
+
+        <!-- Big Spilled Popcorn Shower FX -->
+        <g id="spill-popcorn-fx" class="spill-shower">
+          <g class="shower-k sk1"><circle cx="825" cy="435" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" /><circle cx="831" cy="431" r="6" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" /></g>
+          <g class="shower-k sk2"><circle cx="835" cy="432" r="9" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk3"><circle cx="842" cy="430" r="8" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk4"><circle cx="850" cy="434" r="9" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" /><circle cx="844" cy="430" r="5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" /></g>
+          <g class="shower-k sk5"><circle cx="858" cy="436" r="8" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk6"><circle cx="815" cy="438" r="8" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk7"><circle cx="822" cy="438" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk8"><circle cx="838" cy="440" r="8" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk9"><circle cx="848" cy="438" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" /></g>
+          <g class="shower-k sk10"><circle cx="812" cy="436" r="8" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" /></g>
+        </g>
       </svg>
 
       <!-- Animated TV Screen Glow -->
@@ -710,24 +1076,89 @@
         <div id="bubble-bat" class="speech-bubble" role="button" tabindex="0"></div>
         <div id="bubble-skunk" class="speech-bubble" role="button" tabindex="0"></div>
       </div>
+
+      <!-- One-Click Audio Unlock Overlay -->
+      <div id="start-overlay" class="start-overlay">
+        <button id="btn-start-sound" class="start-cta" type="button">
+          Play Movie Night with Voices &amp; SFX
+        </button>
+      </div>
     </section>
 
     <footer class="dialogue-progress">
       <span id="line-counter">Line 1 of 8</span>
-      <span id="playback-status">Auto-playing</span>
+      <span id="voice-cast" class="voice-Cast">Voices: Sunny Fox (Woman) · Luna Bat (Girl) · PoppyDash (Man)</span>
+      <span id="playback-status">Ready</span>
     </footer>
   </main>
 
   <script>
     const DIALOGUE = [
-      { speaker: 'bat',   name: 'Pip the Bat',  text: 'Ooh! The trailers are starting! Turn it up, turn it up!' },
-      { speaker: 'fox',   name: 'Félix the Fox', text: 'Relax, Pip. Every great film deserves a dramatic entrance.' },
-      { speaker: 'skunk', name: 'Barnaby',      text: 'I brought extra buttered popcorn! Wait—whoa, slippery bucket!' },
-      { speaker: 'bat',   name: 'Pip the Bat',  text: 'Whoa, airborne popcorn! Catching it mid-flight counts as dinner!' },
-      { speaker: 'fox',   name: 'Félix the Fox', text: 'Ten out of ten for style, Barnaby. Zero for structural integrity.' },
-      { speaker: 'skunk', name: 'Barnaby',      text: 'Hey! At least the couch cushions are getting a snack too… right?' },
-      { speaker: 'bat',   name: 'Pip the Bat',  text: 'Shhh! Look at that glowing spaceship! Here comes the hero!' },
-      { speaker: 'fox',   name: 'Félix the Fox', text: 'Alright, crew—eyes on the screen. Best movie night yet.' }
+      {
+        speaker: 'bat',
+        name: 'Luna Bat',
+        text: 'Ooh! The trailers are starting! Turn it up, turn it up!',
+        foxState: 'state-wave',
+        batState: 'state-perch',
+        skunkState: ''
+      },
+      {
+        speaker: 'fox',
+        name: 'Sunny Fox',
+        text: 'Relax, Luna. Every great film deserves a stylish entrance.',
+        foxState: 'state-wave',
+        batState: '',
+        skunkState: ''
+      },
+      {
+        speaker: 'skunk',
+        name: 'PoppyDash',
+        text: 'I brought extra buttered popcorn! Wait—whoa, slippery bucket!',
+        foxState: '',
+        batState: '',
+        skunkState: 'state-wobble'
+      },
+      {
+        speaker: 'skunk',
+        name: 'PoppyDash',
+        text: 'Whoooa—look out below! My popcorn! My dignity!',
+        foxState: 'state-peek',
+        batState: 'state-chase',
+        skunkState: 'state-fall',
+        triggerSpill: true
+      },
+      {
+        speaker: 'bat',
+        name: 'Luna Bat',
+        text: 'Wheee! Airborne popcorn! Catching it mid-flight counts as dinner!',
+        foxState: 'state-peek',
+        batState: 'state-flip',
+        skunkState: 'state-fall'
+      },
+      {
+        speaker: 'fox',
+        name: 'Sunny Fox',
+        text: 'Ten out of ten for the tumble, PoppyDash. Zero for balance.',
+        foxState: 'state-peek',
+        batState: 'state-chase',
+        skunkState: 'state-recover'
+      },
+      {
+        speaker: 'skunk',
+        name: 'PoppyDash',
+        text: 'Hey! At least there is a kernel on my nose for later… right?',
+        foxState: '',
+        batState: '',
+        skunkState: 'state-recover'
+      },
+      {
+        speaker: 'fox',
+        name: 'Sunny Fox',
+        text: 'Alright, crew—eyes on the screen. Best movie night yet!',
+        foxState: 'state-wave',
+        batState: 'state-perch',
+        skunkState: ''
+      }
     ];
 
     const bubbles = {
@@ -736,8 +1167,19 @@
       skunk: document.getElementById('bubble-skunk')
     };
 
+    const chars = {
+      fox: document.getElementById('char-fox'),
+      bat: document.getElementById('char-bat'),
+      skunk: document.getElementById('char-skunk')
+    };
+
+    const spillFx = document.getElementById('spill-popcorn-fx');
+    const startOverlay = document.getElementById('start-overlay');
+    const btnStartSound = document.getElementById('btn-start-sound');
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
+    const btnSpill = document.getElementById('btn-spill');
+    const btnVoice = document.getElementById('btn-voice');
     const btnToggle = document.getElementById('btn-toggle');
     const btnReplay = document.getElementById('btn-replay');
     const lineCounter = document.getElementById('line-counter');
@@ -745,11 +1187,228 @@
 
     let currentIndex = 0;
     let isPlaying = true;
+    let voicesEnabled = true;
+    let audioUnlocked = false;
     let timerId = null;
+    let audioCtx = null;
+
+    // ==================== PROCEDURAL WEB AUDIO SFX ====================
+    function ensureAudioCtx() {
+      if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new Ctx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    function playPopcornSpillSfx() {
+      if (!voicesEnabled || !audioUnlocked) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      // Comedic slide whistle down + soft thud
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(580, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.48);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.52);
+
+      // Soft thud at landing
+      const thud = ctx.createOscillator();
+      const thudGain = ctx.createGain();
+      thud.type = 'triangle';
+      thud.frequency.setValueAtTime(135, now + 0.42);
+      thud.frequency.exponentialRampToValueAtTime(48, now + 0.62);
+      thudGain.gain.setValueAtTime(0.24, now + 0.42);
+      thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      thud.connect(thudGain).connect(ctx.destination);
+      thud.start(now + 0.42);
+      thud.stop(now + 0.66);
+
+      // Popcorn pop bursts
+      for (let i = 0; i < 6; i++) {
+        const t = now + 0.12 + i * 0.09;
+        const popOsc = ctx.createOscillator();
+        const popGain = ctx.createGain();
+        popOsc.type = 'sine';
+        popOsc.frequency.setValueAtTime(340 + i * 65, t);
+        popOsc.frequency.exponentialRampToValueAtTime(860 + i * 40, t + 0.045);
+        popGain.gain.setValueAtTime(0.09, t);
+        popGain.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+        popOsc.connect(popGain).connect(ctx.destination);
+        popOsc.start(t);
+        popOsc.stop(t + 0.06);
+      }
+    }
+
+    function playBatFlutterSfx() {
+      if (!voicesEnabled || !audioUnlocked) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      [520, 660, 780].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+        gain.gain.setValueAtTime(0.06, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.09);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now + idx * 0.06);
+        osc.stop(now + idx * 0.06 + 0.1);
+      });
+    }
+
+    // ==================== CHARACTER VOICE ACTING (WEB SPEECH API) ====================
+    const VoiceManager = (() => {
+      let availableVoices = [];
+
+      function refreshVoices() {
+        if (!('speechSynthesis' in window)) return;
+        availableVoices = window.speechSynthesis.getVoices() || [];
+      }
+
+      if ('speechSynthesis' in window) {
+        refreshVoices();
+        window.speechSynthesis.addEventListener('voiceschanged', refreshVoices);
+      }
+
+      function pickVoice(role) {
+        if (!availableVoices.length) return null;
+        const english = availableVoices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
+        const pool = english.length ? english : availableVoices;
+
+        const femaleHints = ['samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona', 'kate', 'serena', 'zira', 'hazel', 'susan', 'aria', 'jenny', 'sara', 'michelle', 'emma', 'olivia', 'female', 'woman', 'girl'];
+        const maleHints = ['daniel', 'alex', 'fred', 'tom', 'oliver', 'rishi', 'david', 'mark', 'guy', 'ryan', 'christopher', 'eric', 'arthur', 'george', 'matthew', 'male', 'man'];
+
+        const matchesHint = (voice, hints) => hints.some((h) => voice.name.toLowerCase().includes(h));
+
+        const femaleVoices = pool.filter((v) => matchesHint(v, femaleHints));
+        const maleVoices = pool.filter((v) => matchesHint(v, maleHints));
+
+        if (role === 'fox') {
+          return femaleVoices[0] || pool[0];
+        }
+        if (role === 'bat') {
+          return femaleVoices[1] || femaleVoices[0] || pool[0];
+        }
+        if (role === 'skunk') {
+          return maleVoices[0] || pool.find((v) => !matchesHint(v, femaleHints)) || pool[0];
+        }
+        return pool[0];
+      }
+
+      function stop() {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+        Object.values(chars).forEach((el) => el.classList.remove('is-talking'));
+      }
+
+      function speak(speaker, text, onDone) {
+        stop();
+        const charEl = chars[speaker];
+        if (!voicesEnabled || !audioUnlocked || !('speechSynthesis' in window)) {
+          if (charEl) charEl.classList.add('is-talking');
+          setTimeout(() => {
+            if (charEl) charEl.classList.remove('is-talking');
+          }, 1600);
+          onDone(false);
+          return;
+        }
+
+        refreshVoices();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoice = pickVoice(speaker);
+        if (selectedVoice) utterance.voice = selectedVoice;
+
+        if (speaker === 'fox') {
+          // Woman: warm, poised, confident
+          utterance.pitch = 1.06;
+          utterance.rate = 0.96;
+        } else if (speaker === 'bat') {
+          // Girl: bright, youthful, bubbly
+          utterance.pitch = 1.54;
+          utterance.rate = 1.14;
+        } else if (speaker === 'skunk') {
+          // Man: deeper, animated comedic delivery
+          utterance.pitch = 0.84;
+          utterance.rate = 1.0;
+        }
+
+        let finished = false;
+        const finish = () => {
+          if (finished) return;
+          finished = true;
+          if (charEl) charEl.classList.remove('is-talking');
+          onDone(true);
+        };
+
+        utterance.onstart = () => {
+          if (charEl) charEl.classList.add('is-talking');
+        };
+        utterance.onend = finish;
+        utterance.onerror = finish;
+
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch (err) {
+          finish();
+        }
+      }
+
+      return { speak, stop };
+    })();
+
+    // ==================== SCENE CHOREOGRAPHY ====================
+    function triggerSpillBurst() {
+      spillFx.classList.remove('active');
+      void spillFx.offsetWidth;
+      spillFx.classList.add('active');
+      playPopcornSpillSfx();
+    }
+
+    function applyCharacterPoses(entry) {
+      chars.fox.classList.remove('state-peek', 'state-wave');
+      chars.bat.classList.remove('state-chase', 'state-flip', 'state-perch');
+      chars.skunk.classList.remove('state-wobble', 'state-fall', 'state-recover');
+
+      if (entry.foxState) chars.fox.classList.add(entry.foxState);
+      if (entry.batState) {
+        void chars.bat.offsetWidth;
+        chars.bat.classList.add(entry.batState);
+        if (entry.batState === 'state-flip') playBatFlutterSfx();
+      }
+      if (entry.skunkState) chars.skunk.classList.add(entry.skunkState);
+
+      if (entry.skunkState === 'state-fall' || entry.skunkState === 'state-recover') {
+        bubbles.skunk.classList.add('low-pose');
+      } else {
+        bubbles.skunk.classList.remove('low-pose');
+      }
+
+      if (entry.triggerSpill) {
+        triggerSpillBurst();
+      } else if (entry.skunkState !== 'state-fall' && entry.skunkState !== 'state-recover') {
+        spillFx.classList.remove('active');
+      }
+    }
 
     function renderLine(index) {
+      clearTimeout(timerId);
       currentIndex = (index + DIALOGUE.length) % DIALOGUE.length;
       const entry = DIALOGUE[currentIndex];
+
+      applyCharacterPoses(entry);
 
       Object.entries(bubbles).forEach(([key, el]) => {
         if (key === entry.speaker) {
@@ -761,63 +1420,105 @@
       });
 
       lineCounter.textContent = `Line ${currentIndex + 1} of ${DIALOGUE.length}`;
-    }
+      playbackStatus.textContent = isPlaying
+        ? (voicesEnabled && audioUnlocked ? 'Speaking' : 'Auto-playing')
+        : 'Paused';
 
-    function scheduleNext() {
-      clearTimeout(timerId);
-      if (!isPlaying) return;
-      timerId = setTimeout(() => {
-        renderLine(currentIndex + 1);
-        scheduleNext();
-      }, 4200);
-    }
-
-    function stepTo(index) {
-      renderLine(index);
-      scheduleNext();
-    }
-
-    function togglePlayback() {
-      isPlaying = !isPlaying;
-      btnToggle.textContent = isPlaying ? 'Pause' : 'Play';
-      playbackStatus.textContent = isPlaying ? 'Auto-playing' : 'Paused';
-      if (isPlaying) {
-        scheduleNext();
-      } else {
+      VoiceManager.speak(entry.speaker, entry.text, (spokeAudio) => {
+        if (!isPlaying) return;
+        const delayMs = spokeAudio ? 950 : 4200;
         clearTimeout(timerId);
+        timerId = setTimeout(() => {
+          renderLine(currentIndex + 1);
+        }, delayMs);
+      });
+    }
+
+    function unlockAudio() {
+      if (!audioUnlocked) {
+        audioUnlocked = true;
+        ensureAudioCtx();
+        startOverlay.classList.add('hidden');
       }
     }
 
-    function triggerCharacterReaction(charId, speakerKey) {
-      const group = document.getElementById(charId);
+    function stepTo(index) {
+      unlockAudio();
+      renderLine(index);
+    }
+
+    function togglePlayback() {
+      unlockAudio();
+      isPlaying = !isPlaying;
+      btnToggle.textContent = isPlaying ? 'Pause' : 'Play';
+      if (isPlaying) {
+        renderLine(currentIndex);
+      } else {
+        clearTimeout(timerId);
+        VoiceManager.stop();
+        playbackStatus.textContent = 'Paused';
+      }
+    }
+
+    function toggleVoices() {
+      unlockAudio();
+      voicesEnabled = !voicesEnabled;
+      btnVoice.textContent = voicesEnabled ? 'Voices: On' : 'Voices: Muted';
+      btnVoice.classList.toggle('muted', !voicesEnabled);
+      if (!voicesEnabled) {
+        VoiceManager.stop();
+      } else if (isPlaying) {
+        renderLine(currentIndex);
+      }
+    }
+
+    function triggerCharacterReaction(charKey) {
+      unlockAudio();
+      const group = chars[charKey];
       if (group) {
         group.classList.remove('react');
         void group.offsetWidth;
         group.classList.add('react');
       }
-      const nextForSpeaker = DIALOGUE.findIndex((item, idx) => idx > currentIndex && item.speaker === speakerKey);
-      const fallbackForSpeaker = DIALOGUE.findIndex((item) => item.speaker === speakerKey);
+      if (charKey === 'skunk') {
+        // Clicking PoppyDash jumps directly to his popcorn-spill tumble!
+        stepTo(3);
+        return;
+      }
+      const nextForSpeaker = DIALOGUE.findIndex((item, idx) => idx > currentIndex && item.speaker === charKey);
+      const fallbackForSpeaker = DIALOGUE.findIndex((item) => item.speaker === charKey);
       stepTo(nextForSpeaker !== -1 ? nextForSpeaker : fallbackForSpeaker);
     }
 
+    btnStartSound.addEventListener('click', () => {
+      unlockAudio();
+      isPlaying = true;
+      btnToggle.textContent = 'Pause';
+      renderLine(0);
+    });
+
     btnPrev.addEventListener('click', () => stepTo(currentIndex - 1));
     btnNext.addEventListener('click', () => stepTo(currentIndex + 1));
+    btnSpill.addEventListener('click', () => stepTo(3));
+    btnVoice.addEventListener('click', toggleVoices);
     btnToggle.addEventListener('click', togglePlayback);
     btnReplay.addEventListener('click', () => {
-      if (!isPlaying) togglePlayback();
-      stepTo(0);
+      unlockAudio();
+      isPlaying = true;
+      btnToggle.textContent = 'Pause';
+      renderLine(0);
     });
 
     Object.values(bubbles).forEach((el) => {
       el.addEventListener('click', () => stepTo(currentIndex + 1));
     });
 
-    document.getElementById('char-fox').addEventListener('click', () => triggerCharacterReaction('char-fox', 'fox'));
-    document.getElementById('char-bat').addEventListener('click', () => triggerCharacterReaction('char-bat', 'bat'));
-    document.getElementById('char-skunk').addEventListener('click', () => triggerCharacterReaction('char-skunk', 'skunk'));
+    chars.fox.addEventListener('click', () => triggerCharacterReaction('fox'));
+    chars.bat.addEventListener('click', () => triggerCharacterReaction('bat'));
+    chars.skunk.addEventListener('click', () => triggerCharacterReaction('skunk'));
 
+    // Start visual animation cleanly (voices begin on first click via browser policy)
     renderLine(0);
-    scheduleNext();
   </script>
 </body>
 </html>
