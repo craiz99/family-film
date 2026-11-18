@@ -304,6 +304,57 @@
       color: #9e97c4;
     }
 
+    .voice-panel {
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 2.5px solid var(--ink);
+      background: rgba(43, 34, 72, 0.92);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .voice-panel.open {
+      display: grid;
+    }
+
+    .voice-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .voice-row label {
+      font-family: 'Fredoka', system-ui, sans-serif;
+      font-size: 0.85rem;
+      color: var(--gold);
+    }
+
+    .voice-row-controls {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .voice-row select {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 8px;
+      border-radius: 10px;
+      border: 2px solid var(--ink);
+      background: var(--cream);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .btn-mini {
+      padding: 5px 10px;
+      font-size: 0.78rem;
+    }
+
     /* ==================== SCENE & CHARACTER ANIMATIONS ==================== */
     .fairy-bulb {
       animation: twinkle 2.4s ease-in-out infinite alternate;
@@ -659,6 +710,7 @@
         <button id="btn-next" class="btn primary" type="button">Next Line</button>
         <button id="btn-spill" class="btn accent" type="button">Spill Popcorn!</button>
         <button id="btn-voice" class="btn" type="button">Voices: On</button>
+        <button id="btn-cast" class="btn" type="button">Cast Voices</button>
         <button id="btn-toggle" class="btn" type="button">Pause</button>
         <button id="btn-replay" class="btn" type="button">Replay</button>
       </div>
@@ -1090,6 +1142,30 @@
       <span id="voice-cast" class="voice-Cast">Voices: Sunny Fox (Woman) · Luna Bat (Girl) · PoppyDash (Man)</span>
       <span id="playback-status">Ready</span>
     </footer>
+
+    <section id="voice-panel" class="voice-panel" aria-label="Character Voice Cast Selector">
+      <div class="voice-row">
+        <label for="select-voice-fox">Sunny Fox (Woman)</label>
+        <div class="voice-row-controls">
+          <select id="select-voice-fox"></select>
+          <button class="btn btn-mini" type="button" data-test-voice="fox">Test</button>
+        </div>
+      </div>
+      <div class="voice-row">
+        <label for="select-voice-bat">Luna Bat (Girl)</label>
+        <div class="voice-row-controls">
+          <select id="select-voice-bat"></select>
+          <button class="btn btn-mini" type="button" data-test-voice="bat">Test</button>
+        </div>
+      </div>
+      <div class="voice-row">
+        <label for="select-voice-skunk">PoppyDash (Man)</label>
+        <div class="voice-row-controls">
+          <select id="select-voice-skunk"></select>
+          <button class="btn btn-mini" type="button" data-test-voice="skunk">Test</button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -1180,8 +1256,15 @@
     const btnNext = document.getElementById('btn-next');
     const btnSpill = document.getElementById('btn-spill');
     const btnVoice = document.getElementById('btn-voice');
+    const btnCast = document.getElementById('btn-cast');
     const btnToggle = document.getElementById('btn-toggle');
     const btnReplay = document.getElementById('btn-replay');
+    const voicePanel = document.getElementById('voice-panel');
+    const voiceSelects = {
+      fox: document.getElementById('select-voice-fox'),
+      bat: document.getElementById('select-voice-bat'),
+      skunk: document.getElementById('select-voice-skunk')
+    };
     const lineCounter = document.getElementById('line-counter');
     const playbackStatus = document.getElementById('playback-status');
 
@@ -1271,10 +1354,118 @@
     // ==================== CHARACTER VOICE ACTING (WEB SPEECH API) ====================
     const VoiceManager = (() => {
       let availableVoices = [];
+      const overrides = { fox: '', bat: '', skunk: '' };
+
+      const FEMALE_PATTERN = /\b(female|woman|girl|samantha|victoria|karen|moira|tessa|fiona|kate|serena|zira|hazel|susan|aria|jenny|sara|michelle|emma|olivia|allison|ava|nicky|kathy|shelley|sandy|flo|grandma|google us english)\b/i;
+      const MALE_PRIORITY = [
+        'google uk english male',
+        'daniel',
+        'microsoft andrew',
+        'microsoft brian',
+        'microsoft guy',
+        'microsoft david',
+        'microsoft mark',
+        'microsoft christopher',
+        'microsoft eric',
+        'microsoft ryan',
+        'microsoft george',
+        'alex',
+        'aaron',
+        'matthew',
+        'oliver',
+        'arthur',
+        'fred',
+        'tom',
+        'rishi',
+        'evan',
+        'liam',
+        'nathan',
+        'gordon',
+        'reed',
+        'eddy',
+        'grandpa',
+        'malcolm',
+        'ralph',
+        'bruce',
+        'davis',
+        'jason',
+        'tony',
+        'roger',
+        'steffan',
+        'william',
+        'sean'
+      ];
+      const MALE_PATTERN = new RegExp(`\\b(male|man|${MALE_PRIORITY.map((n) => n.replace(/\s+/g, '\\s+')).join('|')})\\b`, 'i');
+
+      function getEnglishPool(voices) {
+        const english = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
+        return english.length ? english : voices;
+      }
+
+      function pickVoiceFromList(voices, role) {
+        if (!voices || !voices.length) return { voice: null, isTrueMatch: false };
+        const pool = getEnglishPool(voices);
+
+        if (overrides[role]) {
+          const custom = voices.find((v) => v.name === overrides[role]);
+          if (custom) return { voice: custom, isTrueMatch: true };
+        }
+
+        const femaleVoices = pool.filter((v) => FEMALE_PATTERN.test(v.name));
+        const maleVoices = pool
+          .filter((v) => !FEMALE_PATTERN.test(v.name) && MALE_PATTERN.test(v.name))
+          .sort((a, b) => {
+            const aIdx = MALE_PRIORITY.findIndex((p) => a.name.toLowerCase().includes(p));
+            const bIdx = MALE_PRIORITY.findIndex((p) => b.name.toLowerCase().includes(p));
+            return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+          });
+
+        if (role === 'fox') {
+          const v = femaleVoices[0] || pool[0];
+          return { voice: v, isTrueMatch: femaleVoices.length > 0 };
+        }
+        if (role === 'bat') {
+          const v = femaleVoices[1] || femaleVoices[0] || pool[0];
+          return { voice: v, isTrueMatch: femaleVoices.length > 0 };
+        }
+        if (role === 'skunk') {
+          if (maleVoices.length > 0) {
+            return { voice: maleVoices[0], isTrueMatch: true };
+          }
+          const nonFemale = pool.find((v) => !FEMALE_PATTERN.test(v.name));
+          return { voice: nonFemale || pool[0], isTrueMatch: false };
+        }
+        return { voice: pool[0], isTrueMatch: false };
+      }
+
+      function populateVoiceSelects() {
+        const pool = getEnglishPool(availableVoices);
+        ['fox', 'bat', 'skunk'].forEach((role) => {
+          const select = voiceSelects[role];
+          if (!select) return;
+          const picked = pickVoiceFromList(availableVoices, role).voice;
+          select.innerHTML = '';
+          if (!pool.length) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'Default Browser Voice';
+            select.appendChild(opt);
+            return;
+          }
+          pool.forEach((v) => {
+            const opt = document.createElement('option');
+            opt.value = v.name;
+            opt.textContent = `${v.name} (${v.lang})`;
+            if (picked && v.name === picked.name) opt.selected = true;
+            select.appendChild(opt);
+          });
+        });
+      }
 
       function refreshVoices() {
         if (!('speechSynthesis' in window)) return;
         availableVoices = window.speechSynthesis.getVoices() || [];
+        populateVoiceSelects();
       }
 
       if ('speechSynthesis' in window) {
@@ -1282,29 +1473,8 @@
         window.speechSynthesis.addEventListener('voiceschanged', refreshVoices);
       }
 
-      function pickVoice(role) {
-        if (!availableVoices.length) return null;
-        const english = availableVoices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
-        const pool = english.length ? english : availableVoices;
-
-        const femaleHints = ['samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona', 'kate', 'serena', 'zira', 'hazel', 'susan', 'aria', 'jenny', 'sara', 'michelle', 'emma', 'olivia', 'female', 'woman', 'girl'];
-        const maleHints = ['daniel', 'alex', 'fred', 'tom', 'oliver', 'rishi', 'david', 'mark', 'guy', 'ryan', 'christopher', 'eric', 'arthur', 'george', 'matthew', 'male', 'man'];
-
-        const matchesHint = (voice, hints) => hints.some((h) => voice.name.toLowerCase().includes(h));
-
-        const femaleVoices = pool.filter((v) => matchesHint(v, femaleHints));
-        const maleVoices = pool.filter((v) => matchesHint(v, maleHints));
-
-        if (role === 'fox') {
-          return femaleVoices[0] || pool[0];
-        }
-        if (role === 'bat') {
-          return femaleVoices[1] || femaleVoices[0] || pool[0];
-        }
-        if (role === 'skunk') {
-          return maleVoices[0] || pool.find((v) => !matchesHint(v, femaleHints)) || pool[0];
-        }
-        return pool[0];
+      function setOverride(role, voiceName) {
+        overrides[role] = voiceName;
       }
 
       function stop() {
@@ -1326,9 +1496,9 @@
           return;
         }
 
-        refreshVoices();
+        if (!availableVoices.length) refreshVoices();
         const utterance = new SpeechSynthesisUtterance(text);
-        const selectedVoice = pickVoice(speaker);
+        const { voice: selectedVoice, isTrueMatch } = pickVoiceFromList(availableVoices, speaker);
         if (selectedVoice) utterance.voice = selectedVoice;
 
         if (speaker === 'fox') {
@@ -1340,9 +1510,9 @@
           utterance.pitch = 1.54;
           utterance.rate = 1.14;
         } else if (speaker === 'skunk') {
-          // Man: deeper, animated comedic delivery
-          utterance.pitch = 0.84;
-          utterance.rate = 1.0;
+          // Man: deeper, clearly masculine comedic delivery
+          utterance.pitch = isTrueMatch ? 0.72 : 0.52;
+          utterance.rate = 0.95;
         }
 
         let finished = false;
@@ -1366,7 +1536,7 @@
         }
       }
 
-      return { speak, stop };
+      return { speak, stop, setOverride, pickVoiceFromList };
     })();
 
     // ==================== SCENE CHOREOGRAPHY ====================
@@ -1501,12 +1671,34 @@
     btnNext.addEventListener('click', () => stepTo(currentIndex + 1));
     btnSpill.addEventListener('click', () => stepTo(3));
     btnVoice.addEventListener('click', toggleVoices);
+    btnCast.addEventListener('click', () => {
+      voicePanel.classList.toggle('open');
+    });
     btnToggle.addEventListener('click', togglePlayback);
     btnReplay.addEventListener('click', () => {
       unlockAudio();
       isPlaying = true;
       btnToggle.textContent = 'Pause';
       renderLine(0);
+    });
+
+    Object.entries(voiceSelects).forEach(([role, select]) => {
+      if (!select) return;
+      select.addEventListener('change', (e) => {
+        VoiceManager.setOverride(role, e.target.value);
+      });
+    });
+
+    document.querySelectorAll('[data-test-voice]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        unlockAudio();
+        const role = btn.getAttribute('data-test-voice');
+        const sample = DIALOGUE.find((d) => d.speaker === role);
+        if (sample) {
+          clearTimeout(timerId);
+          VoiceManager.speak(role, sample.text, () => {});
+        }
+      });
     });
 
     Object.values(bubbles).forEach((el) => {
