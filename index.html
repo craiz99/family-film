@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Movie Night — Sunny Fox, Luna Bat & PoppyDash</title>
-  <meta name="description" content="An interactive cartoon movie night animation starring Sunny Fox, Luna Bat, and PoppyDash with character voices and physical comedy." />
+  <title>Movie Night — Sunny Fox, Luna Bat &amp; PoppyDash</title>
+  <meta name="description" content="An interactive cartoon movie night animation starring Sunny Fox, Luna Bat, and PoppyDash with draggable drinks, interactive living room props, dynamic movie-screen lighting, studio neural voices, and slapstick physical comedy." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -18,6 +18,13 @@
       --coral: #ff6b6b;
       --teal: #2ec4b6;
       --purple: #9b5de5;
+      --tv-r: 92;
+      --tv-g: 225;
+      --tv-b: 230;
+      --tv-a: 0.38;
+      --tv-x: 50%;
+      --tv-y: 96%;
+      --shadow-shift-x: 0px;
     }
 
     * {
@@ -34,7 +41,7 @@
       justify-content: center;
       padding: 16px;
       background: radial-gradient(circle at 50% 25%, #2b2352 0%, var(--bg-night) 55%, var(--bg-deep) 100%);
-      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      font-family: 'Nunito', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif;
       color: var(--cream);
       overflow-x: hidden;
     }
@@ -57,7 +64,7 @@
     }
 
     .title-group h1 {
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
       font-size: clamp(1.35rem, 2.8vw, 1.95rem);
       font-weight: 700;
       letter-spacing: 0.01em;
@@ -66,7 +73,7 @@
     }
 
     .title-group p {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       color: #c8c2e6;
       margin-top: 2px;
     }
@@ -83,7 +90,7 @@
       border: 2.5px solid var(--ink);
       background: var(--cream);
       color: var(--ink);
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
       font-size: 0.9rem;
       font-weight: 600;
       padding: 7px 14px;
@@ -133,6 +140,7 @@
       box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
       background: #2b2248;
       user-select: none;
+      -webkit-user-select: none;
     }
 
     .scene-svg {
@@ -141,29 +149,83 @@
       display: block;
     }
 
-    /* Animated TV Screen Light Glow Overlay */
+    /* Smooth rAF-driven TV Screen Ambient Glow Overlay (CSS custom properties — zero snapping!) */
     .tv-glow {
       position: absolute;
       inset: 0;
       pointer-events: none;
       mix-blend-mode: screen;
-      opacity: 0.36;
-      animation: tvColorShift 9s ease-in-out infinite alternate;
+      background: radial-gradient(
+        ellipse 72% 58% at var(--tv-x) var(--tv-y),
+        rgba(var(--tv-r), var(--tv-g), var(--tv-b), var(--tv-a)) 0%,
+        rgba(var(--tv-r), var(--tv-g), var(--tv-b), calc(var(--tv-a) * 0.34)) 46%,
+        transparent 78%
+      );
+      will-change: background;
+      z-index: 2;
     }
 
-    @keyframes tvColorShift {
-      0% {
-        background: radial-gradient(ellipse at 50% 95%, rgba(92, 225, 230, 0.72) 0%, rgba(92, 225, 230, 0.16) 48%, transparent 78%);
-      }
-      33% {
-        background: radial-gradient(ellipse at 48% 95%, rgba(255, 209, 102, 0.68) 0%, rgba(255, 140, 105, 0.18) 48%, transparent 78%);
-      }
-      66% {
-        background: radial-gradient(ellipse at 52% 95%, rgba(167, 139, 250, 0.7) 0%, rgba(244, 114, 182, 0.18) 48%, transparent 78%);
-      }
-      100% {
-        background: radial-gradient(ellipse at 50% 95%, rgba(74, 222, 128, 0.62) 0%, rgba(56, 189, 248, 0.18) 48%, transparent 78%);
-      }
+    /* Subtle HUD badges (Movie Genre + Lamp state + Drag instruction pill) */
+    .scene-hud {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .hud-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(30, 27, 46, 0.85);
+      background: rgba(23, 20, 43, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: var(--cream);
+      font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
+      font-size: clamp(0.66rem, 1.15vw, 0.78rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    .hud-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgb(var(--tv-r), var(--tv-g), var(--tv-b));
+      box-shadow: 0 0 8px rgb(var(--tv-r), var(--tv-g), var(--tv-b));
+    }
+
+    .drag-hint {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2.5px solid var(--ink);
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
+      font-size: clamp(0.72rem, 1.3vw, 0.86rem);
+      font-weight: 700;
+      box-shadow: 0 4px 0 var(--ink);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 6;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .drag-hint.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Start Sound Banner (unlocks browser SpeechSynthesis + WebAudio cleanly) */
@@ -175,7 +237,7 @@
       justify-content: center;
       padding-bottom: 24px;
       background: linear-gradient(to top, rgba(15, 13, 30, 0.65) 0%, transparent 45%);
-      z-index: 5;
+      z-index: 7;
       transition: opacity 0.25s ease;
     }
 
@@ -189,7 +251,7 @@
       border: 3.5px solid var(--ink);
       background: var(--gold);
       color: var(--ink);
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
       font-size: clamp(0.95rem, 2vw, 1.2rem);
       font-weight: 700;
       padding: 12px 24px;
@@ -223,25 +285,25 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      z-index: 3;
+      z-index: 5;
     }
 
     .speech-bubble {
       position: absolute;
-      max-width: min(275px, 30%);
+      max-width: min(290px, 32%);
       background: #ffffff;
       color: var(--ink);
       border: 3px solid var(--ink);
       border-radius: 18px;
       padding: 10px 14px;
-      font-size: clamp(0.72rem, 1.35vw, 0.94rem);
+      font-size: clamp(0.72rem, 1.32vw, 0.92rem);
       font-weight: 700;
       line-height: 1.32;
       box-shadow: 0 5px 0 rgba(30, 27, 46, 0.9);
       opacity: 0;
       transform: translate(-50%, -8px) scale(0.86);
-      transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.4s ease, left 0.4s ease;
-      pointer-events: auto;
+      transition: opacity 0.24s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.4s ease, left 0.4s ease;
+      pointer-events: none;
       cursor: pointer;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
@@ -250,6 +312,7 @@
     .speech-bubble.visible {
       opacity: 1;
       transform: translate(-50%, 0) scale(1);
+      pointer-events: auto;
     }
 
     .speech-bubble::after {
@@ -279,7 +342,7 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
       font-size: 0.74em;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -290,10 +353,10 @@
     .speaker-bat { color: #7b2cbf; }
     .speaker-skunk { color: #d62828; }
 
-    #bubble-fox { left: 27%; top: 18%; }
+    #bubble-fox { left: 33%; top: 15%; }
     #bubble-bat { left: 52%; top: 7%; }
-    #bubble-skunk { left: 75%; top: 20%; }
-    #bubble-skunk.low-pose { left: 77%; top: 44%; }
+    #bubble-skunk { left: 74%; top: 12%; }
+    #bubble-skunk.low-pose { left: 76%; top: 40%; }
 
     .dialogue-progress {
       display: flex;
@@ -301,7 +364,7 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 8px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       color: #bdb6de;
       padding: 0 4px;
     }
@@ -309,6 +372,27 @@
     .voice-Cast {
       font-size: 0.8rem;
       color: #9e97c4;
+    }
+
+    .prop-hints-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: #c8c2e6;
+      padding: 2px 4px;
+    }
+
+    .hint-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
     }
 
     .voice-panel {
@@ -338,7 +422,7 @@
     }
 
     .voice-engine-row label {
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
       font-size: 0.86rem;
       color: var(--cream);
     }
@@ -356,7 +440,7 @@
       border: 2px solid var(--ink);
       background: var(--gold);
       color: var(--ink);
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
       font-size: 0.82rem;
       font-weight: 600;
     }
@@ -373,7 +457,7 @@
     }
 
     .voice-row label {
-      font-family: 'Fredoka', system-ui, sans-serif;
+      font-family: 'Fredoka', ui-rounded, system-ui, sans-serif;
       font-size: 0.85rem;
       color: var(--gold);
     }
@@ -419,42 +503,326 @@
       display: block;
     }
 
-    /* ==================== SCENE & CHARACTER ANIMATIONS ==================== */
-    .fairy-bulb {
-      animation: twinkle 2.4s ease-in-out infinite alternate;
-    }
-    .fairy-bulb:nth-child(even) {
-      animation-delay: 1.1s;
-    }
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.65; filter: brightness(0.95); }
-      50% { opacity: 1; filter: brightness(1.3); }
+    /* ==================== INTERACTIVE PROP AFFORDANCES ==================== */
+    .interactive-prop {
+      cursor: pointer;
+      outline: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: filter 0.18s ease;
     }
 
-    /* Talking Mouths */
+    .interactive-prop:hover,
+    .interactive-prop:focus-visible {
+      filter: drop-shadow(0 0 8px rgba(255, 209, 102, 0.75));
+    }
+
+    .drink-prop {
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .drink-prop.dragging,
+    .drink-prop.selected {
+      cursor: grabbing;
+      filter: drop-shadow(0 8px 14px rgba(255, 209, 102, 0.85));
+    }
+
+    .drink-prop.serving {
+      transition: transform 0.42s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+
+    .drink-prop.returning {
+      transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Drop Target Halos around characters when holding/dragging a drink */
+    .drop-halo {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .scene-card.drink-active .drop-halo {
+      opacity: 0.78;
+      animation: haloPulse 1.3s ease-in-out infinite alternate;
+    }
+
+    .scene-card.drink-active .drop-halo.hover-target {
+      opacity: 1;
+      stroke: #5ce1e6;
+      stroke-width: 6;
+    }
+
+    @keyframes haloPulse {
+      0% { opacity: 0.45; }
+      100% { opacity: 0.92; }
+    }
+
+    /* ==================== ORGANIC BACKGROUND & MOVIE LIGHTING ==================== */
+    /* Organic Staggered Fairy Lights (GPU-composited opacity + scale, no filter jank) */
+    .fairy-halo {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: fairyHaloGlow var(--dur, 3.3s) ease-in-out var(--delay, 0s) infinite alternate;
+      transition: opacity 0.4s ease;
+    }
+
+    .fairy-bulb {
+      transition: opacity 0.35s ease, fill 0.4s ease;
+      animation: fairyBulbBreath var(--dur, 3.3s) ease-in-out var(--delay, 0s) infinite alternate;
+    }
+
+    @keyframes fairyHaloGlow {
+      0% { opacity: 0.32; transform: scale(0.84); }
+      60% { opacity: 0.88; transform: scale(1.12); }
+      100% { opacity: 0.56; transform: scale(0.96); }
+    }
+
+    @keyframes fairyBulbBreath {
+      0% { opacity: 0.76; }
+      100% { opacity: 1; }
+    }
+
+    /* Fairy Lights Party Rainbow Mode */
+    #prop-fairy-lights.mode-party .fairy-halo {
+      animation: fairyPartyHalo 0.75s ease-in-out var(--party-delay, 0s) infinite alternate;
+    }
+    #prop-fairy-lights.mode-party .fairy-bulb {
+      animation: fairyPartyBulb 1.4s linear var(--party-delay, 0s) infinite;
+    }
+
+    @keyframes fairyPartyHalo {
+      0% { opacity: 0.45; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1.38); }
+    }
+
+    @keyframes fairyPartyBulb {
+      0% { fill: #ff6b6b; }
+      25% { fill: #ffd166; }
+      50% { fill: #5ce1e6; }
+      75% { fill: #c77dff; }
+      100% { fill: #ff6b6b; }
+    }
+
+    /* Fairy Lights Off Mode */
+    #prop-fairy-lights.mode-off .fairy-halo {
+      animation: none;
+      opacity: 0;
+    }
+    #prop-fairy-lights.mode-off .fairy-bulb {
+      animation: none;
+      opacity: 0.36;
+      fill: #5d5678;
+    }
+
+    /* Corner Floor Lamp Organic Glow & Pull-Chain */
+    .lamp-glow-group {
+      transform-origin: 118px 370px;
+      animation: lampBreathe 4.8s ease-in-out infinite;
+      transition: opacity 0.48s ease;
+    }
+
+    @keyframes lampBreathe {
+      0%, 100% { opacity: 0.92; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+
+    .lamp-shade {
+      transition: fill 0.42s ease;
+    }
+
+    .lamp-pull-chain {
+      transform-origin: 120px 374px;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #prop-lamp.pulling .lamp-pull-chain {
+      transform: translateY(15px);
+    }
+
+    .scene-card.lamp-off .lamp-glow-group {
+      animation: none;
+      opacity: 0;
+    }
+
+    .scene-card.lamp-off .lamp-shade {
+      fill: #6f5f4e;
+    }
+
+    /* Cozy Dark Room Vignette when Lamp is Off */
+    #room-darkness {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
+    }
+
+    .scene-card.lamp-off #room-darkness {
+      opacity: 0.44;
+    }
+
+    /* Subtle Cast Shadows behind couch & characters responding to TV light */
+    #wall-cast-shadows {
+      transform: translateX(var(--shadow-shift-x));
+      transition: opacity 0.45s ease;
+    }
+
+    /* Vintage 35mm Film Reel Spin & Sepia Flicker */
+    .reel-wheel {
+      transform-origin: 128px 36px;
+    }
+
+    #prop-reel.spinning .reel-wheel {
+      animation: reelSpin 1.35s cubic-bezier(0.22, 0.78, 0.36, 1);
+    }
+
+    @keyframes reelSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(1080deg); }
+    }
+
+    #vintage-film-flicker {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #vintage-film-flicker.active {
+      animation: vintageFlicker 1.5s ease-out forwards;
+    }
+
+    @keyframes vintageFlicker {
+      0% { opacity: 0; }
+      12% { opacity: 0.32; }
+      26% { opacity: 0.14; }
+      44% { opacity: 0.28; }
+      68% { opacity: 0.16; }
+      100% { opacity: 0; }
+    }
+
+    /* Wall Poster Flip */
+    #prop-poster .poster-card {
+      transform-origin: 68px 88px;
+    }
+
+    #prop-poster.flipping .poster-card {
+      animation: posterPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes posterPop {
+      0% { transform: scale(1) rotate(0deg); }
+      40% { transform: scale(0.92, 1.05) rotate(-4deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* TV Remote IR Flash */
+    .remote-waves {
+      opacity: 0;
+      transform-origin: 274px 20px;
+    }
+
+    #prop-remote.zapping .remote-waves {
+      animation: remotePulse 0.48s ease-out forwards;
+    }
+
+    @keyframes remotePulse {
+      0% { opacity: 0.95; transform: scale(0.6); }
+      100% { opacity: 0; transform: scale(1.85); }
+    }
+
+    /* Throw Pillows Fluff & Ambush Hat Gag */
+    #prop-pillow-left {
+      transform-origin: 476px 451px;
+    }
+    #prop-pillow-left.fluffing {
+      animation: pillowFluff 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #prop-pillow-right {
+      transform-origin: 593px 446px;
+    }
+    #prop-pillow-right.fluffing {
+      animation: pillowFluff 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #prop-pillow-right.ambush-poppy {
+      animation: pillowAmbushPoppy 2.35s cubic-bezier(0.28, 0.88, 0.36, 1) forwards;
+    }
+
+    @keyframes pillowFluff {
+      0% { transform: scale(1, 1) translateY(0); }
+      30% { transform: scale(1.18, 0.82) translateY(5px); }
+      62% { transform: scale(0.92, 1.14) translateY(-10px); }
+      100% { transform: scale(1, 1) translateY(0); }
+    }
+
+    @keyframes pillowAmbushPoppy {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      18% { transform: translate(118px, -172px) rotate(128deg) scale(1.06); }
+      32% { transform: translate(262px, -148px) rotate(16deg) scale(1.04, 0.88); }
+      44% { transform: translate(260px, -155px) rotate(11deg) scale(1); }
+      72% { transform: translate(260px, -155px) rotate(14deg) scale(1); }
+      88% { transform: translate(115px, -110px) rotate(-18deg) scale(0.98); }
+      100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    /* Floating Dust Motes in Cinema Light Cone */
+    .dust-mote {
+      animation: dustDrift var(--mote-dur, 7s) ease-in-out var(--mote-delay, 0s) infinite alternate;
+    }
+
+    @keyframes dustDrift {
+      0% { transform: translate(0px, 0px); opacity: 0.14; }
+      50% { transform: translate(12px, -18px); opacity: 0.42; }
+      100% { transform: translate(-8px, -32px); opacity: 0.18; }
+    }
+
+    /* Drink Fizz & Sparkle Bursts */
+    .fx-burst {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .fx-burst.active {
+      animation: fxBurstFade 1.15s ease-out forwards;
+    }
+
+    @keyframes fxBurstFade {
+      0% { opacity: 0; transform: translateY(6px) scale(0.7); }
+      22% { opacity: 1; transform: translateY(-6px) scale(1.08); }
+      100% { opacity: 0; transform: translateY(-34px) scale(1.18); }
+    }
+
+    /* ==================== CHARACTER ANIMATIONS (CLEAN NESTED LAYERS) ==================== */
+    /* Talking Mouths & Subtle Talking Head Nod */
     .mouth-talking { display: none; }
     .is-talking .mouth-idle { display: none; }
     .is-talking .mouth-talking {
       display: block;
-      animation: mouthChatter 0.24s ease-in-out infinite alternate;
+      animation: mouthChatter 0.22s ease-in-out infinite alternate;
     }
+
     @keyframes mouthChatter {
-      0% { transform: scaleY(0.55); }
-      100% { transform: scaleY(1.15); }
+      0% { transform: scaleY(0.56); }
+      100% { transform: scaleY(1.14); }
     }
 
     .fox-group,
-    .bat-group,
+    .bat-anchor,
     .skunk-group {
+      outline: none;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+    }
+    .fox-group:focus-visible,
+    .bat-anchor:focus-visible,
+    .skunk-group:focus-visible {
+      filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.85));
     }
 
     /* ---------- SUNNY FOX (WOMAN) ---------- */
     .fox-group {
       cursor: pointer;
       transform-origin: 330px 490px;
-      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.58s cubic-bezier(0.34, 1.45, 0.64, 1);
     }
     .fox-group.state-peek {
       transform: translate(24px, 6px) rotate(9deg);
@@ -462,9 +830,33 @@
     .fox-group.state-wave {
       transform: translate(-4px, -4px) rotate(-2deg);
     }
-    .fox-group.react {
+    .fox-group.state-stink-lean {
+      transform: translate(-34px, -4px) rotate(-14deg);
+    }
+
+    .fox-inner {
+      transform-origin: 330px 490px;
+      animation: foxBreathe 4.2s ease-in-out infinite;
+    }
+    .fox-group.react .fox-inner {
       animation: charPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    @keyframes foxBreathe {
+      0%, 100% { transform: translateY(0px) scaleY(1); }
+      50% { transform: translateY(-2.2px) scaleY(1.012); }
+    }
+
+    .fox-head {
+      transform-origin: 332px 395px;
+    }
+    .fox-group.is-talking .fox-head {
+      animation: talkNod 0.72s ease-in-out infinite alternate;
+    }
+    @keyframes talkNod {
+      0% { transform: rotate(-1.6deg) translateY(0px); }
+      100% { transform: rotate(2.2deg) translateY(-1.5px); }
+    }
+
     .fox-tail {
       transform-origin: 252px 482px;
       animation: foxTailSway 3.4s ease-in-out infinite;
@@ -498,56 +890,116 @@
     .fox-group.state-wave .fox-gesture-arm {
       animation: foxArmGesture 0.85s ease-in-out infinite alternate;
     }
+    .fox-group.state-stink-lean .fox-gesture-arm {
+      animation: foxWaveStink 0.2s ease-in-out infinite alternate;
+    }
     @keyframes foxArmGesture {
       0% { transform: rotate(-4deg); }
       100% { transform: rotate(-22deg) translateY(-4px); }
     }
+    @keyframes foxWaveStink {
+      0% { transform: rotate(-52deg) translate(-12px, -22px); }
+      100% { transform: rotate(-78deg) translate(-18px, -28px); }
+    }
     .fox-mouth-talk-origin { transform-origin: 332px 390px; }
 
-    /* ---------- LUNA BAT (GIRL — EXTRA CUTE) ---------- */
-    .bat-group {
+    /* ---------- LUNA BAT (GIRL — NESTED SMOOTH FLIGHT, ZERO TELEPORTING) ---------- */
+    .bat-anchor {
       cursor: pointer;
       transform-origin: 605px 235px;
-      animation: batSwoopIdle 4.8s ease-in-out infinite;
+      transition: transform 0.78s cubic-bezier(0.34, 1.28, 0.64, 1);
     }
-    .bat-group.state-chase {
-      animation: batChasePopcorn 2.2s ease-in-out infinite;
+    .bat-anchor.state-perch {
+      transform: translate(-18px, 84px);
     }
-    .bat-group.state-flip {
-      animation: batHappyFlip 1.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .bat-anchor.state-chase {
+      transform: translate(92px, 34px) scale(1.05);
     }
-    .bat-group.state-perch {
-      animation: batPerchBounce 1.8s ease-in-out infinite;
+    .bat-anchor.state-pillow-bounce {
+      transform: translate(-14px, 146px);
+    }
+    .bat-anchor.state-poster-look {
+      transform: translate(-240px, -24px) scale(0.96);
+    }
+
+    .bat-motion {
+      transform-origin: 605px 235px;
+      animation: batSwoopIdle 5.2s ease-in-out infinite;
+    }
+    .bat-anchor.state-perch .bat-motion {
+      animation: batPerchBob 1.9s ease-in-out infinite;
+    }
+    .bat-anchor.state-chase .bat-motion {
+      animation: batChaseWeave 1.7s ease-in-out infinite;
+    }
+    .bat-anchor.state-flip .bat-motion {
+      animation: batHappyFlip 1.15s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    .bat-anchor.state-double-flip .bat-motion {
+      animation: batDoubleFlip 1.35s cubic-bezier(0.34, 1.35, 0.64, 1);
+    }
+    .bat-anchor.state-pillow-bounce .bat-motion {
+      animation: batTrampoline 0.95s ease-in-out infinite;
+    }
+    .bat-anchor.state-squint .bat-motion {
+      animation: batBrightSquint 0.9s ease-in-out infinite alternate;
+    }
+    .bat-anchor.react .bat-motion {
+      animation: charPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     @keyframes batSwoopIdle {
-      0%, 100% { transform: translate(0px, 0px) rotate(-3deg); }
-      25% { transform: translate(42px, -24px) rotate(6deg); }
-      50% { transform: translate(8px, 8px) rotate(-1deg); }
-      75% { transform: translate(-44px, -20px) rotate(-7deg); }
+      0%, 100% { transform: translate(0px, 0px) rotate(-2.5deg); }
+      25% { transform: translate(38px, -20px) rotate(5.5deg); }
+      50% { transform: translate(6px, 8px) rotate(-1deg); }
+      75% { transform: translate(-40px, -18px) rotate(-6deg); }
     }
-    @keyframes batChasePopcorn {
-      0%, 100% { transform: translate(40px, 16px) rotate(6deg) scale(1.04); }
-      35% { transform: translate(135px, 68px) rotate(-12deg) scale(1.08); }
-      70% { transform: translate(75px, -14px) rotate(10deg) scale(1); }
+    @keyframes batPerchBob {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-13px) rotate(3deg); }
+    }
+    @keyframes batChaseWeave {
+      0%, 100% { transform: translate(-24px, -10px) rotate(7deg); }
+      45% { transform: translate(34px, 28px) rotate(-11deg); }
+      75% { transform: translate(8px, -20px) rotate(9deg); }
     }
     @keyframes batHappyFlip {
       0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-      45% { transform: translate(18px, -36px) rotate(195deg) scale(1.12); }
+      45% { transform: translate(16px, -36px) rotate(190deg) scale(1.12); }
       100% { transform: translate(0, 0) rotate(360deg) scale(1); }
     }
-    @keyframes batPerchBounce {
-      0%, 100% { transform: translate(-18px, 84px) rotate(0deg); }
-      50% { transform: translate(-18px, 70px) rotate(3deg); }
+    @keyframes batDoubleFlip {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      50% { transform: translate(0, -44px) rotate(360deg) scale(1.14); }
+      100% { transform: translate(0, 0) rotate(720deg) scale(1); }
+    }
+    @keyframes batTrampoline {
+      0%, 100% { transform: translateY(0px) scale(1.08, 0.9); }
+      45% { transform: translateY(-58px) scale(0.95, 1.08) rotate(-8deg); }
+      70% { transform: translateY(-34px) rotate(6deg); }
+    }
+    @keyframes batBrightSquint {
+      0% { transform: translate(0, -8px) rotate(-6deg) scale(0.96); }
+      100% { transform: translate(6px, -14px) rotate(5deg) scale(0.94); }
     }
 
     .bat-wing-l {
       transform-origin: 572px 248px;
-      animation: wingFlapL 0.36s ease-in-out infinite alternate;
+      animation: wingFlapL 0.4s ease-in-out infinite alternate;
     }
     .bat-wing-r {
       transform-origin: 638px 248px;
-      animation: wingFlapR 0.36s ease-in-out infinite alternate;
+      animation: wingFlapR 0.4s ease-in-out infinite alternate;
+    }
+    .bat-anchor.state-chase .bat-wing-l,
+    .bat-anchor.state-flip .bat-wing-l,
+    .bat-anchor.state-double-flip .bat-wing-l {
+      animation-duration: 0.21s;
+    }
+    .bat-anchor.state-chase .bat-wing-r,
+    .bat-anchor.state-flip .bat-wing-r,
+    .bat-anchor.state-double-flip .bat-wing-r {
+      animation-duration: 0.21s;
     }
     @keyframes wingFlapL {
       0% { transform: rotate(-16deg) scaleX(0.95); }
@@ -557,10 +1009,19 @@
       0% { transform: rotate(16deg) scaleX(0.95); }
       100% { transform: rotate(-24deg) scaleX(1.05); }
     }
+
     .bat-eyes {
       transform-origin: 605px 226px;
       animation: blinkEyes 4.4s ease-in-out infinite;
     }
+    .bat-night-eyes {
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+    .scene-card.lamp-off .bat-night-eyes {
+      opacity: 0.92;
+    }
+
     .bat-feet {
       transform-origin: 605px 282px;
       animation: feetKick 0.7s ease-in-out infinite alternate;
@@ -571,11 +1032,11 @@
     }
     .bat-mouth-talk-origin { transform-origin: 605px 248px; }
 
-    /* ---------- POPPYDASH THE SKUNK (MAN — PHYSICAL COMEDY) ---------- */
+    /* ---------- POPPYDASH THE SKUNK (MAN — PHYSICAL COMEDY POWERHOUSE) ---------- */
     .skunk-group {
       cursor: pointer;
       transform-origin: 855px 465px;
-      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .skunk-group.state-wobble {
       animation: skunkPanicWobble 0.65s ease-in-out infinite;
@@ -592,8 +1053,274 @@
       transform: translate(12px, 84px) rotate(-6deg) scale(0.96);
       transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .skunk-group.react {
+
+    /* Inner wrapper so physical comedy stunts & breathing compose cleanly without clobbering pose states */
+    .skunk-inner {
+      transform-origin: 855px 490px;
+      animation: skunkBreathe 3.8s ease-in-out infinite;
+    }
+    .skunk-group.react .skunk-inner {
       animation: charPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes skunkBreathe {
+      0%, 100% { transform: translateY(0px) scaleY(1); }
+      50% { transform: translateY(-2.5px) scaleY(1.015); }
+    }
+
+    .skunk-head-group {
+      transform-origin: 854px 396px;
+    }
+    .skunk-group.is-talking .skunk-head-group {
+      animation: talkNod 0.68s ease-in-out infinite alternate;
+    }
+
+    /* === POPPYDASH NON-POPCORN PHYSICAL COMEDY GAGS === */
+    /* 1. Mega Skunk Toot (Rocket-Hop + Giant Cartoon Green Toot Cloud!) */
+    .skunk-toot-cloud {
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: 940px 465px;
+    }
+    .skunk-group.gag-toot .skunk-toot-cloud {
+      animation: tootCloudPuff 2.6s cubic-bezier(0.22, 0.86, 0.36, 1) forwards;
+    }
+    .skunk-group.gag-bounce-fail .skunk-toot-cloud {
+      animation: miniTootPuff 1.6s ease-out 0.95s forwards;
+    }
+    .skunk-group.gag-toot .skunk-inner {
+      animation: poppyTootRocket 2.1s cubic-bezier(0.28, 0.9, 0.36, 1) forwards;
+    }
+    .skunk-group.gag-toot .skunk-tail {
+      animation: poppyTootTailFlip 2.1s ease-in-out forwards;
+    }
+    @keyframes poppyTootRocket {
+      0% { transform: translateY(0) scale(1, 1); }
+      14% { transform: translateY(6px) scale(1.13, 0.9); }
+      28% { transform: translateY(-38px) scale(0.92, 1.12) rotate(-8deg); }
+      46% { transform: translateY(-28px) scale(0.96, 1.06) rotate(6deg); }
+      64% { transform: translateY(8px) scale(1.08, 0.92) rotate(-4deg); }
+      82% { transform: translateY(-6px) rotate(3deg); }
+      100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
+    }
+    @keyframes poppyTootTailFlip {
+      0% { transform: rotate(0deg); }
+      22% { transform: rotate(-28deg) scale(1.14); }
+      65% { transform: rotate(-16deg) scale(1.08); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    @keyframes tootCloudPuff {
+      0%, 10% { opacity: 0; transform: translate(-24px, 12px) scale(0.25); }
+      24% { opacity: 0.96; transform: translate(18px, -12px) scale(1.08); }
+      58% { opacity: 0.9; transform: translate(42px, -68px) scale(1.38) rotate(8deg); }
+      100% { opacity: 0; transform: translate(62px, -135px) scale(1.65) rotate(14deg); }
+    }
+    @keyframes miniTootPuff {
+      0% { opacity: 0; transform: translate(-18px, 14px) scale(0.2); }
+      24% { opacity: 0.86; transform: translate(14px, -6px) scale(0.75); }
+      100% { opacity: 0; transform: translate(34px, -74px) scale(1.1); }
+    }
+
+    /* 1b. Brain Freeze Shake (kept for compatibility) */
+    .skunk-frost {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    .skunk-group.gag-brainfreeze .skunk-frost {
+      opacity: 1;
+    }
+    .skunk-group.gag-brainfreeze .skunk-inner {
+      animation: poppyBrainFreeze 0.16s ease-in-out infinite alternate;
+    }
+    @keyframes poppyBrainFreeze {
+      0% { transform: translate(-5px, -3px) rotate(-3.5deg) scale(1.02, 0.98); }
+      100% { transform: translate(5px, -5px) rotate(3.5deg) scale(0.98, 1.03); }
+    }
+
+    /* 2. Super Bubble Burp + Hiccup Bounces */
+    .skunk-hiccup-bubbles {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .skunk-group.gag-hiccup .skunk-hiccup-bubbles,
+    .skunk-group.gag-burp-hiccup .skunk-hiccup-bubbles {
+      animation: hiccupBubblesFloat 2.5s ease-out forwards;
+    }
+    .skunk-group.gag-hiccup .skunk-inner,
+    .skunk-group.gag-burp-hiccup .skunk-inner {
+      animation: poppyHiccup 0.76s cubic-bezier(0.34, 1.56, 0.64, 1) 3;
+    }
+    @keyframes poppyHiccup {
+      0%, 100% { transform: translateY(0) scale(1, 1); }
+      26% { transform: translateY(-28px) scale(0.92, 1.14) rotate(-4deg); }
+      56% { transform: translateY(6px) scale(1.1, 0.92) rotate(3deg); }
+    }
+    @keyframes hiccupBubblesFloat {
+      0% { opacity: 0; transform: translateY(10px) scale(0.5); }
+      18% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+      72% { opacity: 0.92; transform: translateY(-64px) scale(1.32); }
+      100% { opacity: 0; transform: translateY(-98px) scale(1.48); }
+    }
+
+    /* 3. Darkness Panic + Bottle-Brush Puffed Tail */
+    .skunk-group.gag-dark-panic .skunk-inner {
+      animation: poppyDarkPanic 1.8s cubic-bezier(0.28, 0.92, 0.36, 1) forwards;
+    }
+    .skunk-group.gag-dark-panic .skunk-tail {
+      animation: poppyBottleBrush 0.25s ease-in-out infinite alternate;
+    }
+    @keyframes poppyDarkPanic {
+      0% { transform: translateY(0) scale(1); }
+      16% { transform: translateY(-38px) scale(0.95, 1.1) rotate(-6deg); }
+      34% { transform: translateY(10px) scale(1.06, 0.92) rotate(5deg); }
+      54% { transform: translate(-8px, 6px) rotate(-6deg); }
+      74% { transform: translate(8px, 6px) rotate(6deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    @keyframes poppyBottleBrush {
+      0% { transform: rotate(-22deg) scale(1.18, 1.14); }
+      100% { transform: rotate(-14deg) scale(1.24, 1.18); }
+    }
+
+    /* 4. Spooky Scooby-Doo Hover & Shiver */
+    .skunk-group.gag-spooked .skunk-inner {
+      animation: poppyScoobyHover 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .skunk-group.gag-spooked .skunk-legs {
+      animation: poppyKickAir 0.14s ease-in-out 10 alternate;
+    }
+    @keyframes poppyScoobyHover {
+      0% { transform: translateY(0) scale(1); }
+      14% { transform: translateY(-48px) rotate(-4deg) scale(0.96, 1.08); }
+      44% { transform: translateY(-44px) rotate(4deg) scale(0.96, 1.06); }
+      60% { transform: translateY(8px) scale(1.1, 0.88); }
+      72% { transform: translate(-4px, 4px) scale(0.96, 0.94); }
+      82% { transform: translate(4px, 4px) scale(0.96, 0.94); }
+      92% { transform: translate(-3px, 2px) scale(0.98, 0.96); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+    @keyframes poppyKickAir {
+      0% { transform: translateY(-4px) rotate(-7deg); }
+      100% { transform: translateY(6px) rotate(7deg); }
+    }
+
+    /* 5. Sci-Fi Hero Armrest Flop */
+    .skunk-group.gag-hero-flop .skunk-inner {
+      animation: poppyHeroFlop 2.3s cubic-bezier(0.32, 0.9, 0.36, 1) forwards;
+    }
+    @keyframes poppyHeroFlop {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-10px, -12px) rotate(-11deg) scale(1.04); }
+      42% { transform: translate(44px, 26px) rotate(36deg); }
+      68% { transform: translate(48px, 30px) rotate(40deg); }
+      86% { transform: translate(8px, -6px) rotate(-5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    /* 6. Pillow Ambush Head Bonk */
+    .skunk-group.gag-pillow-bonk .skunk-inner {
+      animation: poppyPillowBonk 2.35s ease-in-out forwards;
+    }
+    @keyframes poppyPillowBonk {
+      0%, 26% { transform: translateY(0) scale(1, 1); }
+      34% { transform: translateY(14px) scale(1.12, 0.86) rotate(-5deg); }
+      48% { transform: translateY(4px) scale(1.02, 0.97) rotate(3deg); }
+      72% { transform: translateY(4px) scale(1.02, 0.97) rotate(-2deg); }
+      100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
+    }
+
+    /* 7. Funky Skunk Disco Spin-Out */
+    .skunk-group.gag-disco-dizzy .skunk-inner {
+      animation: poppyDiscoSpin 2.3s ease-in-out forwards;
+    }
+    .skunk-group.gag-disco-dizzy .dizzy-stars {
+      opacity: 1;
+      animation: spinStars 1.1s linear infinite;
+    }
+    @keyframes poppyDiscoSpin {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      14% { transform: translate(-14px, -10px) rotate(-12deg); }
+      28% { transform: translate(14px, -10px) rotate(12deg); }
+      42% { transform: translate(-16px, -12px) rotate(-15deg); }
+      56% { transform: translate(18px, -6px) rotate(18deg); }
+      76% { transform: translate(24px, 12px) rotate(24deg) scale(0.98); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    /* 8. Cushion Abyss Sink (Film Reel Critic Fail) */
+    .skunk-group.gag-cushion-sink .skunk-inner {
+      animation: poppyCushionSink 2.5s cubic-bezier(0.32, 0.88, 0.36, 1) forwards;
+    }
+    @keyframes poppyCushionSink {
+      0% { transform: translateY(0) rotate(0deg) scaleY(1); }
+      22% { transform: translate(-6px, -8px) rotate(-12deg) scaleY(1.03); }
+      44% { transform: translate(6px, 68px) rotate(-18deg) scale(1.04, 0.72); }
+      74% { transform: translate(4px, 72px) rotate(-14deg) scale(1.04, 0.7); }
+      90% { transform: translateY(-14px) rotate(5deg) scale(0.96, 1.06); }
+      100% { transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    /* 9. Giant Cartoon Sneeze Recoil */
+    .skunk-sneeze-puff {
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: 830px 388px;
+    }
+    .skunk-group.gag-sneeze .skunk-sneeze-puff {
+      animation: sneezePuffBlast 1.8s ease-out forwards;
+    }
+    .skunk-group.gag-sneeze .skunk-inner {
+      animation: poppyGiantSneeze 2.0s cubic-bezier(0.32, 0.9, 0.36, 1) forwards;
+    }
+    @keyframes poppyGiantSneeze {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      18% { transform: translate(6px, -10px) rotate(9deg) scale(1.05, 1.07); }
+      32% { transform: translate(10px, -16px) rotate(14deg) scale(1.08, 1.1); }
+      44% { transform: translate(-28px, 12px) rotate(-24deg) scale(1.12, 0.88); }
+      62% { transform: translate(30px, 6px) rotate(18deg) scale(0.95, 1.04); }
+      82% { transform: translate(-4px, -2px) rotate(-3deg); }
+      100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+    @keyframes sneezePuffBlast {
+      0%, 38% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+      46% { opacity: 0.95; transform: translate(-28px, 8px) scale(1.15); }
+      85% { opacity: 0; transform: translate(-86px, 18px) scale(1.65); }
+      100% { opacity: 0; }
+    }
+
+    /* 10. Extra-Springy Cushion Bounce */
+    .skunk-group.gag-bounce-fail .skunk-inner {
+      animation: poppySpringyBounce 2.0s cubic-bezier(0.28, 0.86, 0.36, 1) forwards;
+    }
+    @keyframes poppySpringyBounce {
+      0% { transform: translateY(0) scale(1, 1); }
+      14% { transform: translateY(12px) scale(1.14, 0.84); }
+      38% { transform: translateY(-64px) rotate(14deg) scale(0.92, 1.1); }
+      58% { transform: translateY(10px) rotate(-10deg) scale(1.1, 0.88); }
+      74% { transform: translateY(-22px) rotate(6deg) scale(0.97, 1.04); }
+      88% { transform: translateY(3px) rotate(-4deg); }
+      100% { transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    /* 11. Slow-Mo Ninja Dodge Tail Tangle */
+    .skunk-group.gag-dodge-tangle .skunk-inner {
+      animation: poppyDodgeTangle 2.1s ease-in-out forwards;
+    }
+    .skunk-group.gag-dodge-tangle .skunk-tail {
+      animation: tailTangleSwing 2.1s ease-in-out forwards;
+    }
+    @keyframes poppyDodgeTangle {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      32% { transform: translate(-26px, -6px) rotate(-22deg); }
+      54% { transform: translate(22px, 16px) rotate(26deg) scale(1.05, 0.93); }
+      74% { transform: translate(-10px, 6px) rotate(-10deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    @keyframes tailTangleSwing {
+      0% { transform: rotate(0deg); }
+      36% { transform: rotate(-42deg); }
+      58% { transform: rotate(26deg); }
+      100% { transform: rotate(0deg); }
     }
 
     .skunk-tail {
@@ -603,6 +1330,9 @@
     @keyframes skunkTailBob {
       0%, 100% { transform: rotate(-3deg); }
       50% { transform: rotate(7deg); }
+    }
+    .skunk-legs {
+      transform-origin: 855px 500px;
     }
     .skunk-eyes {
       transform-origin: 854px 356px;
@@ -661,16 +1391,17 @@
       100% { transform: rotate(18deg) translate(8px, -10px); }
     }
 
-    /* Big Popcorn Shower FX */
+    /* Big Popcorn Shower FX (with smooth landing bounce & smooth fade-out) */
     .spill-shower {
       opacity: 0;
       pointer-events: none;
+      transition: opacity 0.55s ease;
     }
     .spill-shower.active {
       opacity: 1;
     }
     .spill-shower.active .shower-k {
-      animation-duration: 1.45s;
+      animation-duration: 1.55s;
       animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
       animation-fill-mode: forwards;
     }
@@ -687,52 +1418,72 @@
 
     @keyframes showerFly1 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(-155px, -170px) rotate(180deg) scale(1.1); opacity: 1; }
-      100% { transform: translate(-245px, 165px) rotate(360deg) scale(1); opacity: 1; }
+      40% { transform: translate(-155px, -170px) rotate(180deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(-240px, 168px) rotate(340deg) scale(1); opacity: 1; }
+      91% { transform: translate(-244px, 148px) rotate(352deg) scale(1); opacity: 1; }
+      100% { transform: translate(-246px, 165px) rotate(360deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly2 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(-95px, -210px) rotate(-150deg) scale(1.15); opacity: 1; }
+      40% { transform: translate(-95px, -210px) rotate(-150deg) scale(1.15); opacity: 1; }
+      82% { transform: translate(-136px, 184px) rotate(-305deg) scale(1); opacity: 1; }
+      91% { transform: translate(-139px, 164px) rotate(-315deg) scale(1); opacity: 1; }
       100% { transform: translate(-140px, 180px) rotate(-320deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly3 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(-35px, -230px) rotate(120deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(-35px, -230px) rotate(120deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(-53px, 198px) rotate(265deg) scale(1); opacity: 1; }
+      91% { transform: translate(-54px, 178px) rotate(274deg) scale(1); opacity: 1; }
       100% { transform: translate(-55px, 195px) rotate(280deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly4 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(35px, -195px) rotate(-140deg) scale(1.15); opacity: 1; }
+      40% { transform: translate(35px, -195px) rotate(-140deg) scale(1.15); opacity: 1; }
+      82% { transform: translate(62px, 212px) rotate(-288deg) scale(1); opacity: 1; }
+      91% { transform: translate(64px, 192px) rotate(-295deg) scale(1); opacity: 1; }
       100% { transform: translate(65px, 210px) rotate(-300deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly5 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(115px, -165px) rotate(200deg) scale(1.05); opacity: 1; }
+      40% { transform: translate(115px, -165px) rotate(200deg) scale(1.05); opacity: 1; }
+      82% { transform: translate(166px, 203px) rotate(365deg) scale(1); opacity: 1; }
+      91% { transform: translate(168px, 184px) rotate(374deg) scale(1); opacity: 1; }
       100% { transform: translate(170px, 200px) rotate(380deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly6 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(-215px, -125px) rotate(-180deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(-215px, -125px) rotate(-180deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(-336px, 148px) rotate(-338deg) scale(1); opacity: 1; }
+      91% { transform: translate(-339px, 132px) rotate(-345deg) scale(1); opacity: 1; }
       100% { transform: translate(-340px, 145px) rotate(-350deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly7 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(-120px, -150px) rotate(140deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(-120px, -150px) rotate(140deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(-182px, 78px) rotate(278deg) scale(1); opacity: 1; }
+      91% { transform: translate(-184px, 64px) rotate(286deg) scale(1); opacity: 1; }
       100% { transform: translate(-185px, 75px) rotate(290deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly8 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(10px, -140px) rotate(-110deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(10px, -140px) rotate(-110deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(18px, 93px) rotate(-240deg) scale(1); opacity: 1; }
+      91% { transform: translate(19px, 78px) rotate(-246deg) scale(1); opacity: 1; }
       100% { transform: translate(20px, 90px) rotate(-250deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly9 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(90px, -130px) rotate(160deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(90px, -130px) rotate(160deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(118px, 134px) rotate(308deg) scale(1); opacity: 1; }
+      91% { transform: translate(119px, 118px) rotate(316deg) scale(1); opacity: 1; }
       100% { transform: translate(120px, 130px) rotate(320deg) scale(1); opacity: 1; }
     }
     @keyframes showerFly10 {
       0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      45% { transform: translate(-295px, -145px) rotate(170deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(-295px, -145px) rotate(170deg) scale(1.1); opacity: 1; }
+      82% { transform: translate(-416px, 128px) rotate(326deg) scale(1); opacity: 1; }
+      91% { transform: translate(-418px, 114px) rotate(334deg) scale(1); opacity: 1; }
       100% { transform: translate(-420px, 125px) rotate(340deg) scale(1); opacity: 1; }
     }
 
@@ -755,9 +1506,28 @@
       100% { transform: scale(1); }
     }
 
+    /* Respect reduced-motion preferences while preserving interactivity */
+    @media (prefers-reduced-motion: reduce) {
+      .bat-motion,
+      .bat-wing-l,
+      .bat-wing-r,
+      .fox-inner,
+      .skunk-inner,
+      .fox-tail,
+      .skunk-tail,
+      .fairy-halo,
+      .fairy-bulb,
+      .lamp-glow-group,
+      .dust-mote,
+      .popcorn-juggle,
+      .start-cta {
+        animation: none !important;
+      }
+    }
+
     @media (max-width: 640px) {
       .speech-bubble {
-        max-width: 38%;
+        max-width: 40%;
         padding: 7px 10px;
         border-width: 2px;
         border-radius: 13px;
@@ -774,7 +1544,7 @@
     <header class="header-bar">
       <div class="title-group">
         <h1>Movie Night!</h1>
-        <p>Starring Sunny Fox, Luna Bat &amp; PoppyDash — click any character or trigger the popcorn spill!</p>
+        <p>Starring Sunny Fox, Luna Bat &amp; PoppyDash — drag drinks, flip the lamp, zap the remote, or click any prop!</p>
       </div>
       <div class="controls">
         <button id="btn-prev" class="btn" type="button">Prev</button>
@@ -787,8 +1557,14 @@
       </div>
     </header>
 
-    <section class="scene-card" aria-label="Animated movie night living room scene">
-      <svg class="scene-svg" viewBox="0 0 1200 740" xmlns="http://www.w3.org/2000/svg">
+    <section id="scene-card" class="scene-card" aria-label="Animated interactive movie night living room scene">
+      <!-- Subtle Scene Status HUD -->
+      <div class="scene-hud" aria-hidden="true">
+        <span class="hud-pill"><span class="hud-dot"></span><span id="hud-genre">Sci-Fi</span></span>
+        <span class="hud-pill" id="hud-lamp">Lamp: On</span>
+      </div>
+
+      <svg id="scene-svg" class="scene-svg" viewBox="0 0 1200 740" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#35285c" />
@@ -811,8 +1587,56 @@
             <stop offset="100%" stop-color="#6a1b9a" />
           </linearGradient>
           <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#ffd166" stop-opacity="0.58" />
+            <stop offset="0%" stop-color="#ffd166" stop-opacity="0.62" />
+            <stop offset="55%" stop-color="#ffb703" stop-opacity="0.22" />
             <stop offset="100%" stop-color="#ffd166" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="lampWallSpill" cx="20%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#ffe08a" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="#ffd166" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- Organic Fairy Bulb Halos -->
+          <radialGradient id="haloGold" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffe08a" stop-opacity="0.82" />
+            <stop offset="50%" stop-color="#ffd166" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="#ffd166" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="haloCoral" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff8fa3" stop-opacity="0.8" />
+            <stop offset="50%" stop-color="#ff6b6b" stop-opacity="0.26" />
+            <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="haloCyan" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#9bf6ff" stop-opacity="0.82" />
+            <stop offset="50%" stop-color="#5ce1e6" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="#5ce1e6" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="haloPurple" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#e0aaff" stop-opacity="0.82" />
+            <stop offset="50%" stop-color="#c77dff" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="#c77dff" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- Dynamic Movie Screen Light Pools (stops driven smoothly by MovieLightEngine) -->
+          <radialGradient id="movieWashGrad" cx="50%" cy="96%" r="68%">
+            <stop id="mw-stop-0" offset="0%" stop-color="rgb(92,225,230)" stop-opacity="0.48" />
+            <stop id="mw-stop-1" offset="48%" stop-color="rgb(92,225,230)" stop-opacity="0.16" />
+            <stop id="mw-stop-2" offset="100%" stop-color="rgb(92,225,230)" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="charLightGrad" cx="50%" cy="68%" r="54%">
+            <stop id="cl-stop-0" offset="0%" stop-color="rgb(92,225,230)" stop-opacity="0.52" />
+            <stop id="cl-stop-1" offset="65%" stop-color="rgb(92,225,230)" stop-opacity="0.14" />
+            <stop id="cl-stop-2" offset="100%" stop-color="rgb(92,225,230)" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="frostGrad" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stop-color="#caf0f8" stop-opacity="0.62" />
+            <stop offset="65%" stop-color="#48cae4" stop-opacity="0.34" />
+            <stop offset="100%" stop-color="#00b4d8" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="darkRoomVignette" cx="50%" cy="62%" r="65%">
+            <stop offset="0%" stop-color="#120c28" stop-opacity="0.55" />
+            <stop offset="100%" stop-color="#070514" stop-opacity="1" />
           </radialGradient>
         </defs>
 
@@ -828,54 +1652,140 @@
           <line x1="920" y1="534" x2="970" y2="740" />
         </g>
 
+        <!-- Dynamic Back-Wall Cast Shadows from Off-Screen Movie Projection -->
+        <g id="wall-cast-shadows" opacity="0.22">
+          <ellipse cx="600" cy="430" rx="430" ry="118" fill="#120c24" />
+          <ellipse cx="332" cy="340" rx="82" ry="72" fill="#120c24" />
+          <ellipse cx="856" cy="346" rx="82" ry="70" fill="#120c24" />
+          <ellipse cx="605" cy="215" rx="68" ry="38" fill="#120c24" opacity="0.55" />
+        </g>
+
         <!-- Cozy Rug -->
         <ellipse cx="600" cy="655" rx="455" ry="72" fill="#e76f51" stroke="#1e1b2e" stroke-width="4.5" />
         <ellipse cx="600" cy="655" rx="395" ry="52" fill="#f4a261" stroke="#1e1b2e" stroke-width="3.5" stroke-dasharray="14 10" />
         <ellipse cx="600" cy="655" rx="320" ry="34" fill="#e9c46a" opacity="0.85" />
 
-        <!-- Wall Poster (Left) -->
-        <g transform="translate(115, 92)">
-          <rect x="0" y="0" width="136" height="176" rx="10" fill="#ffd166" stroke="#1e1b2e" stroke-width="4.5" />
-          <rect x="12" y="12" width="112" height="152" rx="5" fill="#231942" stroke="#1e1b2e" stroke-width="3" />
-          <circle cx="68" cy="68" r="30" fill="#ff6b6b" />
-          <polygon points="68,45 75,62 93,62 79,72 84,89 68,79 52,89 57,72 43,62 61,62" fill="#ffd166" />
-          <rect x="26" y="114" width="84" height="10" rx="5" fill="#fff8ec" />
-          <rect x="38" y="132" width="60" height="8" rx="4" fill="#9b5de5" />
+        <!-- Interactive Wall Poster (Left — Cycles 3 Movie Posters) -->
+        <g id="prop-poster" class="interactive-prop" transform="translate(94, 88)" role="button" tabindex="0" aria-label="Change movie wall poster">
+          <g class="poster-card">
+            <rect x="0" y="0" width="136" height="176" rx="10" fill="#ffd166" stroke="#1e1b2e" stroke-width="4.5" />
+            <rect x="12" y="12" width="112" height="152" rx="5" fill="#231942" stroke="#1e1b2e" stroke-width="3" />
+            <!-- Poster 0: Star Quest -->
+            <g class="poster-art" data-poster="0">
+              <circle cx="68" cy="68" r="30" fill="#ff6b6b" />
+              <polygon points="68,45 75,62 93,62 79,72 84,89 68,79 52,89 57,72 43,62 61,62" fill="#ffd166" />
+              <rect x="26" y="114" width="84" height="10" rx="5" fill="#fff8ec" />
+              <rect x="38" y="132" width="60" height="8" rx="4" fill="#9b5de5" />
+            </g>
+            <!-- Poster 1: Midnight Wings (Luna's favorite) -->
+            <g class="poster-art" data-poster="1" style="display:none">
+              <circle cx="68" cy="66" r="28" fill="#ffd166" />
+              <circle cx="78" cy="60" r="22" fill="#231942" />
+              <path d="M40,80 Q54,64 68,76 Q82,64 96,80 Q82,84 68,90 Q54,84 40,80 Z" fill="#c77dff" stroke="#1e1b2e" stroke-width="2.5" />
+              <rect x="24" y="114" width="88" height="10" rx="5" fill="#c77dff" />
+              <rect x="38" y="132" width="60" height="8" rx="4" fill="#ff9ebb" />
+            </g>
+            <!-- Poster 2: Funky Skunk -->
+            <g class="poster-art" data-poster="2" style="display:none">
+              <rect x="18" y="20" width="100" height="84" rx="6" fill="#3a5a9b" />
+              <circle cx="68" cy="62" r="24" fill="#252333" stroke="#fff8ec" stroke-width="3" />
+              <path d="M68,40 C62,48 62,74 68,84 C74,74 74,48 68,40 Z" fill="#fff8ec" />
+              <circle cx="42" cy="40" r="5" fill="#ffd166" />
+              <circle cx="94" cy="44" r="5" fill="#5ce1e6" />
+              <rect x="26" y="114" width="84" height="10" rx="5" fill="#5ce1e6" />
+              <rect x="38" y="132" width="60" height="8" rx="4" fill="#ffd166" />
+            </g>
+          </g>
         </g>
 
-        <!-- Wall Shelf & Plant (Right) -->
+        <!-- Wall Shelf, Potted Plant & Interactive Vintage Film Reel (Right) -->
         <g transform="translate(940, 145)">
           <rect x="0" y="65" width="170" height="18" rx="7" fill="#d48c46" stroke="#1e1b2e" stroke-width="4" />
           <path d="M26,65 L34,26 L68,26 L76,65 Z" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3.5" />
           <path d="M51,26 C35,5 20,14 34,28" fill="#52b788" stroke="#1e1b2e" stroke-width="3.5" />
           <path d="M51,26 C52,0 72,2 64,26" fill="#74c69d" stroke="#1e1b2e" stroke-width="3.5" />
           <path d="M51,26 C68,12 85,22 68,32" fill="#40916c" stroke="#1e1b2e" stroke-width="3.5" />
-          <circle cx="128" cy="36" r="28" fill="#adb5bd" stroke="#1e1b2e" stroke-width="3.5" />
-          <circle cx="128" cy="36" r="8" fill="#1e1b2e" />
-          <circle cx="128" cy="18" r="5" fill="#2b2248" />
-          <circle cx="128" cy="54" r="5" fill="#2b2248" />
-          <circle cx="110" cy="36" r="5" fill="#2b2248" />
-          <circle cx="146" cy="36" r="5" fill="#2b2248" />
+          <!-- Interactive Vintage 35mm Film Reel -->
+          <g id="prop-reel" class="interactive-prop" role="button" tabindex="0" aria-label="Spin vintage 35mm film reel">
+            <circle cx="128" cy="36" r="34" fill="transparent" />
+            <g class="reel-wheel">
+              <circle cx="128" cy="36" r="28" fill="#adb5bd" stroke="#1e1b2e" stroke-width="3.5" />
+              <circle cx="128" cy="36" r="8" fill="#1e1b2e" />
+              <circle cx="128" cy="18" r="5.5" fill="#2b2248" />
+              <circle cx="128" cy="54" r="5.5" fill="#2b2248" />
+              <circle cx="110" cy="36" r="5.5" fill="#2b2248" />
+              <circle cx="146" cy="36" r="5.5" fill="#2b2248" />
+              <circle cx="128" cy="36" r="3" fill="#ffd166" />
+            </g>
+          </g>
         </g>
 
-        <!-- String Fairy Lights -->
-        <path d="M0,45 Q300,105 600,52 T1200,48" fill="none" stroke="#1e1b2e" stroke-width="4" />
-        <g>
-          <circle class="fairy-bulb" cx="110" cy="67" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="235" cy="79" r="9" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="370" cy="77" r="9" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="505" cy="63" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="655" cy="45" r="9" fill="#c77dff" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="800" cy="37" r="9" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="950" cy="42" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
-          <circle class="fairy-bulb" cx="1090" cy="48" r="9" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3" />
+        <!-- Interactive Organic String Fairy Lights (Cycles Cozy / Party / Off) -->
+        <g id="prop-fairy-lights" class="interactive-prop mode-cozy" role="button" tabindex="0" aria-label="Toggle string fairy lights mode">
+          <!-- Generous click hitbox along the wire -->
+          <path d="M0,45 Q300,105 600,52 T1200,48" fill="none" stroke="transparent" stroke-width="38" />
+          <path d="M0,45 Q300,105 600,52 T1200,48" fill="none" stroke="#1e1b2e" stroke-width="4" />
+
+          <g style="--dur:2.7s; --delay:-0.4s; --party-delay:0s;">
+            <circle class="fairy-halo" cx="110" cy="67" r="26" fill="url(#haloGold)" />
+            <circle class="fairy-bulb" cx="110" cy="67" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="107" cy="64" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:3.4s; --delay:-1.7s; --party-delay:-0.2s;">
+            <circle class="fairy-halo" cx="235" cy="79" r="26" fill="url(#haloCoral)" />
+            <circle class="fairy-bulb" cx="235" cy="79" r="9" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="232" cy="76" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:4.1s; --delay:-2.9s; --party-delay:-0.4s;">
+            <circle class="fairy-halo" cx="370" cy="77" r="26" fill="url(#haloCyan)" />
+            <circle class="fairy-bulb" cx="370" cy="77" r="9" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="367" cy="74" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:2.9s; --delay:-0.9s; --party-delay:-0.6s;">
+            <circle class="fairy-halo" cx="505" cy="63" r="26" fill="url(#haloGold)" />
+            <circle class="fairy-bulb" cx="505" cy="63" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="502" cy="60" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:3.8s; --delay:-2.1s; --party-delay:-0.8s;">
+            <circle class="fairy-halo" cx="655" cy="45" r="26" fill="url(#haloPurple)" />
+            <circle class="fairy-bulb" cx="655" cy="45" r="9" fill="#c77dff" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="652" cy="42" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:4.5s; --delay:-1.2s; --party-delay:-1.0s;">
+            <circle class="fairy-halo" cx="800" cy="37" r="26" fill="url(#haloCyan)" />
+            <circle class="fairy-bulb" cx="800" cy="37" r="9" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="797" cy="34" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:3.1s; --delay:-2.6s; --party-delay:-1.2s;">
+            <circle class="fairy-halo" cx="950" cy="42" r="26" fill="url(#haloGold)" />
+            <circle class="fairy-bulb" cx="950" cy="42" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="947" cy="39" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
+          <g style="--dur:3.6s; --delay:-0.7s; --party-delay:-1.4s;">
+            <circle class="fairy-halo" cx="1090" cy="48" r="26" fill="url(#haloCoral)" />
+            <circle class="fairy-bulb" cx="1090" cy="48" r="9" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3" />
+            <circle cx="1087" cy="45" r="2.5" fill="#ffffff" opacity="0.75" />
+          </g>
         </g>
 
-        <!-- Warm Corner Floor Lamp -->
-        <circle cx="118" cy="370" r="115" fill="url(#lampGlow)" />
-        <rect x="92" y="370" width="12" height="205" fill="#3a3356" stroke="#1e1b2e" stroke-width="4" />
-        <ellipse cx="98" cy="576" rx="34" ry="11" fill="#3a3356" stroke="#1e1b2e" stroke-width="4" />
-        <polygon points="56,374 140,374 124,310 72,310" fill="#ffd166" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+        <!-- Corner Floor Lamp Ambient Glow (separate from clickable lamp geometry) -->
+        <g class="lamp-glow-group" style="pointer-events:none;">
+          <ellipse cx="165" cy="415" rx="185" ry="155" fill="url(#lampWallSpill)" />
+          <circle cx="118" cy="370" r="120" fill="url(#lampGlow)" />
+        </g>
+
+        <!-- Interactive Warm Corner Floor Lamp (With Animated Brass Pull-Chain) -->
+        <g id="prop-lamp" class="interactive-prop" role="button" tabindex="0" aria-label="Turn corner floor lamp on or off">
+          <rect x="52" y="306" width="94" height="278" rx="14" fill="transparent" />
+          <rect x="92" y="370" width="12" height="205" fill="#3a3356" stroke="#1e1b2e" stroke-width="4" />
+          <ellipse cx="98" cy="576" rx="34" ry="11" fill="#3a3356" stroke="#1e1b2e" stroke-width="4" />
+          <!-- Animated Pull Chain -->
+          <g class="lamp-pull-chain">
+            <line x1="120" y1="374" x2="120" y2="412" stroke="#ffd166" stroke-width="3" stroke-dasharray="3 2" />
+            <circle cx="120" cy="416" r="6" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
+          </g>
+          <polygon class="lamp-shade" points="56,374 140,374 124,310 72,310" fill="#ffd166" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+        </g>
 
         <!-- Plush Living Room Couch (Back, Cushions & Armrests) -->
         <g id="couch">
@@ -891,288 +1801,353 @@
           <rect x="176" y="418" width="64" height="156" rx="28" fill="#2ec4b6" stroke="#1e1b2e" stroke-width="5" />
           <rect x="960" y="418" width="64" height="156" rx="28" fill="#2ec4b6" stroke="#1e1b2e" stroke-width="5" />
           <rect x="195" y="544" width="810" height="36" rx="14" fill="#1b9aaa" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- Throw Pillows -->
-          <rect x="236" y="412" width="76" height="70" rx="18" transform="rotate(-12 274 447)" fill="#ffd166" stroke="#1e1b2e" stroke-width="4" />
-          <rect x="556" y="412" width="74" height="68" rx="18" transform="rotate(7 593 446)" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="4" />
+
+          <!-- Interactive Left Throw Pillow (Yellow — cozy next to Sunny Fox) -->
+          <g id="prop-pillow-left" class="interactive-prop" role="button" tabindex="0" aria-label="Fluff yellow couch pillow">
+            <rect x="438" y="416" width="76" height="70" rx="18" transform="rotate(-10 476 451)" fill="#ffd166" stroke="#1e1b2e" stroke-width="4" />
+          </g>
+
           <!-- Contact Shadows on Cushions -->
           <ellipse cx="330" cy="510" rx="68" ry="12" fill="#136f79" opacity="0.45" />
           <ellipse cx="855" cy="510" rx="66" ry="12" fill="#136f79" opacity="0.45" />
         </g>
 
+        <!-- Drink Drop-Target Halos (visible when dragging/selecting a drink) -->
+        <ellipse id="halo-fox" class="drop-halo" cx="332" cy="405" rx="95" ry="122" fill="rgba(255,209,102,0.12)" stroke="#ffd166" stroke-width="4" stroke-dasharray="10 8" />
+        <ellipse id="halo-bat" class="drop-halo" cx="605" cy="245" rx="108" ry="86" fill="rgba(255,209,102,0.12)" stroke="#ffd166" stroke-width="4" stroke-dasharray="10 8" />
+        <ellipse id="halo-skunk" class="drop-halo" cx="856" cy="415" rx="98" ry="122" fill="rgba(255,209,102,0.12)" stroke="#ffd166" stroke-width="4" stroke-dasharray="10 8" />
+
         <!-- ==================== CHARACTER 1: SUNNY FOX (WOMAN) ==================== -->
-        <g id="char-fox" class="fox-group">
-          <!-- Lush Multi-Tone Swaying Tail -->
-          <g class="fox-tail">
-            <path d="M262,492 C176,472 140,388 192,348 C228,322 262,368 258,438 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <path d="M174,382 C176,354 198,342 222,350 C226,370 208,392 182,394 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
-            <!-- Fur highlight arc -->
-            <path d="M188,434 C180,414 184,394 196,382" fill="none" stroke="#ffad69" stroke-width="5" stroke-linecap="round" opacity="0.7" />
-          </g>
-
-          <!-- Seated Legs & Paws on Cushion -->
-          <ellipse cx="304" cy="498" rx="22" ry="14" fill="#2e243d" stroke="#1e1b2e" stroke-width="4" />
-          <ellipse cx="362" cy="498" rx="22" ry="14" fill="#2e243d" stroke="#1e1b2e" stroke-width="4" />
-          <circle cx="298" cy="500" r="3" fill="#ffad69" />
-          <circle cx="306" cy="500" r="3" fill="#ffad69" />
-          <circle cx="358" cy="500" r="3" fill="#ffad69" />
-          <circle cx="366" cy="500" r="3" fill="#ffad69" />
-
-          <!-- Sleek Body & Cozy Berry Cardigan -->
-          <path d="M272,496 C270,432 296,396 332,396 C368,396 394,432 390,496 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- Fluffy Cream Chest Ruff -->
-          <path d="M308,402 C328,400 346,418 346,478 L314,478 C306,450 304,420 308,402 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" />
-          <!-- Stylish Plum Cardigan Lapels -->
-          <path d="M286,404 C272,424 270,468 274,494 L308,494 C304,458 302,424 306,402 Z" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
-          <path d="M376,404 C390,424 392,468 388,494 L354,494 C358,458 360,424 356,402 Z" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
-          <!-- Golden Sun Lapel Pin -->
-          <circle cx="292" cy="434" r="7" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
-
-          <!-- Left Relaxed Arm -->
-          <path d="M278,426 C252,442 252,470 274,476 C288,480 298,468 295,452" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
-          <circle cx="276" cy="470" r="10" fill="#2e243d" stroke="#1e1b2e" stroke-width="3.5" />
-
-          <!-- Right Expressive Gesture Arm -->
-          <g class="fox-gesture-arm">
-            <path d="M378,424 C402,436 410,458 394,470 C382,478 368,466 368,450" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
-            <circle cx="394" cy="462" r="10" fill="#2e243d" stroke="#1e1b2e" stroke-width="3.5" />
-          </g>
-
-          <!-- Sunny Fox Head -->
-          <g>
-            <!-- Left Ear + Gold Ear Stud -->
-            <polygon points="282,332 266,260 322,302" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <polygon points="287,320 276,276 314,304" fill="#2e243d" />
-            <path d="M286,314 Q295,302 304,312" fill="none" stroke="#fff5e4" stroke-width="3" stroke-linecap="round" />
-            <circle cx="272" cy="304" r="4.5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
-
-            <!-- Right Ear (Twitches) -->
-            <g class="fox-ear-r">
-              <polygon points="342,302 394,258 380,332" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-              <polygon points="348,304 384,274 374,320" fill="#2e243d" />
-              <path d="M358,312 Q367,302 374,314" fill="none" stroke="#fff5e4" stroke-width="3" stroke-linecap="round" />
+        <g id="char-fox" class="fox-group" role="button" tabindex="0" aria-label="Sunny Fox">
+          <g class="fox-inner">
+            <!-- Lush Multi-Tone Swaying Tail -->
+            <g class="fox-tail">
+              <path d="M262,492 C176,472 140,388 192,348 C228,322 262,368 258,438 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <path d="M174,382 C176,354 198,342 222,350 C226,370 208,392 182,394 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
+              <path d="M188,434 C180,414 184,394 196,382" fill="none" stroke="#ffad69" stroke-width="5" stroke-linecap="round" opacity="0.7" />
             </g>
 
-            <!-- Head Contour with Cheek Fur Tufts -->
-            <path d="M266,352 C264,310 298,292 332,292 C366,292 400,310 398,352 L408,360 L394,370 C386,396 356,412 332,412 C308,412 278,396 270,370 L256,360 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <!-- Cream Cheek Fur -->
-            <path d="M262,360 C288,354 312,372 332,410 C296,410 272,390 262,360 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" stroke-linejoin="round" />
-            <path d="M402,360 C376,354 352,372 332,410 C368,410 392,390 402,360 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" stroke-linejoin="round" />
-            <!-- Rosy Cheek Blush -->
-            <ellipse cx="290" cy="376" rx="8" ry="4.5" fill="#ff758f" opacity="0.5" />
-            <ellipse cx="374" cy="376" rx="8" ry="4.5" fill="#ff758f" opacity="0.5" />
+            <!-- Seated Legs & Paws on Cushion -->
+            <ellipse cx="304" cy="498" rx="22" ry="14" fill="#2e243d" stroke="#1e1b2e" stroke-width="4" />
+            <ellipse cx="362" cy="498" rx="22" ry="14" fill="#2e243d" stroke="#1e1b2e" stroke-width="4" />
+            <circle cx="298" cy="500" r="3" fill="#ffad69" />
+            <circle cx="306" cy="500" r="3" fill="#ffad69" />
+            <circle cx="358" cy="500" r="3" fill="#ffad69" />
+            <circle cx="366" cy="500" r="3" fill="#ffad69" />
 
-            <!-- Expressive Woman Eyes with Eyelashes, Warm Upper Lid & Catchlights -->
-            <path d="M291,337 Q305,330 318,337" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
-            <path d="M346,337 Q359,330 373,337" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
-            <!-- Left Eye -->
-            <ellipse cx="306" cy="354" rx="10" ry="8.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3" />
-            <circle cx="308" cy="354" r="5.5" fill="#1b9aaa" />
-            <circle cx="308" cy="354" r="3.2" fill="#1e1b2e" />
-            <circle cx="310" cy="351" r="2" fill="#ffffff" />
-            <path d="M294,350 Q306,343 317,350" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
-            <path d="M294,349 L288,343 M297,346 L293,340" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
-            <!-- Right Eye (Winks) -->
-            <g class="fox-wink-eye">
-              <ellipse cx="358" cy="354" rx="10" ry="8.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3" />
-              <circle cx="356" cy="354" r="5.5" fill="#1b9aaa" />
-              <circle cx="356" cy="354" r="3.2" fill="#1e1b2e" />
-              <circle cx="358" cy="351" r="2" fill="#ffffff" />
-              <path d="M347,350 Q358,343 370,350" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
-              <path d="M370,349 L376,343 M367,346 L371,340" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+            <!-- Sleek Body & Cozy Berry Cardigan -->
+            <path d="M272,496 C270,432 296,396 332,396 C368,396 394,432 390,496 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" />
+            <path d="M308,402 C328,400 346,418 346,478 L314,478 C306,450 304,420 308,402 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" />
+            <path d="M286,404 C272,424 270,468 274,494 L308,494 C304,458 302,424 306,402 Z" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
+            <path d="M376,404 C390,424 392,468 388,494 L354,494 C358,458 360,424 356,402 Z" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linejoin="round" />
+            <circle cx="292" cy="434" r="7" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
+
+            <!-- Left Relaxed Arm -->
+            <path d="M278,426 C252,442 252,470 274,476 C288,480 298,468 295,452" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
+            <circle cx="276" cy="470" r="10" fill="#2e243d" stroke="#1e1b2e" stroke-width="3.5" />
+
+            <!-- Right Expressive Gesture Arm -->
+            <g class="fox-gesture-arm">
+              <path d="M378,424 C402,436 410,458 394,470 C382,478 368,466 368,450" fill="#8e3b68" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
+              <circle cx="394" cy="462" r="10" fill="#2e243d" stroke="#1e1b2e" stroke-width="3.5" />
             </g>
 
-            <!-- Nose & Animated Speaking Mouth -->
-            <ellipse cx="332" cy="376" rx="7.5" ry="5.5" fill="#1e1b2e" />
-            <ellipse cx="330" cy="374.5" rx="2.5" ry="1.5" fill="#ffffff" opacity="0.7" />
-            <path class="mouth-idle" d="M320,388 Q334,398 349,386" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
-            <ellipse class="mouth-talking fox-mouth-talk-origin" cx="332" cy="390" rx="7" ry="5.5" fill="#9e2a2b" stroke="#1e1b2e" stroke-width="3" />
+            <!-- Sunny Fox Head -->
+            <g class="fox-head">
+              <polygon points="282,332 266,260 322,302" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <polygon points="287,320 276,276 314,304" fill="#2e243d" />
+              <path d="M286,314 Q295,302 304,312" fill="none" stroke="#fff5e4" stroke-width="3" stroke-linecap="round" />
+              <circle cx="272" cy="304" r="4.5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+
+              <g class="fox-ear-r">
+                <polygon points="342,302 394,258 380,332" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+                <polygon points="348,304 384,274 374,320" fill="#2e243d" />
+                <path d="M358,312 Q367,302 374,314" fill="none" stroke="#fff5e4" stroke-width="3" stroke-linecap="round" />
+              </g>
+
+              <path d="M266,352 C264,310 298,292 332,292 C366,292 400,310 398,352 L408,360 L394,370 C386,396 356,412 332,412 C308,412 278,396 270,370 L256,360 Z" fill="url(#foxFurGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <path d="M262,360 C288,354 312,372 332,410 C296,410 272,390 262,360 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" stroke-linejoin="round" />
+              <path d="M402,360 C376,354 352,372 332,410 C368,410 392,390 402,360 Z" fill="#fff5e4" stroke="#1e1b2e" stroke-width="3.5" stroke-linejoin="round" />
+              <ellipse cx="290" cy="376" rx="8" ry="4.5" fill="#ff758f" opacity="0.5" />
+              <ellipse cx="374" cy="376" rx="8" ry="4.5" fill="#ff758f" opacity="0.5" />
+
+              <path d="M291,337 Q305,330 318,337" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+              <path d="M346,337 Q359,330 373,337" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+
+              <ellipse cx="306" cy="354" rx="10" ry="8.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="308" cy="354" r="5.5" fill="#1b9aaa" />
+              <circle cx="308" cy="354" r="3.2" fill="#1e1b2e" />
+              <circle cx="310" cy="351" r="2" fill="#ffffff" />
+              <path d="M294,350 Q306,343 317,350" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+              <path d="M294,349 L288,343 M297,346 L293,340" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+
+              <g class="fox-wink-eye">
+                <ellipse cx="358" cy="354" rx="10" ry="8.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3" />
+                <circle cx="356" cy="354" r="5.5" fill="#1b9aaa" />
+                <circle cx="356" cy="354" r="3.2" fill="#1e1b2e" />
+                <circle cx="358" cy="351" r="2" fill="#ffffff" />
+                <path d="M347,350 Q358,343 370,350" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+                <path d="M370,349 L376,343 M367,346 L371,340" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
+              </g>
+
+              <ellipse cx="332" cy="376" rx="7.5" ry="5.5" fill="#1e1b2e" />
+              <ellipse cx="330" cy="374.5" rx="2.5" ry="1.5" fill="#ffffff" opacity="0.7" />
+              <path class="mouth-idle" d="M320,388 Q334,398 349,386" fill="none" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+              <ellipse class="mouth-talking fox-mouth-talk-origin" cx="332" cy="390" rx="7" ry="5.5" fill="#9e2a2b" stroke="#1e1b2e" stroke-width="3" />
+            </g>
           </g>
         </g>
 
-        <!-- ==================== CHARACTER 2: LUNA BAT (GIRL — EXTRA CUTE) ==================== -->
-        <g id="char-bat" class="bat-group">
-          <!-- Left Wing (Scalloped & Highlighted) -->
-          <g class="bat-wing-l">
-            <path d="M572,248 C528,208 476,220 478,262 C496,258 506,268 514,282 C528,270 542,276 548,288 C562,276 572,272 578,266 Z" fill="url(#batWingGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <path d="M566,252 C536,226 502,232 496,254" fill="none" stroke="#c77dff" stroke-width="3.5" stroke-linecap="round" opacity="0.75" />
-          </g>
-          <!-- Right Wing -->
-          <g class="bat-wing-r">
-            <path d="M638,248 C682,208 734,220 732,262 C714,258 704,268 696,282 C682,270 668,276 662,288 C648,276 638,272 632,266 Z" fill="url(#batWingGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <path d="M644,252 C674,226 708,232 714,254" fill="none" stroke="#c77dff" stroke-width="3.5" stroke-linecap="round" opacity="0.75" />
-          </g>
+        <!-- ==================== CHARACTER 2: LUNA BAT (GIRL — NESTED SMOOTH FLIGHT) ==================== -->
+        <g id="char-bat" class="bat-anchor" role="button" tabindex="0" aria-label="Luna Bat">
+          <g class="bat-motion">
+            <g class="bat-wing-l">
+              <path d="M572,248 C528,208 476,220 478,262 C496,258 506,268 514,282 C528,270 542,276 548,288 C562,276 572,272 578,266 Z" fill="url(#batWingGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <path d="M566,252 C536,226 502,232 496,254" fill="none" stroke="#c77dff" stroke-width="3.5" stroke-linecap="round" opacity="0.75" />
+            </g>
+            <g class="bat-wing-r">
+              <path d="M638,248 C682,208 734,220 732,262 C714,258 704,268 696,282 C682,270 668,276 662,288 C648,276 638,272 632,266 Z" fill="url(#batWingGrad)" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <path d="M644,252 C674,226 708,232 714,254" fill="none" stroke="#c77dff" stroke-width="3.5" stroke-linecap="round" opacity="0.75" />
+            </g>
 
-          <!-- Cute Little Feet -->
-          <g class="bat-feet">
-            <path d="M590,282 L584,296 M595,283 L595,297 M615,283 L615,297 M620,282 L626,296" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
-          </g>
+            <g class="bat-feet">
+              <path d="M590,282 L584,296 M595,283 L595,297 M615,283 L615,297 M620,282 L626,296" stroke="#1e1b2e" stroke-width="4" stroke-linecap="round" />
+            </g>
 
-          <!-- Chibi Plump Torso & Fluffy Collar Ruff -->
-          <ellipse cx="605" cy="260" rx="28" ry="26" fill="#8b46d9" stroke="#1e1b2e" stroke-width="4.5" />
-          <ellipse cx="605" cy="265" rx="17" ry="15" fill="#e0aaff" />
-          <!-- Fluffy Neck Ruff -->
-          <path d="M578,245 Q588,260 598,248 Q605,262 612,248 Q622,260 632,245 Z" fill="#fff0fb" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
-          <!-- Tiny Cute Waving Paws -->
-          <circle cx="578" cy="262" r="7" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" />
-          <circle cx="632" cy="262" r="7" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" />
+            <ellipse cx="605" cy="260" rx="28" ry="26" fill="#8b46d9" stroke="#1e1b2e" stroke-width="4.5" />
+            <ellipse cx="605" cy="265" rx="17" ry="15" fill="#e0aaff" />
+            <path d="M578,245 Q588,260 598,248 Q605,262 612,248 Q622,260 632,245 Z" fill="#fff0fb" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
+            <circle cx="578" cy="262" r="7" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="632" cy="262" r="7" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" />
 
-          <!-- Big Fuzzy Ears + Coral-Pink Hair Bow -->
-          <path d="M570,206 Q550,158 556,156 Q562,154 596,188 Z" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          <path d="M573,200 Q560,168 563,166 Q566,164 590,190 Z" fill="#ff9ebb" />
-          <path d="M640,206 Q660,158 654,156 Q648,154 614,188 Z" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          <path d="M637,200 Q650,168 647,166 Q644,164 620,190 Z" fill="#ff9ebb" />
+            <path d="M570,206 Q550,158 556,156 Q562,154 596,188 Z" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M573,200 Q560,168 563,166 Q566,164 590,190 Z" fill="#ff9ebb" />
+            <path d="M640,206 Q660,158 654,156 Q648,154 614,188 Z" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M637,200 Q650,168 647,166 Q644,164 620,190 Z" fill="#ff9ebb" />
 
-          <!-- Cute Coral-Pink Bow on Right Ear -->
-          <g transform="translate(632, 184) rotate(16)">
-            <path d="M0,0 L-15,-9 L-14,9 Z" fill="#ff6b9d" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
-            <path d="M0,0 L15,-9 L14,9 Z" fill="#ff6b9d" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
-            <circle cx="0" cy="0" r="5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
-          </g>
+            <g transform="translate(632, 184) rotate(16)">
+              <path d="M0,0 L-15,-9 L-14,9 Z" fill="#ff6b9d" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
+              <path d="M0,0 L15,-9 L14,9 Z" fill="#ff6b9d" stroke="#1e1b2e" stroke-width="3" stroke-linejoin="round" />
+              <circle cx="0" cy="0" r="5" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" />
+            </g>
 
-          <!-- Big Round Chibi Head -->
-          <ellipse cx="605" cy="222" rx="42" ry="37" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- Forehead Cute Hair Tuft -->
-          <path d="M598,186 Q605,174 612,186" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
+            <ellipse cx="605" cy="222" rx="42" ry="37" fill="#9b5de5" stroke="#1e1b2e" stroke-width="4.5" />
+            <path d="M598,186 Q605,174 612,186" fill="#9b5de5" stroke="#1e1b2e" stroke-width="3.5" stroke-linecap="round" />
 
-          <!-- Huge Sparkly Chibi Eyes -->
-          <g class="bat-eyes">
-            <!-- Left Eye -->
-            <circle cx="586" cy="222" r="14" fill="#1e1b2e" />
-            <circle cx="586" cy="224" r="10.5" fill="#5a189a" />
-            <circle cx="586" cy="222" r="7" fill="#1e1b2e" />
-            <circle cx="582" cy="217" r="4.5" fill="#ffffff" />
-            <circle cx="591" cy="227" r="2.2" fill="#ffffff" />
-            <path d="M572,216 L567,211" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
-            <!-- Right Eye -->
-            <circle cx="624" cy="222" r="14" fill="#1e1b2e" />
-            <circle cx="624" cy="224" r="10.5" fill="#5a189a" />
-            <circle cx="624" cy="222" r="7" fill="#1e1b2e" />
-            <circle cx="620" cy="217" r="4.5" fill="#ffffff" />
-            <circle cx="629" cy="227" r="2.2" fill="#ffffff" />
-            <path d="M638,216 L643,211" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
-          </g>
+            <g class="bat-eyes">
+              <circle cx="586" cy="222" r="14" fill="#1e1b2e" />
+              <circle cx="586" cy="224" r="10.5" fill="#5a189a" />
+              <circle cx="586" cy="222" r="7" fill="#1e1b2e" />
+              <circle cx="582" cy="217" r="4.5" fill="#ffffff" />
+              <circle cx="591" cy="227" r="2.2" fill="#ffffff" />
+              <path d="M572,216 L567,211" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
 
-          <!-- Soft Rosy Cheeks & Cute Button Nose -->
-          <ellipse cx="569" cy="236" rx="7.5" ry="4.5" fill="#ff75a0" opacity="0.8" />
-          <ellipse cx="641" cy="236" rx="7.5" ry="4.5" fill="#ff75a0" opacity="0.8" />
-          <ellipse cx="605" cy="233" rx="4.5" ry="3.2" fill="#ff8fab" stroke="#1e1b2e" stroke-width="2" />
+              <circle cx="624" cy="222" r="14" fill="#1e1b2e" />
+              <circle cx="624" cy="224" r="10.5" fill="#5a189a" />
+              <circle cx="624" cy="222" r="7" fill="#1e1b2e" />
+              <circle cx="620" cy="217" r="4.5" fill="#ffffff" />
+              <circle cx="629" cy="227" r="2.2" fill="#ffffff" />
+              <path d="M638,216 L643,211" stroke="#1e1b2e" stroke-width="2.5" stroke-linecap="round" />
 
-          <!-- Cute :3 Idle Smile & Talking Fang Mouth -->
-          <path class="mouth-idle" d="M594,242 Q600,248 605,241 Q610,248 616,242" fill="none" stroke="#1e1b2e" stroke-width="3" stroke-linecap="round" />
-          <g class="mouth-talking bat-mouth-talk-origin">
-            <path d="M593,242 Q605,258 617,242 Z" fill="#ff4d6d" stroke="#1e1b2e" stroke-width="2.8" stroke-linejoin="round" />
-            <polygon points="597,243 600,249 603,243" fill="#ffffff" />
-            <polygon points="607,243 610,249 613,243" fill="#ffffff" />
+              <!-- Nocturnal Bat-Vision Glow when Floor Lamp is Off -->
+              <g class="bat-night-eyes">
+                <circle cx="586" cy="222" r="9.5" fill="#ffe08a" opacity="0.58" />
+                <circle cx="586" cy="222" r="4.8" fill="#ffffff" />
+                <circle cx="624" cy="222" r="9.5" fill="#ffe08a" opacity="0.58" />
+                <circle cx="624" cy="222" r="4.8" fill="#ffffff" />
+              </g>
+            </g>
+
+            <ellipse cx="569" cy="236" rx="7.5" ry="4.5" fill="#ff75a0" opacity="0.8" />
+            <ellipse cx="641" cy="236" rx="7.5" ry="4.5" fill="#ff75a0" opacity="0.8" />
+            <ellipse cx="605" cy="233" rx="4.5" ry="3.2" fill="#ff8fab" stroke="#1e1b2e" stroke-width="2" />
+
+            <path class="mouth-idle" d="M594,242 Q600,248 605,241 Q610,248 616,242" fill="none" stroke="#1e1b2e" stroke-width="3" stroke-linecap="round" />
+            <g class="mouth-talking bat-mouth-talk-origin">
+              <path d="M593,242 Q605,258 617,242 Z" fill="#ff4d6d" stroke="#1e1b2e" stroke-width="2.8" stroke-linejoin="round" />
+              <polygon points="597,243 600,249 603,243" fill="#ffffff" />
+              <polygon points="607,243 610,249 613,243" fill="#ffffff" />
+            </g>
           </g>
         </g>
 
-        <!-- ==================== CHARACTER 3: POPPYDASH (SKUNK, MAN) ==================== -->
-        <g id="char-skunk" class="skunk-group">
-          <!-- Fluffy Two-Tone Tail -->
-          <g class="skunk-tail">
-            <path d="M908,484 C980,474 1020,408 996,346 C980,306 930,310 916,354 C902,398 920,445 900,478 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <path d="M956,326 C978,338 986,372 968,412 C952,448 932,466 914,474 C926,442 930,388 956,326 Z" fill="#fafafa" />
-          </g>
+        <!-- ==================== CHARACTER 3: POPPYDASH (SKUNK, MAN — SLAPSTICK COMIC RELIEF) ==================== -->
+        <g id="char-skunk" class="skunk-group" role="button" tabindex="0" aria-label="PoppyDash the Skunk">
+          <g class="skunk-inner">
+            <!-- Fluffy Two-Tone Tail -->
+            <g class="skunk-tail">
+              <path d="M908,484 C980,474 1020,408 996,346 C980,306 930,310 916,354 C902,398 920,445 900,478 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <path d="M956,326 C978,338 986,372 968,412 C952,448 932,466 914,474 C926,442 930,388 956,326 Z" fill="#fafafa" />
+            </g>
 
-          <!-- Legs & Paws (Kickable during fall!) -->
-          <ellipse cx="825" cy="500" rx="22" ry="13" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-          <ellipse cx="885" cy="500" rx="22" ry="13" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+            <!-- Legs & Paws (Kick during Scooby-hover & fall!) -->
+            <g class="skunk-legs">
+              <ellipse cx="825" cy="500" rx="22" ry="13" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+              <ellipse cx="885" cy="500" rx="22" ry="13" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+            </g>
 
-          <!-- Body & Cozy Striped Lounge Shirt -->
-          <path d="M794,494 C790,428 820,396 862,396 C904,396 926,432 920,494 Z" fill="#3a5a9b" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- Shirt Stripes (neatly fitted inside torso) -->
-          <path d="M804,432 Q858,440 912,432 L916,440 Q858,448 801,440 Z" fill="#ffd166" />
-          <path d="M797,458 Q858,466 920,458 L921,466 Q858,474 795,466 Z" fill="#ffd166" />
-          <!-- Re-outline torso cleanly -->
-          <path d="M794,494 C790,428 820,396 862,396 C904,396 926,432 920,494 Z" fill="none" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- White Collar Trim -->
-          <path d="M832,398 Q856,416 882,398" fill="none" stroke="#fafafa" stroke-width="5" stroke-linecap="round" />
+            <!-- Body & Cozy Striped Lounge Shirt -->
+            <path d="M794,494 C790,428 820,396 862,396 C904,396 926,432 920,494 Z" fill="#3a5a9b" stroke="#1e1b2e" stroke-width="4.5" />
+            <path d="M804,432 Q858,440 912,432 L916,440 Q858,448 801,440 Z" fill="#ffd166" />
+            <path d="M797,458 Q858,466 920,458 L921,466 Q858,474 795,466 Z" fill="#ffd166" />
+            <path d="M794,494 C790,428 820,396 862,396 C904,396 926,432 920,494 Z" fill="none" stroke="#1e1b2e" stroke-width="4.5" />
+            <path d="M832,398 Q856,416 882,398" fill="none" stroke="#fafafa" stroke-width="5" stroke-linecap="round" />
 
-          <!-- Head & Fur Tufts -->
-          <circle cx="812" cy="330" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-          <circle cx="812" cy="330" r="7" fill="#ff9ebb" opacity="0.65" />
-          <circle cx="896" cy="330" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-          <circle cx="896" cy="330" r="7" fill="#ff9ebb" opacity="0.65" />
+            <!-- Head Group -->
+            <g class="skunk-head-group">
+              <circle cx="812" cy="330" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+              <circle cx="812" cy="330" r="7" fill="#ff9ebb" opacity="0.65" />
+              <circle cx="896" cy="330" r="15" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+              <circle cx="896" cy="330" r="7" fill="#ff9ebb" opacity="0.65" />
 
-          <path d="M804,360 C804,328 826,314 854,314 C882,314 904,328 904,360 L912,368 L900,376 C892,398 874,408 854,408 C834,408 816,398 808,376 L796,368 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-          <!-- Bold White Nose Stripe -->
-          <path d="M854,316 C838,320 836,354 830,376 C842,388 866,388 878,376 C872,354 870,320 854,316 Z" fill="#fafafa" />
+              <path d="M804,360 C804,328 826,314 854,314 C882,314 904,328 904,360 L912,368 L900,376 C892,398 874,408 854,408 C834,408 816,398 808,376 L796,368 Z" fill="#252333" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <path d="M854,316 C838,320 836,354 830,376 C842,388 866,388 878,376 C872,354 870,320 854,316 Z" fill="#fafafa" />
 
-          <!-- Expressive Goofy Eyes -->
-          <g class="skunk-eyes">
-            <circle cx="834" cy="356" r="10.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="836" cy="358" r="5" fill="#1e1b2e" />
-            <circle cx="838" cy="355" r="2" fill="#ffffff" />
-            <circle cx="874" cy="356" r="10.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="872" cy="354" r="5" fill="#1e1b2e" />
-            <circle cx="874" cy="351" r="2" fill="#ffffff" />
-          </g>
+              <g class="skunk-eyes">
+                <circle cx="834" cy="356" r="10.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
+                <circle cx="836" cy="358" r="5" fill="#1e1b2e" />
+                <circle cx="838" cy="355" r="2" fill="#ffffff" />
+                <circle cx="874" cy="356" r="10.5" fill="#ffffff" stroke="#1e1b2e" stroke-width="3.5" />
+                <circle cx="872" cy="354" r="5" fill="#1e1b2e" />
+                <circle cx="874" cy="351" r="2" fill="#ffffff" />
+              </g>
 
-          <!-- Thick Expressive Brows -->
-          <path d="M820,340 Q834,334 844,342" fill="none" stroke="#fafafa" stroke-width="4" stroke-linecap="round" />
-          <path d="M864,342 Q874,334 888,340" fill="none" stroke="#fafafa" stroke-width="4" stroke-linecap="round" />
+              <path d="M820,340 Q834,334 844,342" fill="none" stroke="#fafafa" stroke-width="4" stroke-linecap="round" />
+              <path d="M864,342 Q874,334 888,340" fill="none" stroke="#fafafa" stroke-width="4" stroke-linecap="round" />
 
-          <!-- Nose, Blush, Sweat Drop & Animated Mouth -->
-          <ellipse cx="854" cy="374" rx="7" ry="5" fill="#ff70a6" stroke="#1e1b2e" stroke-width="2.5" />
-          <ellipse cx="820" cy="374" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
-          <ellipse cx="888" cy="374" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
-          <path class="sweat-drop" d="M899,338 C906,350 906,358 899,358 C892,358 892,350 899,338 Z" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2.5" />
+              <ellipse cx="854" cy="374" rx="7" ry="5" fill="#ff70a6" stroke="#1e1b2e" stroke-width="2.5" />
+              <ellipse cx="820" cy="374" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
+              <ellipse cx="888" cy="374" rx="7" ry="4" fill="#ff6b6b" opacity="0.65" />
+              <path class="sweat-drop" d="M899,338 C906,350 906,358 899,358 C892,358 892,350 899,338 Z" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2.5" />
 
-          <path class="mouth-idle" d="M842,388 Q854,397 866,388" fill="none" stroke="#fafafa" stroke-width="3.5" stroke-linecap="round" />
-          <g class="mouth-talking skunk-mouth-talk-origin">
-            <ellipse cx="854" cy="390" rx="10" ry="7" fill="#d62828" stroke="#fafafa" stroke-width="2.5" />
-            <rect x="850" y="384" width="8" height="4" rx="1" fill="#ffffff" />
-          </g>
+              <path class="mouth-idle" d="M842,388 Q854,397 866,388" fill="none" stroke="#fafafa" stroke-width="3.5" stroke-linecap="round" />
+              <g class="mouth-talking skunk-mouth-talk-origin">
+                <ellipse cx="854" cy="390" rx="10" ry="7" fill="#d62828" stroke="#fafafa" stroke-width="2.5" />
+                <rect x="850" y="384" width="8" height="4" rx="1" fill="#ffffff" />
+              </g>
 
-          <!-- Stray Popcorn Kernel Perched on Nose during Recovery -->
-          <g class="nose-kernel" transform="translate(854, 366)">
-            <circle cx="-4" cy="0" r="6" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
-            <circle cx="3" cy="-2" r="5" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" />
-          </g>
+              <!-- Brain Freeze Icy Frost Tint & Snowflakes -->
+              <g class="skunk-frost">
+                <ellipse cx="854" cy="356" rx="64" ry="54" fill="url(#frostGrad)" />
+                <path d="M800,312 L814,312 M807,305 L807,319 M802,307 L812,317 M812,307 L802,317" stroke="#caf0f8" stroke-width="2.5" stroke-linecap="round" />
+                <path d="M898,314 L912,314 M905,307 L905,321 M900,309 L910,319 M910,309 L900,319" stroke="#caf0f8" stroke-width="2.5" stroke-linecap="round" />
+                <path d="M850,294 L862,294 M856,288 L856,300" stroke="#90e0ef" stroke-width="2.5" stroke-linecap="round" />
+              </g>
 
-          <!-- Dizzy Spinning Stars during Fall -->
-          <g class="dizzy-stars">
-            <polygon points="815,295 819,303 828,304 821,310 823,319 815,314 807,319 809,310 802,304 811,303" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
-            <polygon points="888,288 891,294 898,295 893,299 894,306 888,302 882,306 883,299 878,295 885,294" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2" />
-            <polygon points="855,274 858,280 865,281 860,285 861,292 855,288 849,292 850,285 845,281 852,280" fill="#ff758f" stroke="#1e1b2e" stroke-width="2" />
-          </g>
+              <!-- Super Bubble Burp & Hiccup Floating Bubbles -->
+              <g class="skunk-hiccup-bubbles">
+                <circle cx="834" cy="378" r="11" fill="#5ce1e6" fill-opacity="0.78" stroke="#ffffff" stroke-width="2.2" />
+                <circle cx="830" cy="374" r="3" fill="#ffffff" />
+                <circle cx="872" cy="362" r="15" fill="#9bf6ff" fill-opacity="0.74" stroke="#ffffff" stroke-width="2.4" />
+                <circle cx="867" cy="356" r="4" fill="#ffffff" />
+                <circle cx="852" cy="342" r="9" fill="#ff9ebb" fill-opacity="0.78" stroke="#ffffff" stroke-width="2" />
+                <circle cx="888" cy="336" r="7" fill="#ffd166" fill-opacity="0.82" stroke="#ffffff" stroke-width="1.8" />
+                <circle cx="820" cy="350" r="8" fill="#c77dff" fill-opacity="0.72" stroke="#ffffff" stroke-width="1.8" />
+              </g>
 
-          <!-- Juggled Striped Popcorn Bucket -->
-          <g class="popcorn-juggle">
-            <circle cx="806" cy="436" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="830" cy="428" r="16" fill="#ffd166" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="854" cy="436" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
-            <circle cx="820" cy="444" r="13" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
-            <circle cx="844" cy="444" r="13" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
+              <!-- Giant Cartoon Sneeze Gust Puff -->
+              <g class="skunk-sneeze-puff">
+                <path d="M830,384 C802,372 778,376 762,390 C782,394 806,396 828,392 Z" fill="#ffffff" opacity="0.88" stroke="#5ce1e6" stroke-width="2.5" />
+                <path d="M776,374 L748,366 M772,388 L742,392 M778,400 L752,410" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+              </g>
 
-            <polygon points="790,446 870,446 858,520 802,520" fill="#fafafa" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <polygon points="806,446 820,446 816,520 806,520" fill="#ef233c" />
-            <polygon points="838,446 852,446 846,520 834,520" fill="#ef233c" />
-            <polygon points="790,446 870,446 858,520 802,520" fill="none" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
-            <!-- Clumsy Paws Holding Bucket -->
-            <ellipse cx="790" cy="478" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
-            <ellipse cx="870" cy="472" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+              <!-- Stray Popcorn Kernel Perched on Nose during Recovery -->
+              <g class="nose-kernel" transform="translate(854, 366)">
+                <circle cx="-4" cy="0" r="6" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+                <circle cx="3" cy="-2" r="5" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2" />
+              </g>
+
+              <!-- Dizzy Spinning Stars during Fall & Disco Spin-Out -->
+              <g class="dizzy-stars">
+                <polygon points="815,295 819,303 828,304 821,310 823,319 815,314 807,319 809,310 802,304 811,303" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+                <polygon points="888,288 891,294 898,295 893,299 894,306 888,302 882,306 883,299 878,295 885,294" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2" />
+                <polygon points="855,274 858,280 865,281 860,285 861,292 855,288 849,292 850,285 845,281 852,280" fill="#ff758f" stroke="#1e1b2e" stroke-width="2" />
+              </g>
+            </g>
+
+            <!-- Silly Cartoon Lime-Green Skunk Toot Cloud! -->
+            <g id="skunk-toot-cloud" class="skunk-toot-cloud">
+              <circle cx="944" cy="466" r="24" fill="#80ed99" fill-opacity="0.88" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="972" cy="450" r="30" fill="#b5e48c" fill-opacity="0.9" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="998" cy="468" r="22" fill="#80ed99" fill-opacity="0.88" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="968" cy="476" r="22" fill="#99e2b4" fill-opacity="0.92" />
+              <circle cx="956" cy="452" r="14" fill="#d9ed92" fill-opacity="0.85" />
+              <!-- Wiggly Cartoon Stink Lines -->
+              <path d="M950,420 Q942,404 952,390 Q960,378 952,366" fill="none" stroke="#80ed99" stroke-width="4.5" stroke-linecap="round" />
+              <path d="M976,412 Q986,396 976,380 Q968,368 978,354" fill="none" stroke="#d9ed92" stroke-width="4.5" stroke-linecap="round" />
+              <path d="M1002,430 Q1012,414 1002,400" fill="none" stroke="#b5e48c" stroke-width="4" stroke-linecap="round" />
+            </g>
+
+            <!-- Juggled Striped Popcorn Bucket -->
+            <g class="popcorn-juggle">
+              <circle cx="806" cy="436" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
+              <circle cx="830" cy="428" r="16" fill="#ffd166" stroke="#1e1b2e" stroke-width="3.5" />
+              <circle cx="854" cy="436" r="14" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3.5" />
+              <circle cx="820" cy="444" r="13" fill="#ffd166" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="844" cy="444" r="13" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
+
+              <polygon points="790,446 870,446 858,520 802,520" fill="#fafafa" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <polygon points="806,446 820,446 816,520 806,520" fill="#ef233c" />
+              <polygon points="838,446 852,446 846,520 834,520" fill="#ef233c" />
+              <polygon points="790,446 870,446 858,520 802,520" fill="none" stroke="#1e1b2e" stroke-width="4.5" stroke-linejoin="round" />
+              <ellipse cx="790" cy="478" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+              <ellipse cx="870" cy="472" rx="13" ry="10" fill="#252333" stroke="#1e1b2e" stroke-width="4" />
+            </g>
           </g>
         </g>
 
-        <!-- Coffee Table & Movie Snacks -->
+        <!-- Interactive Center Throw Pillow (Coral — layered above PoppyDash so Pillow Ambush lands cleanly on his head!) -->
+        <g id="prop-pillow-right" class="interactive-prop" role="button" tabindex="0" aria-label="Bounce coral couch pillow">
+          <rect x="556" y="412" width="74" height="68" rx="18" transform="rotate(7 593 446)" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="4" />
+        </g>
+
+        <!-- Coffee Table & Interactive TV Remote -->
         <g id="coffee-table" transform="translate(385, 595)">
           <rect x="24" y="46" width="16" height="58" rx="6" fill="#5c3721" stroke="#1e1b2e" stroke-width="4" />
           <rect x="390" y="46" width="16" height="58" rx="6" fill="#5c3721" stroke="#1e1b2e" stroke-width="4" />
           <rect x="0" y="28" width="430" height="26" rx="12" fill="#d48c46" stroke="#1e1b2e" stroke-width="4.5" />
-          <!-- Soda Cup 1 -->
-          <polygon points="82,28 74,-12 108,-12 100,28" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3.5" />
-          <rect x="71" y="-18" width="40" height="8" rx="4" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
-          <path d="M92,-18 L100,-36 L112,-36" fill="none" stroke="#ffd166" stroke-width="4" stroke-linecap="round" />
-          <!-- Soda Cup 2 -->
-          <polygon points="134,28 126,-8 158,-8 150,28" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="3.5" />
-          <rect x="123" y="-14" width="38" height="8" rx="4" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
-          <path d="M142,-14 L148,-31 L160,-31" fill="none" stroke="#ff6b6b" stroke-width="4" stroke-linecap="round" />
-          <!-- Remote Control -->
-          <rect x="275" y="14" width="66" height="16" rx="7" fill="#2b2248" stroke="#1e1b2e" stroke-width="3.5" />
-          <circle cx="290" cy="22" r="3.5" fill="#ff6b6b" />
-          <circle cx="304" cy="22" r="3" fill="#ffd166" />
-          <circle cx="318" cy="22" r="3" fill="#5ce1e6" />
+
+          <!-- Interactive TV Remote Control -->
+          <g id="prop-remote" class="interactive-prop" role="button" tabindex="0" aria-label="Click TV remote to change movie genre">
+            <rect x="268" y="4" width="80" height="32" rx="10" fill="transparent" />
+            <rect x="275" y="14" width="66" height="16" rx="7" fill="#2b2248" stroke="#1e1b2e" stroke-width="3.5" />
+            <circle cx="290" cy="22" r="3.5" fill="#ff6b6b" />
+            <circle cx="304" cy="22" r="3" fill="#ffd166" />
+            <circle cx="318" cy="22" r="3" fill="#5ce1e6" />
+            <circle cx="331" cy="22" r="2.2" fill="#c77dff" />
+            <!-- IR Zap Pulse Waves -->
+            <g class="remote-waves">
+              <circle cx="274" cy="22" r="5" fill="#ff4d6d" />
+              <path d="M266,14 Q258,22 266,30" fill="none" stroke="#ff6b6b" stroke-width="3" stroke-linecap="round" />
+              <path d="M259,9 Q248,22 259,35" fill="none" stroke="#ffd166" stroke-width="2.5" stroke-linecap="round" />
+            </g>
+          </g>
+        </g>
+
+        <!-- Interactive Draggable Soda Cup 1 (Coral Berry Fizz — top layer so dragging passes over characters!) -->
+        <g id="prop-drink-1" class="interactive-prop drink-prop" data-drink="berry" data-home-x="475" data-home-y="623" transform="translate(475, 623)" role="button" tabindex="0" aria-label="Drag or click Berry Fizz soda cup to give to a character">
+          <rect x="-26" y="-44" width="56" height="54" rx="10" fill="transparent" />
+          <polygon points="-8,0 -16,-40 18,-40 10,0" fill="#ff6b6b" stroke="#1e1b2e" stroke-width="3.5" />
+          <rect x="-19" y="-46" width="40" height="8" rx="4" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
+          <path d="M2,-46 L10,-64 L22,-64" fill="none" stroke="#ffd166" stroke-width="4" stroke-linecap="round" />
+          <circle cx="1" cy="-20" r="5" fill="#ffd166" opacity="0.85" />
+        </g>
+
+        <!-- Interactive Draggable Soda Cup 2 (Teal Blue-Razz — top layer!) -->
+        <g id="prop-drink-2" class="interactive-prop drink-prop" data-drink="razz" data-home-x="527" data-home-y="623" transform="translate(527, 623)" role="button" tabindex="0" aria-label="Drag or click Blue-Razz soda cup to give to a character">
+          <rect x="-24" y="-40" width="54" height="50" rx="10" fill="transparent" />
+          <polygon points="-8,0 -16,-36 16,-36 8,0" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="3.5" />
+          <rect x="-19" y="-42" width="38" height="8" rx="4" fill="#fff8ec" stroke="#1e1b2e" stroke-width="3" />
+          <path d="M0,-42 L6,-59 L18,-59" fill="none" stroke="#ff6b6b" stroke-width="4" stroke-linecap="round" />
+          <polygon points="0,-24 5,-14 -5,-14" fill="#fff8ec" opacity="0.85" />
+        </g>
+
+        <!-- Reusable Reaction Sparkle / Fizz / Puff Burst Overlay -->
+        <g id="fx-burst" class="fx-burst" transform="translate(332, 340)">
+          <circle cx="-26" cy="-12" r="7" fill="#ffd166" stroke="#1e1b2e" stroke-width="2" />
+          <circle cx="24" cy="-22" r="6" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2" />
+          <circle cx="4" cy="-34" r="5" fill="#ff9ebb" stroke="#1e1b2e" stroke-width="2" />
+          <polygon points="-8,-6 -5,1 2,2 -3,6 -2,13 -8,9 -14,13 -13,6 -18,2 -11,1" fill="#fff8ec" stroke="#1e1b2e" stroke-width="1.8" />
         </g>
 
         <!-- Big Spilled Popcorn Shower FX -->
@@ -1188,9 +2163,37 @@
           <g class="shower-k sk9"><circle cx="848" cy="438" r="9" fill="#ffd166" stroke="#1e1b2e" stroke-width="2.5" /></g>
           <g class="shower-k sk10"><circle cx="812" cy="436" r="8" fill="#fff8ec" stroke="#1e1b2e" stroke-width="2.5" /></g>
         </g>
+
+        <!-- Cozy Dark-Room Atmosphere Overlay (activates smoothly when Floor Lamp is OFF) -->
+        <rect id="room-darkness" x="0" y="0" width="1200" height="740" fill="url(#darkRoomVignette)" />
+
+        <!-- Simulated Movie-Screen Light Falling Onto Characters, Couch & Coffee Table -->
+        <g id="movie-light-layer" style="mix-blend-mode:screen; pointer-events:none;">
+          <!-- Main Upward Movie Screen Cone -->
+          <rect x="0" y="120" width="1200" height="620" fill="url(#movieWashGrad)" />
+          <!-- Character Face & Rim Glow Pools (tinted live by MovieLightEngine) -->
+          <ellipse id="char-light-fox" cx="332" cy="415" rx="118" ry="132" fill="url(#charLightGrad)" opacity="0.36" />
+          <ellipse id="char-light-bat" cx="605" cy="245" rx="110" ry="74" fill="url(#charLightGrad)" opacity="0.24" />
+          <ellipse id="char-light-skunk" cx="855" cy="422" rx="118" ry="132" fill="url(#charLightGrad)" opacity="0.36" />
+        </g>
+
+        <!-- Subtle Drifting Cinema Dust Motes -->
+        <g id="dust-motes" style="pointer-events:none;">
+          <circle class="dust-mote" cx="270" cy="460" r="2.2" fill="#fff8ec" style="--mote-dur:6.8s; --mote-delay:-1.2s;" />
+          <circle class="dust-mote" cx="420" cy="340" r="1.8" fill="#ffd166" style="--mote-dur:8.1s; --mote-delay:-3.1s;" />
+          <circle class="dust-mote" cx="515" cy="510" r="2.4" fill="#9bf6ff" style="--mote-dur:7.3s; --mote-delay:-0.5s;" />
+          <circle class="dust-mote" cx="610" cy="390" r="1.9" fill="#fff8ec" style="--mote-dur:6.2s; --mote-delay:-2.4s;" />
+          <circle class="dust-mote" cx="695" cy="520" r="2.1" fill="#ffd166" style="--mote-dur:7.9s; --mote-delay:-4.2s;" />
+          <circle class="dust-mote" cx="765" cy="350" r="1.7" fill="#9bf6ff" style="--mote-dur:6.5s; --mote-delay:-1.9s;" />
+          <circle class="dust-mote" cx="920" cy="470" r="2.2" fill="#fff8ec" style="--mote-dur:8.4s; --mote-delay:-2.8s;" />
+          <circle class="dust-mote" cx="470" cy="245" r="1.6" fill="#e0aaff" style="--mote-dur:7.1s; --mote-delay:-0.9s;" />
+        </g>
+
+        <!-- Vintage 35mm Projector Sepia Flicker Overlay -->
+        <rect id="vintage-film-flicker" x="0" y="0" width="1200" height="740" fill="#ffb703" />
       </svg>
 
-      <!-- Animated TV Screen Glow -->
+      <!-- Smooth rAF-Driven TV Screen Ambient Glow -->
       <div class="tv-glow" aria-hidden="true"></div>
 
       <!-- Speech Bubbles Overlay -->
@@ -1200,6 +2203,9 @@
         <div id="bubble-skunk" class="speech-bubble" role="button" tabindex="0"></div>
       </div>
 
+      <!-- Drag Drink Hint Banner -->
+      <div id="drag-hint" class="drag-hint" aria-live="polite">Drop soda on Sunny Fox, Luna Bat, or PoppyDash!</div>
+
       <!-- One-Click Audio Unlock Overlay -->
       <div id="start-overlay" class="start-overlay">
         <button id="btn-start-sound" class="start-cta" type="button">
@@ -1207,6 +2213,16 @@
         </button>
       </div>
     </section>
+
+    <div class="prop-hints-bar" aria-label="Interactive elements in the scene">
+      <span class="hint-chip">🥤 Drag or tap drinks</span>
+      <span class="hint-chip">💡 Floor lamp</span>
+      <span class="hint-chip">📺 TV remote</span>
+      <span class="hint-chip">✨ Fairy lights</span>
+      <span class="hint-chip">🛋️ Throw pillows</span>
+      <span class="hint-chip">🎞️ Film reel &amp; poster</span>
+      <span class="hint-chip">🦨 Click PoppyDash for stunts!</span>
+    </div>
 
     <footer class="dialogue-progress">
       <span id="line-counter">Line 1 of 8</span>
@@ -1251,6 +2267,12 @@
   </main>
 
   <script>
+    const CHARACTER_NAMES = {
+      fox: 'Sunny Fox',
+      bat: 'Luna Bat',
+      skunk: 'PoppyDash'
+    };
+
     const DIALOGUE = [
       {
         speaker: 'bat',
@@ -1327,6 +2349,328 @@
       }
     ];
 
+    // Pre-rendered Studio neural voice reactions for all 6 interactive props & PoppyDash stunts
+    const PROP_REACTIONS = {
+      drink: {
+        fox: [
+          {
+            speaker: 'fox',
+            text: 'Mmm, yummy berry bubbles! Thanks, buddy!',
+            audioFile: 'audio/react-drink-fox-1.mp3',
+            foxState: 'state-wave',
+            sfx: 'slurp',
+            burst: { x: 332, y: 340 }
+          },
+          {
+            speaker: 'fox',
+            text: 'Ooh, icy cold! Careful not to spill it on my fluffy tail!',
+            audioFile: 'audio/react-drink-fox-2.mp3',
+            foxState: 'state-wave',
+            sfx: 'slurp',
+            burst: { x: 332, y: 340 }
+          }
+        ],
+        bat: [
+          {
+            speaker: 'bat',
+            text: 'Slurp! Fizzy bubbles are tickling my nose! Hehehe! Zoom zoom!',
+            audioFile: 'audio/react-drink-bat-1.mp3',
+            batState: 'state-flip',
+            sfx: 'slurp',
+            burst: { x: 605, y: 215 }
+          },
+          {
+            speaker: 'bat',
+            text: 'Whoa, super rocket juice! Look at me spin like a purple tornado! Wheee!',
+            audioFile: 'audio/react-drink-bat-2.mp3',
+            batState: 'state-double-flip',
+            sfx: 'slurp',
+            burst: { x: 605, y: 215 }
+          }
+        ],
+        skunk: [
+          {
+            speaker: 'skunk',
+            text: "Uh oh, bubbly tummy… Oops, toot! Excuse me! That wasn't me, it was the couch cushion!",
+            audioFile: 'audio/react-drink-skunk-1.mp3',
+            skunkGag: 'gag-toot',
+            foxState: 'state-stink-lean',
+            batState: 'state-flip',
+            sfx: 'toot',
+            burst: { x: 965, y: 440 }
+          },
+          {
+            speaker: 'skunk',
+            text: 'Burp! Oopsie! That blue soda gave me super bubble burps! Hic! Hehe!',
+            audioFile: 'audio/react-drink-skunk-2.mp3',
+            skunkGag: 'gag-burp-hiccup',
+            foxState: 'state-peek',
+            sfx: 'burp',
+            burst: { x: 855, y: 330 }
+          }
+        ]
+      },
+      lampOff: [
+        {
+          speaker: 'skunk',
+          text: "Eek! Who turned out the lights?! Something fluffy touched me! Oh, wait—that's my own butt!",
+          audioFile: 'audio/react-lamp-off-skunk.mp3',
+          skunkGag: 'gag-dark-panic',
+          foxState: 'state-peek',
+          sfx: 'boing'
+        },
+        {
+          speaker: 'bat',
+          text: 'Yay, dark time! My sparkly bat eyes can see everything! Peek-a-boo!',
+          audioFile: 'audio/react-lamp-off-bat.mp3',
+          batState: 'state-flip',
+          sfx: 'flutter'
+        }
+      ],
+      lampOn: [
+        {
+          speaker: 'bat',
+          text: 'Whoa, too bright! My bat eyes are blinking like crazy! Bloop bloop!',
+          audioFile: 'audio/react-lamp-on-bat.mp3',
+          batState: 'state-squint',
+          sfx: 'flutter'
+        },
+        {
+          speaker: 'fox',
+          text: "Phew, lights back on! Now we can see PoppyDash's silly face!",
+          audioFile: 'audio/react-lamp-on-fox.mp3',
+          foxState: 'state-wave'
+        }
+      ],
+      remote: {
+        scifi: {
+          speaker: 'skunk',
+          text: 'Blast off! Pew pew! Whoa, crash landing on the squishy armrest!',
+          audioFile: 'audio/react-remote-scifi-skunk.mp3',
+          skunkGag: 'gag-hero-flop',
+          foxState: 'state-peek',
+          sfx: 'laser'
+        },
+        spooky: {
+          speaker: 'skunk',
+          text: 'Yikes! A tickle monster! Hide me! Hide my toes!',
+          audioFile: 'audio/react-remote-spooky-skunk.mp3',
+          skunkGag: 'gag-spooked',
+          batState: 'state-perch',
+          sfx: 'spooky'
+        },
+        action: {
+          speaker: 'bat',
+          text: 'Kaboom! Super bat flip! Watch me do it again, wheee!',
+          audioFile: 'audio/react-remote-action-bat.mp3',
+          batState: 'state-double-flip',
+          sfx: 'flutter'
+        },
+        romcom: {
+          speaker: 'fox',
+          text: 'Aww, look at the cute fluffy puppies on TV! Best channel ever!',
+          audioFile: 'audio/react-remote-romcom-fox.mp3',
+          foxState: 'state-wave'
+        }
+      },
+      fairy: {
+        party: {
+          speaker: 'skunk',
+          text: 'Wiggle wiggle! Watch my silly skunk dance! Whoa, too wiggly, my head is spinning!',
+          audioFile: 'audio/react-fairy-party-skunk.mp3',
+          skunkGag: 'gag-disco-dizzy',
+          batState: 'state-flip',
+          sfx: 'disco'
+        },
+        off: {
+          speaker: 'fox',
+          text: 'Ooh, super secret movie fort! Shhh, the movie is starting!',
+          audioFile: 'audio/react-fairy-off-fox.mp3',
+          foxState: 'state-wave',
+          sfx: 'chime'
+        },
+        cozy: {
+          speaker: 'bat',
+          text: 'Ooh, pretty rainbow stars! Like fireflies in our living room!',
+          audioFile: 'audio/react-fairy-cozy-bat.mp3',
+          batState: 'state-perch',
+          sfx: 'chime'
+        }
+      },
+      pillowLeft: {
+        speaker: 'fox',
+        text: 'Poof! Super squishy! Hey, no pillow fights until after the movie!',
+        audioFile: 'audio/react-pillow-fox.mp3',
+        foxState: 'state-wave',
+        sfx: 'pillow',
+        burst: { x: 476, y: 420 }
+      },
+      pillowRight: [
+        {
+          speaker: 'skunk',
+          text: 'Bonk! Hey, the pillow jumped on my head! Do I look like a silly pillow king?',
+          audioFile: 'audio/react-pillow-skunk.mp3',
+          skunkGag: 'gag-pillow-bonk',
+          foxState: 'state-peek',
+          pillowAmbush: true,
+          sfx: 'boing',
+          burst: { x: 855, y: 318 }
+        },
+        {
+          speaker: 'bat',
+          text: 'Boing, boing, boing! Best bouncy pillow trampoline ever!',
+          audioFile: 'audio/react-pillow-bat.mp3',
+          batState: 'state-pillow-bounce',
+          sfx: 'pillow',
+          burst: { x: 593, y: 420 }
+        }
+      ],
+      reel: [
+        {
+          speaker: 'skunk',
+          text: 'Whoa, spinny wheel! Help, the couch is eating me! Blub blub blub!',
+          audioFile: 'audio/react-reel-skunk.mp3',
+          skunkGag: 'gag-cushion-sink',
+          foxState: 'state-peek',
+          sfx: 'reel'
+        },
+        {
+          speaker: 'fox',
+          text: "Spin, spin, spin! That's how old-timey cartoons used to play!",
+          audioFile: 'audio/react-reel-fox.mp3',
+          foxState: 'state-wave',
+          sfx: 'reel'
+        }
+      ],
+      poster: {
+        speaker: 'bat',
+        text: 'Ooh, the purple bat poster! Look, that looks just like me! Hehe!',
+        audioFile: 'audio/react-poster-bat.mp3',
+        batState: 'state-poster-look',
+        sfx: 'poster'
+      },
+      skunkStunts: [
+        {
+          speaker: 'skunk',
+          text: 'Ah… ah… achoo! Whoa! My fluffy tail tickled my nose! Hehehe!',
+          audioFile: 'audio/react-click-skunk-sneeze.mp3',
+          skunkGag: 'gag-sneeze',
+          foxState: 'state-peek',
+          sfx: 'sneeze'
+        },
+        {
+          speaker: 'skunk',
+          text: 'Boing! Look how high I can bounce… oops! Squeaky landing! Hehe!',
+          audioFile: 'audio/react-click-skunk-bounce.mp3',
+          skunkGag: 'gag-bounce-fail',
+          batState: 'state-flip',
+          sfx: 'boingToot'
+        },
+        {
+          speaker: 'skunk',
+          text: 'Hi-yah! Super skunk spin! Oops, I bonked myself with my own tail!',
+          audioFile: 'audio/react-click-skunk-dodge.mp3',
+          skunkGag: 'gag-dodge-tangle',
+          foxState: 'state-peek',
+          sfx: 'boing'
+        }
+      ]
+    };
+
+    const MOVIE_GENRES = [
+      {
+        id: 'scifi',
+        label: 'Sci-Fi',
+        palettes: [
+          [82, 226, 240],
+          [112, 165, 255],
+          [168, 130, 255],
+          [72, 212, 196]
+        ],
+        baseIntensity: 0.42,
+        flickerAmp: 0.08,
+        eventRate: 0.012,
+        eventColor: [145, 245, 255]
+      },
+      {
+        id: 'spooky',
+        label: 'Spooky',
+        palettes: [
+          [94, 224, 146],
+          [138, 92, 246],
+          [64, 178, 162],
+          [116, 86, 198]
+        ],
+        baseIntensity: 0.36,
+        flickerAmp: 0.11,
+        eventRate: 0.014,
+        eventColor: [232, 242, 255]
+      },
+      {
+        id: 'action',
+        label: 'Action',
+        palettes: [
+          [255, 164, 72],
+          [255, 96, 84],
+          [255, 214, 102],
+          [92, 196, 255]
+        ],
+        baseIntensity: 0.48,
+        flickerAmp: 0.13,
+        eventRate: 0.018,
+        eventColor: [255, 232, 150]
+      },
+      {
+        id: 'romcom',
+        label: 'Puppies',
+        palettes: [
+          [255, 196, 128],
+          [255, 146, 178],
+          [255, 214, 142],
+          [242, 166, 214]
+        ],
+        baseIntensity: 0.4,
+        flickerAmp: 0.05,
+        eventRate: 0.004,
+        eventColor: [255, 230, 195]
+      }
+    ];
+
+    const ALL_REACTION_AUDIO_FILES = [
+      'audio/react-drink-fox-1.mp3',
+      'audio/react-drink-fox-2.mp3',
+      'audio/react-drink-bat-1.mp3',
+      'audio/react-drink-bat-2.mp3',
+      'audio/react-drink-skunk-1.mp3',
+      'audio/react-drink-skunk-2.mp3',
+      'audio/react-lamp-off-skunk.mp3',
+      'audio/react-lamp-off-bat.mp3',
+      'audio/react-lamp-on-bat.mp3',
+      'audio/react-lamp-on-fox.mp3',
+      'audio/react-remote-scifi-skunk.mp3',
+      'audio/react-remote-spooky-skunk.mp3',
+      'audio/react-remote-action-bat.mp3',
+      'audio/react-remote-romcom-fox.mp3',
+      'audio/react-fairy-party-skunk.mp3',
+      'audio/react-fairy-off-fox.mp3',
+      'audio/react-fairy-cozy-bat.mp3',
+      'audio/react-pillow-fox.mp3',
+      'audio/react-pillow-skunk.mp3',
+      'audio/react-pillow-bat.mp3',
+      'audio/react-reel-fox.mp3',
+      'audio/react-reel-skunk.mp3',
+      'audio/react-poster-bat.mp3',
+      'audio/react-click-skunk-sneeze.mp3',
+      'audio/react-click-skunk-bounce.mp3',
+      'audio/react-click-skunk-dodge.mp3'
+    ];
+
+    const sceneCard = document.getElementById('scene-card');
+    const sceneSvg = document.getElementById('scene-svg');
+    const hudGenre = document.getElementById('hud-genre');
+    const hudLamp = document.getElementById('hud-lamp');
+    const dragHint = document.getElementById('drag-hint');
+
     const bubbles = {
       fox: document.getElementById('bubble-fox'),
       bat: document.getElementById('bubble-bat'),
@@ -1339,7 +2683,15 @@
       skunk: document.getElementById('char-skunk')
     };
 
+    const halos = {
+      fox: document.getElementById('halo-fox'),
+      bat: document.getElementById('halo-bat'),
+      skunk: document.getElementById('halo-skunk')
+    };
+
     const spillFx = document.getElementById('spill-popcorn-fx');
+    const fxBurst = document.getElementById('fx-burst');
+    const vintageFlicker = document.getElementById('vintage-film-flicker');
     const startOverlay = document.getElementById('start-overlay');
     const btnStartSound = document.getElementById('btn-start-sound');
     const btnPrev = document.getElementById('btn-prev');
@@ -1362,6 +2714,19 @@
     const lineCounter = document.getElementById('line-counter');
     const playbackStatus = document.getElementById('playback-status');
 
+    // Interactive prop elements
+    const propLamp = document.getElementById('prop-lamp');
+    const propRemote = document.getElementById('prop-remote');
+    const propFairyLights = document.getElementById('prop-fairy-lights');
+    const propPillowLeft = document.getElementById('prop-pillow-left');
+    const propPillowRight = document.getElementById('prop-pillow-right');
+    const propReel = document.getElementById('prop-reel');
+    const propPoster = document.getElementById('prop-poster');
+    const drinkEls = [
+      document.getElementById('prop-drink-1'),
+      document.getElementById('prop-drink-2')
+    ];
+
     // Minimal valid silent PCM WAV (used synchronously on tap to unlock iOS/iPadOS playback audio session)
     const SILENT_WAV_DATA_URI = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 
@@ -1372,13 +2737,58 @@
       return /iPad|iPhone|iPod/i.test(ua) || (platform === 'MacIntel' && maxTouch > 1);
     })();
 
+    const SKUNK_GAG_CLASSES = [
+      'gag-toot',
+      'gag-burp-hiccup',
+      'gag-brainfreeze',
+      'gag-hiccup',
+      'gag-dark-panic',
+      'gag-spooked',
+      'gag-hero-flop',
+      'gag-pillow-bonk',
+      'gag-disco-dizzy',
+      'gag-cushion-sink',
+      'gag-sneeze',
+      'gag-bounce-fail',
+      'gag-dodge-tangle'
+    ];
+
+    const BAT_STATE_CLASSES = [
+      'state-chase',
+      'state-flip',
+      'state-double-flip',
+      'state-perch',
+      'state-pillow-bounce',
+      'state-squint',
+      'state-poster-look'
+    ];
+
     let currentIndex = 0;
     let isPlaying = true;
+    let storyFinished = false;
     let voicesEnabled = true;
     let audioUnlocked = false;
     let timerId = null;
+    let reactionCleanupTimerId = null;
     let audioCtx = null;
     let sharedAudioEl = null;
+
+    // Interactive scene state
+    let lampOn = true;
+    let genreIdx = 0;
+    let fairyModeIdx = 0;
+    const FAIRY_MODES = ['cozy', 'party', 'off'];
+    let posterIdx = 0;
+    const counters = {
+      drinkFox: 0,
+      drinkBat: 0,
+      drinkSkunk: 0,
+      lampOff: 0,
+      lampOn: 0,
+      pillowRight: 0,
+      reel: 0,
+      skunkStunt: 0
+    };
 
     function setAudioTip(message) {
       if (!audioTipEl) return;
@@ -1391,15 +2801,13 @@
       }
     }
 
-    // ==================== UNIVERSAL AUDIO SESSION & WEB AUDIO SFX ====================
+    // ==================== UNIVERSAL AUDIO SESSION & PROCEDURAL WEB AUDIO SFX ====================
     function setPlaybackAudioSession() {
       try {
         if (typeof navigator !== 'undefined' && 'audioSession' in navigator && navigator.audioSession) {
           navigator.audioSession.type = 'playback';
         }
-      } catch (_) {
-        // Ignore on browsers that do not support mutable navigator.audioSession.type
-      }
+      } catch (_) {}
     }
 
     function getSharedAudioEl() {
@@ -1467,9 +2875,7 @@
                   el.volume = 1;
                 }
               })
-              .catch(() => {
-                el.volume = 1;
-              });
+              .catch(() => { el.volume = 1; });
           } else {
             el.volume = 1;
           }
@@ -1485,7 +2891,6 @@
       if (!ctx) return;
       const now = ctx.currentTime;
 
-      // Comedic slide whistle down + soft thud
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
@@ -1497,7 +2902,6 @@
       osc.start(now);
       osc.stop(now + 0.52);
 
-      // Soft thud at landing
       const thud = ctx.createOscillator();
       const thudGain = ctx.createGain();
       thud.type = 'triangle';
@@ -1509,7 +2913,6 @@
       thud.start(now + 0.42);
       thud.stop(now + 0.66);
 
-      // Popcorn pop bursts
       for (let i = 0; i < 6; i++) {
         const t = now + 0.12 + i * 0.09;
         const popOsc = ctx.createOscillator();
@@ -1543,11 +2946,352 @@
       });
     }
 
+    function playLampClickSfx(turningOn) {
+      if (!voicesEnabled || !audioUnlocked) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(turningOn ? 920 : 620, now);
+      osc.frequency.exponentialRampToValueAtTime(turningOn ? 1480 : 280, now + 0.045);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    }
+
+    function playPropSfx(kind) {
+      if (!voicesEnabled || !audioUnlocked || !kind) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      if (kind === 'flutter') {
+        playBatFlutterSfx();
+        return;
+      }
+
+      if (kind === 'slurp') {
+        // Playful upward straw slurp + fizzy bubble pops
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.24);
+        gain.gain.setValueAtTime(0.11, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.28);
+        [0.24, 0.31, 0.38].forEach((offset, i) => {
+          const b = ctx.createOscillator();
+          const bg = ctx.createGain();
+          b.type = 'sine';
+          b.frequency.setValueAtTime(720 + i * 190, now + offset);
+          b.frequency.exponentialRampToValueAtTime(1240 + i * 150, now + offset + 0.04);
+          bg.gain.setValueAtTime(0.06, now + offset);
+          bg.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.05);
+          b.connect(bg).connect(ctx.destination);
+          b.start(now + offset);
+          b.stop(now + offset + 0.06);
+        });
+      } else if (kind === 'toot') {
+        // Silly cartoon raspberry fart: fluttering sawtooth pitch-drop + cheeky high squeak!
+        const startT = now + 0.14;
+        const osc = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(155, startT);
+        osc.frequency.exponentialRampToValueAtTime(92, startT + 0.28);
+        osc.frequency.exponentialRampToValueAtTime(58, startT + 0.62);
+
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(28, startT);
+        lfo.frequency.linearRampToValueAtTime(16, startT + 0.62);
+        lfoGain.gain.setValueAtTime(34, startT);
+        lfo.connect(lfoGain).connect(osc.frequency);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(540, startT);
+        filter.Q.setValueAtTime(4.5, startT);
+
+        gain.gain.setValueAtTime(0.001, startT);
+        gain.gain.linearRampToValueAtTime(0.24, startT + 0.04);
+        gain.gain.setValueAtTime(0.22, startT + 0.45);
+        gain.gain.exponentialRampToValueAtTime(0.001, startT + 0.66);
+
+        osc.connect(filter).connect(gain).connect(ctx.destination);
+        osc.start(startT);
+        lfo.start(startT);
+        osc.stop(startT + 0.68);
+        lfo.stop(startT + 0.68);
+
+        // Cheeky high cartoon squeak at the tail end!
+        const sq = ctx.createOscillator();
+        const sqGain = ctx.createGain();
+        sq.type = 'triangle';
+        sq.frequency.setValueAtTime(420, startT + 0.54);
+        sq.frequency.exponentialRampToValueAtTime(760, startT + 0.65);
+        sqGain.gain.setValueAtTime(0.09, startT + 0.54);
+        sqGain.gain.exponentialRampToValueAtTime(0.001, startT + 0.68);
+        sq.connect(sqGain).connect(ctx.destination);
+        sq.start(startT + 0.54);
+        sq.stop(startT + 0.7);
+      } else if (kind === 'burp') {
+        // Goofy bubbly cartoon burp + two squeaky hiccup pops
+        const osc = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(128, now);
+        osc.frequency.exponentialRampToValueAtTime(78, now + 0.42);
+        lfo.frequency.setValueAtTime(19, now);
+        lfoGain.gain.setValueAtTime(22, now);
+        lfo.connect(lfoGain).connect(osc.frequency);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(340, now);
+        filter.Q.setValueAtTime(3.2, now);
+
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.46);
+        osc.connect(filter).connect(gain).connect(ctx.destination);
+        osc.start(now);
+        lfo.start(now);
+        osc.stop(now + 0.48);
+        lfo.stop(now + 0.48);
+
+        [0.62, 1.38].forEach((offset) => {
+          const t = now + offset;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(330, t);
+          o.frequency.exponentialRampToValueAtTime(820, t + 0.085);
+          g.gain.setValueAtTime(0.11, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.12);
+        });
+      } else if (kind === 'boingToot') {
+        // Big trampoline bounce + cheeky squeaky landing toot!
+        playPropSfx('boing');
+        const sqT = now + 0.92;
+        const sq = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const sqGain = ctx.createGain();
+        sq.type = 'sawtooth';
+        sq.frequency.setValueAtTime(240, sqT);
+        sq.frequency.exponentialRampToValueAtTime(490, sqT + 0.18);
+        lfo.frequency.setValueAtTime(32, sqT);
+        lfoGain.gain.setValueAtTime(28, sqT);
+        lfo.connect(lfoGain).connect(sq.frequency);
+        sqGain.gain.setValueAtTime(0.11, sqT);
+        sqGain.gain.exponentialRampToValueAtTime(0.001, sqT + 0.22);
+        sq.connect(sqGain).connect(ctx.destination);
+        sq.start(sqT);
+        lfo.start(sqT);
+        sq.stop(sqT + 0.24);
+        lfo.stop(sqT + 0.24);
+      } else if (kind === 'brainfreeze') {
+        // Fast slurp -> crystalline shivering freeze chimes
+        playPropSfx('slurp');
+        [1320, 1760, 1568, 2093, 1760].forEach((f, idx) => {
+          const t = now + 0.22 + idx * 0.065;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(f, t);
+          g.gain.setValueAtTime(0.08, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.13);
+        });
+      } else if (kind === 'hiccup') {
+        // Three comedic ascending hiccup pops
+        [0.08, 0.82, 1.56].forEach((offset) => {
+          const t = now + offset;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(320, t);
+          o.frequency.exponentialRampToValueAtTime(780, t + 0.085);
+          g.gain.setValueAtTime(0.11, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.12);
+        });
+      } else if (kind === 'boing') {
+        // Classic springy cartoon boing
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(160, now);
+        o.frequency.exponentialRampToValueAtTime(520, now + 0.16);
+        o.frequency.exponentialRampToValueAtTime(240, now + 0.3);
+        o.frequency.exponentialRampToValueAtTime(420, now + 0.44);
+        g.gain.setValueAtTime(0.15, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.48);
+        o.connect(g).connect(ctx.destination);
+        o.start(now);
+        o.stop(now + 0.5);
+      } else if (kind === 'laser') {
+        // Sci-fi pew-pew + cushion flop
+        [0, 0.16].forEach((offset) => {
+          const t = now + offset;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sawtooth';
+          o.frequency.setValueAtTime(1180, t);
+          o.frequency.exponentialRampToValueAtTime(210, t + 0.13);
+          g.gain.setValueAtTime(0.07, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.15);
+        });
+      } else if (kind === 'spooky') {
+        // Playful eerie theremin wobble
+        const o = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(520, now);
+        o.frequency.linearRampToValueAtTime(340, now + 0.55);
+        lfo.frequency.setValueAtTime(9, now);
+        lfoGain.gain.setValueAtTime(26, now);
+        lfo.connect(lfoGain).connect(o.frequency);
+        g.gain.setValueAtTime(0.09, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.58);
+        o.connect(g).connect(ctx.destination);
+        o.start(now);
+        lfo.start(now);
+        o.stop(now + 0.6);
+        lfo.stop(now + 0.6);
+      } else if (kind === 'disco') {
+        // Funky 4-note bass groove
+        [146.8, 174.6, 196, 220].forEach((f, idx) => {
+          const t = now + idx * 0.11;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sawtooth';
+          o.frequency.setValueAtTime(f, t);
+          g.gain.setValueAtTime(0.08, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.11);
+        });
+      } else if (kind === 'chime') {
+        // Sparkly fairy lights chime
+        [880, 1174.6, 1568].forEach((f, idx) => {
+          const t = now + idx * 0.065;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(f, t);
+          g.gain.setValueAtTime(0.07, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.24);
+        });
+      } else if (kind === 'pillow') {
+        // Soft cloth cushion poof
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(190, now);
+        o.frequency.exponentialRampToValueAtTime(75, now + 0.14);
+        g.gain.setValueAtTime(0.18, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+        o.connect(g).connect(ctx.destination);
+        o.start(now);
+        o.stop(now + 0.18);
+      } else if (kind === 'reel') {
+        // Vintage 35mm projector clack-clack-whir
+        for (let i = 0; i < 9; i++) {
+          const t = now + i * 0.065;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'square';
+          o.frequency.setValueAtTime(220 + (i % 2) * 90, t);
+          g.gain.setValueAtTime(0.045, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.032);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.035);
+        }
+      } else if (kind === 'poster') {
+        // Paper snap flip
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(340, now);
+        o.frequency.exponentialRampToValueAtTime(640, now + 0.09);
+        g.gain.setValueAtTime(0.09, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        o.connect(g).connect(ctx.destination);
+        o.start(now);
+        o.stop(now + 0.11);
+      } else if (kind === 'sneeze') {
+        // Cartoon sneeze whoosh burst
+        const bufferSize = Math.floor(ctx.sampleRate * 0.28);
+        const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1200, now + 0.42);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.2, now + 0.42);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+        noise.connect(filter).connect(g).connect(ctx.destination);
+        noise.start(now + 0.42);
+      }
+    }
+
+    function playRemoteZapSfx() {
+      if (!voicesEnabled || !audioUnlocked) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(980, now);
+      o.frequency.setValueAtTime(1320, now + 0.055);
+      g.gain.setValueAtTime(0.08, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+      o.connect(g).connect(ctx.destination);
+      o.start(now);
+      o.stop(now + 0.14);
+    }
+
     // ==================== DUAL-ENGINE CHARACTER VOICE MANAGER ====================
-    // Primary: Pre-rendered neural Studio Voices via unlocked Web Audio / HTML5 <audio> (universal across iPhone, iPad, Android & Desktop)
+    // Primary: Pre-rendered neural Studio Voices via unlocked Web Audio / HTML5 <audio>
     // Secondary / Fallback: Cross-platform hardened Web Speech API (speechSynthesis)
     const VoiceManager = (() => {
-      let mode = 'studio'; // 'studio' | 'browser'
+      let mode = 'studio';
       let availableVoices = [];
       const overrides = { fox: '', bat: '', skunk: '' };
 
@@ -1565,63 +3309,19 @@
 
       const NOVELTY_PATTERN = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|eddy|flo|fred|good news|grandma|grandpa|jester|kathy|organ|ralph|reed|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)\b/i;
       const FEMALE_PRIORITY = [
-        'samantha',
-        'aria',
-        'jenny',
-        'karen',
-        'moira',
-        'tessa',
-        'ava',
-        'allison',
-        'serena',
-        'kate',
-        'victoria',
-        'nicky',
-        'zoe',
-        'susan',
-        'google uk english female',
-        'google us english',
-        'zira',
-        'hazel',
-        'michelle',
-        'emma',
-        'olivia',
-        'sara',
-        'fiona'
+        'samantha', 'aria', 'jenny', 'karen', 'moira', 'tessa', 'ava', 'allison',
+        'serena', 'kate', 'victoria', 'nicky', 'zoe', 'susan',
+        'google uk english female', 'google us english', 'zira', 'hazel',
+        'michelle', 'emma', 'olivia', 'sara', 'fiona'
       ];
       const FEMALE_PATTERN = new RegExp(`\\b(female|woman|girl|${FEMALE_PRIORITY.map((n) => n.replace(/\s+/g, '\\s+')).join('|')})\\b`, 'i');
 
       const MALE_PRIORITY = [
-        'daniel',
-        'google uk english male',
-        'microsoft andrew',
-        'microsoft brian',
-        'microsoft guy',
-        'microsoft david',
-        'microsoft mark',
-        'microsoft christopher',
-        'microsoft eric',
-        'microsoft ryan',
-        'microsoft george',
-        'aaron',
-        'arthur',
-        'rishi',
-        'gordon',
-        'oliver',
-        'alex',
-        'matthew',
-        'tom',
-        'evan',
-        'liam',
-        'nathan',
-        'malcolm',
-        'davis',
-        'jason',
-        'tony',
-        'roger',
-        'steffan',
-        'william',
-        'sean'
+        'daniel', 'google uk english male', 'microsoft andrew', 'microsoft brian',
+        'microsoft guy', 'microsoft david', 'microsoft mark', 'microsoft christopher',
+        'microsoft eric', 'microsoft ryan', 'microsoft george', 'aaron', 'arthur',
+        'rishi', 'gordon', 'oliver', 'alex', 'matthew', 'tom', 'evan', 'liam',
+        'nathan', 'malcolm', 'davis', 'jason', 'tony', 'roger', 'steffan', 'william', 'sean'
       ];
       const MALE_PATTERN = new RegExp(`\\b(male|man|${MALE_PRIORITY.map((n) => n.replace(/\s+/g, '\\s+')).join('|')})\\b`, 'i');
 
@@ -1631,6 +3331,7 @@
 
       function normalizeTextForSpeech(text) {
         return String(text || '')
+          .replace(/\b([A-Z]{2,})\b/g, (word) => word[0] + word.slice(1).toLowerCase())
           .replace(/—/g, ', ')
           .replace(/…/g, '...')
           .replace(/\s+/g, ' ')
@@ -1661,12 +3362,8 @@
       }
 
       async function fetchStudioArrayBuffer(audioFile) {
-        if (rawBufferCache.has(audioFile)) {
-          return rawBufferCache.get(audioFile);
-        }
-        if (rawFetchInFlight.has(audioFile)) {
-          return rawFetchInFlight.get(audioFile);
-        }
+        if (rawBufferCache.has(audioFile)) return rawBufferCache.get(audioFile);
+        if (rawFetchInFlight.has(audioFile)) return rawFetchInFlight.get(audioFile);
         if (typeof fetch !== 'function' || (window.location && window.location.protocol === 'file:')) {
           throw new Error('fetch unavailable for local file');
         }
@@ -1693,10 +3390,21 @@
         if (typeof fetch !== 'function' || (window.location && window.location.protocol === 'file:')) {
           return;
         }
-        DIALOGUE.forEach((entry) => {
+        // Preload main story clips first, then lazily warm reaction clips in the background
+        const storyPromises = DIALOGUE.map((entry) => {
           if (entry.audioFile && !rawBufferCache.has(entry.audioFile)) {
-            fetchStudioArrayBuffer(entry.audioFile).catch(() => {});
+            return fetchStudioArrayBuffer(entry.audioFile).catch(() => {});
           }
+          return Promise.resolve();
+        });
+        Promise.all(storyPromises).then(() => {
+          ALL_REACTION_AUDIO_FILES.forEach((file, idx) => {
+            if (!rawBufferCache.has(file)) {
+              setTimeout(() => {
+                fetchStudioArrayBuffer(file).catch(() => {});
+              }, 200 + idx * 120);
+            }
+          });
         });
       }
 
@@ -1746,9 +3454,7 @@
           return { voice: v, isTrueMatch: femaleVoices.length > 0 };
         }
         if (role === 'skunk') {
-          if (maleVoices.length > 0) {
-            return { voice: maleVoices[0], isTrueMatch: true };
-          }
+          if (maleVoices.length > 0) return { voice: maleVoices[0], isTrueMatch: true };
           const nonFemale = pool.find((v) => !FEMALE_PATTERN.test(v.name));
           return { voice: nonFemale || pool[0], isTrueMatch: false };
         }
@@ -1845,7 +3551,6 @@
           activeUtterance = null;
         }
 
-        // Only cancel speechSynthesis when it is actually active (avoids Safari < 27 & Chrome cancel-eats-speak bug)
         if (cancelSpeechIfActive && audioUnlocked && isSpeechActive()) {
           try {
             window.speechSynthesis.cancel();
@@ -1860,13 +3565,8 @@
         syncVoicePanelUi();
       }
 
-      function getMode() {
-        return mode;
-      }
-
-      function setOverride(role, voiceName) {
-        overrides[role] = voiceName;
-      }
+      function getMode() { return mode; }
+      function setOverride(role, voiceName) { overrides[role] = voiceName; }
 
       function speakViaSpeechSynthesis(speaker, text, myToken, wasSpeechActive, onDone) {
         const charEl = chars[speaker];
@@ -1895,7 +3595,6 @@
 
         const queueUtterance = (useDefaultVoice) => {
           if (finished || myToken !== speakToken) return;
-
           const utterance = new SpeechSynthesisUtterance(spokenText);
           utterance.volume = 1;
 
@@ -1907,15 +3606,12 @@
           }
 
           if (speaker === 'fox') {
-            // Woman: warm, poised, confident
             utterance.pitch = 1.06;
             utterance.rate = 0.96;
           } else if (speaker === 'bat') {
-            // Girl: bright, youthful, bubbly
             utterance.pitch = 1.48;
             utterance.rate = 1.12;
           } else if (speaker === 'skunk') {
-            // Man: deeper, clearly masculine comedic delivery
             utterance.pitch = (!useDefaultVoice && isTrueMatch) ? 0.75 : 0.58;
             utterance.rate = 0.95;
           }
@@ -1950,7 +3646,6 @@
           startWatchdogId = setTimeout(() => {
             if (finished || started || myToken !== speakToken) return;
             if (window.speechSynthesis.speaking) {
-              // Some mobile WebKit builds speak without firing onstart promptly
               started = true;
               if (charEl) charEl.classList.add('is-talking');
               maxDurationWatchdogId = setTimeout(() => finish(true), Math.max(8000, spokenText.length * 180));
@@ -1967,9 +3662,7 @@
           }, 1400);
 
           try {
-            if (window.speechSynthesis.paused) {
-              window.speechSynthesis.resume();
-            }
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
             window.speechSynthesis.speak(utterance);
           } catch (_) {
             if (!useDefaultVoice && selectedVoice) {
@@ -1981,13 +3674,11 @@
         };
 
         if (wasSpeechActive) {
-          // Wait briefly for WebKit/Chrome async cancel to settle before queueing the next utterance
           pendingSpeakTimerId = setTimeout(() => {
             pendingSpeakTimerId = null;
             queueUtterance(false);
           }, 100);
         } else {
-          // Speak synchronously inside the user gesture / onend flow with zero cancel() call
           queueUtterance(false);
         }
       }
@@ -2030,9 +3721,7 @@
 
         el.volume = 1;
         el.src = resolveAssetUrl(audioFile);
-        try {
-          el.currentTime = 0;
-        } catch (_) {}
+        try { el.currentTime = 0; } catch (_) {}
 
         maxDurationWatchdogId = setTimeout(() => finish(true), 12000);
         const playPromise = el.play();
@@ -2157,7 +3846,144 @@
       }
     }
 
-    // ==================== SCENE CHOREOGRAPHY ====================
+    // ==================== ORGANIC MOVIE-SCREEN LIGHT ENGINE (60fps rAF) ====================
+    const MovieLightEngine = (() => {
+      const mw0 = document.getElementById('mw-stop-0');
+      const mw1 = document.getElementById('mw-stop-1');
+      const mw2 = document.getElementById('mw-stop-2');
+      const cl0 = document.getElementById('cl-stop-0');
+      const cl1 = document.getElementById('cl-stop-1');
+      const cl2 = document.getElementById('cl-stop-2');
+      const wallShadows = document.getElementById('wall-cast-shadows');
+      const rootStyle = document.documentElement.style;
+
+      const reducedMotion = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let curColor = [92, 225, 230];
+      let targetColor = [92, 225, 230];
+      let paletteCursor = 0;
+      let nextCutTime = performance.now() + 4200;
+      let cutDip = 0;
+      let flashPulse = 0;
+      let flashColor = [255, 255, 255];
+      let rafId = null;
+
+      function getGenre() {
+        return MOVIE_GENRES[genreIdx] || MOVIE_GENRES[0];
+      }
+
+      function triggerFlash(rgb, strength = 0.55) {
+        flashColor = rgb;
+        flashPulse = Math.max(flashPulse, strength);
+      }
+
+      function switchGenre() {
+        const g = getGenre();
+        paletteCursor = 0;
+        targetColor = [...g.palettes[0]];
+        cutDip = 0.45;
+        nextCutTime = performance.now() + 3600 + Math.random() * 2400;
+        triggerFlash(g.eventColor, 0.35);
+        if (hudGenre) hudGenre.textContent = g.label;
+      }
+
+      function step(now) {
+        const g = getGenre();
+        const t = now * 0.001;
+
+        // Schedule realistic movie scene cuts (brief luminance dip + new color temperature)
+        if (now >= nextCutTime) {
+          paletteCursor = (paletteCursor + 1) % g.palettes.length;
+          targetColor = [...g.palettes[paletteCursor]];
+          cutDip = 0.55;
+          nextCutTime = now + 3500 + Math.random() * 3200;
+        }
+
+        // Occasional genre event flares (lightning in Spooky, explosions in Action, lasers in Sci-Fi)
+        if (Math.random() < g.eventRate && flashPulse < 0.12) {
+          triggerFlash(g.eventColor, g.id === 'spooky' ? 0.72 : 0.42);
+        }
+
+        // Smoothly interpolate color & decay transient dips/flashes
+        curColor[0] += (targetColor[0] - curColor[0]) * 0.045;
+        curColor[1] += (targetColor[1] - curColor[1]) * 0.045;
+        curColor[2] += (targetColor[2] - curColor[2]) * 0.045;
+        cutDip *= 0.86;
+        flashPulse *= 0.87;
+
+        const r = Math.min(255, Math.round(curColor[0] * (1 - flashPulse) + flashColor[0] * flashPulse));
+        const gr = Math.min(255, Math.round(curColor[1] * (1 - flashPulse) + flashColor[1] * flashPulse));
+        const b = Math.min(255, Math.round(curColor[2] * (1 - flashPulse) + flashColor[2] * flashPulse));
+
+        // Layered incommensurate sine waves simulate natural 24fps film motion & luminance variation
+        const organicWave =
+          Math.sin(t * 2.13) * 0.42 +
+          Math.sin(t * 5.71 + 1.1) * 0.31 +
+          Math.sin(t * 11.4 + 2.4) * 0.18 +
+          Math.sin(t * 19.3) * 0.09;
+
+        const darkBoost = lampOn ? 1.0 : 1.42;
+        const intensity = Math.max(
+          0.12,
+          Math.min(0.82, (g.baseIntensity + organicWave * g.flickerAmp - cutDip * 0.22 + flashPulse * 0.32) * darkBoost)
+        );
+
+        const lightXOffset = Math.sin(t * 0.85) * 3.6 + Math.sin(t * 2.3) * 1.4;
+        const cssX = (50 + lightXOffset).toFixed(2) + '%';
+        const shadowShift = (-lightXOffset * 2.4).toFixed(2) + 'px';
+
+        rootStyle.setProperty('--tv-r', r);
+        rootStyle.setProperty('--tv-g', gr);
+        rootStyle.setProperty('--tv-b', b);
+        rootStyle.setProperty('--tv-a', intensity.toFixed(3));
+        rootStyle.setProperty('--tv-x', cssX);
+        rootStyle.setProperty('--shadow-shift-x', shadowShift);
+
+        const rgbStr = `rgb(${r},${gr},${b})`;
+        if (mw0 && mw1 && mw2) {
+          mw0.setAttribute('stop-color', rgbStr);
+          mw1.setAttribute('stop-color', rgbStr);
+          mw2.setAttribute('stop-color', rgbStr);
+          mw0.setAttribute('stop-opacity', (intensity * 0.92).toFixed(3));
+          mw1.setAttribute('stop-opacity', (intensity * 0.34).toFixed(3));
+        }
+        if (cl0 && cl1 && cl2) {
+          cl0.setAttribute('stop-color', rgbStr);
+          cl1.setAttribute('stop-color', rgbStr);
+          cl2.setAttribute('stop-color', rgbStr);
+          cl0.setAttribute('stop-opacity', (intensity * 0.95).toFixed(3));
+          cl1.setAttribute('stop-opacity', (intensity * 0.28).toFixed(3));
+        }
+        if (wallShadows) {
+          wallShadows.setAttribute('opacity', (lampOn ? 0.2 + intensity * 0.14 : 0.32 + intensity * 0.24).toFixed(3));
+        }
+
+        if (!reducedMotion && !document.hidden) {
+          rafId = requestAnimationFrame(step);
+        }
+      }
+
+      function start() {
+        if (rafId) cancelAnimationFrame(rafId);
+        if (reducedMotion) {
+          step(performance.now());
+          return;
+        }
+        rafId = requestAnimationFrame(step);
+      }
+
+      function stop() {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      }
+
+      return { start, stop, switchGenre, triggerFlash };
+    })();
+
+    // ==================== SCENE CHOREOGRAPHY & REACTION ENGINE ====================
     function triggerSpillBurst() {
       spillFx.classList.remove('active');
       void spillFx.offsetWidth;
@@ -2165,23 +3991,56 @@
       playPopcornSpillSfx();
     }
 
+    function triggerBurstAt(x, y) {
+      if (!fxBurst) return;
+      fxBurst.setAttribute('transform', `translate(${x}, ${y})`);
+      fxBurst.classList.remove('active');
+      void fxBurst.offsetWidth;
+      fxBurst.classList.add('active');
+    }
+
+    function clearAllCharacterStates() {
+      chars.fox.classList.remove('state-peek', 'state-wave', 'state-stink-lean');
+      chars.bat.classList.remove(...BAT_STATE_CLASSES);
+      chars.skunk.classList.remove('state-wobble', 'state-fall', 'state-recover', ...SKUNK_GAG_CLASSES);
+      bubbles.skunk.classList.remove('low-pose');
+    }
+
+    function hideAllBubbles() {
+      Object.values(bubbles).forEach((el) => el.classList.remove('visible'));
+    }
+
+    function showBubble(speaker, text) {
+      const name = CHARACTER_NAMES[speaker] || speaker;
+      Object.entries(bubbles).forEach(([key, el]) => {
+        if (key === speaker) {
+          el.innerHTML = `<span class="speaker-tag speaker-${key}">${name}</span>${text}`;
+          el.classList.add('visible');
+        } else {
+          el.classList.remove('visible');
+        }
+      });
+    }
+
     function applyCharacterPoses(entry) {
-      chars.fox.classList.remove('state-peek', 'state-wave');
-      chars.bat.classList.remove('state-chase', 'state-flip', 'state-perch');
-      chars.skunk.classList.remove('state-wobble', 'state-fall', 'state-recover');
+      clearAllCharacterStates();
 
       if (entry.foxState) chars.fox.classList.add(entry.foxState);
       if (entry.batState) {
         void chars.bat.offsetWidth;
         chars.bat.classList.add(entry.batState);
-        if (entry.batState === 'state-flip') playBatFlutterSfx();
+        if (entry.batState === 'state-flip' || entry.batState === 'state-double-flip') {
+          playBatFlutterSfx();
+        }
       }
       if (entry.skunkState) chars.skunk.classList.add(entry.skunkState);
+      if (entry.skunkGag) {
+        void chars.skunk.offsetWidth;
+        chars.skunk.classList.add(entry.skunkGag);
+      }
 
       if (entry.skunkState === 'state-fall' || entry.skunkState === 'state-recover') {
         bubbles.skunk.classList.add('low-pose');
-      } else {
-        bubbles.skunk.classList.remove('low-pose');
       }
 
       if (entry.triggerSpill) {
@@ -2191,21 +4050,32 @@
       }
     }
 
+    function finishStoryCleanly() {
+      storyFinished = true;
+      isPlaying = false;
+      clearTimeout(timerId);
+      btnToggle.textContent = 'Play';
+      playbackStatus.textContent = 'Story complete — explore the room or press Replay';
+      hideAllBubbles();
+      clearAllCharacterStates();
+      spillFx.classList.remove('active');
+    }
+
     function renderLine(index) {
       clearTimeout(timerId);
-      currentIndex = (index + DIALOGUE.length) % DIALOGUE.length;
+      clearTimeout(reactionCleanupTimerId);
+
+      // Single-pass guard: clamp manually stepped indices and do not auto-loop past Line 8
+      if (index >= DIALOGUE.length) {
+        finishStoryCleanly();
+        return;
+      }
+      currentIndex = Math.max(0, Math.min(index, DIALOGUE.length - 1));
+      storyFinished = false;
       const entry = DIALOGUE[currentIndex];
 
       applyCharacterPoses(entry);
-
-      Object.entries(bubbles).forEach(([key, el]) => {
-        if (key === entry.speaker) {
-          el.innerHTML = `<span class="speaker-tag speaker-${key}">${entry.name}</span>${entry.text}`;
-          el.classList.add('visible');
-        } else {
-          el.classList.remove('visible');
-        }
-      });
+      showBubble(entry.speaker, entry.text);
 
       lineCounter.textContent = `Line ${currentIndex + 1} of ${DIALOGUE.length}`;
       playbackStatus.textContent = isPlaying
@@ -2214,12 +4084,82 @@
 
       VoiceManager.speak(entry, (spokeAudio) => {
         if (!isPlaying) return;
-        const delayMs = spokeAudio ? 900 : 4200;
+        const delayMs = spokeAudio ? 950 : 4200;
         clearTimeout(timerId);
         timerId = setTimeout(() => {
-          renderLine(currentIndex + 1);
+          if (currentIndex + 1 >= DIALOGUE.length) {
+            // Story ends after Line 8 — never auto-loop back to Line 1!
+            finishStoryCleanly();
+          } else {
+            renderLine(currentIndex + 1);
+          }
         }, delayMs);
       });
+    }
+
+    function playPropReaction(reaction) {
+      unlockAudio();
+      clearTimeout(timerId);
+      clearTimeout(reactionCleanupTimerId);
+
+      const wasPlayingStory = isPlaying && !storyFinished;
+
+      applyCharacterPoses(reaction);
+
+      if (reaction.pillowAmbush && propPillowRight) {
+        propPillowRight.classList.remove('fluffing', 'ambush-poppy');
+        void propPillowRight.offsetWidth;
+        propPillowRight.classList.add('ambush-poppy');
+        setTimeout(() => propPillowRight.classList.remove('ambush-poppy'), 2450);
+      }
+
+      if (reaction.burst) {
+        triggerBurstAt(reaction.burst.x, reaction.burst.y);
+      }
+      if (reaction.sfx) {
+        playPropSfx(reaction.sfx);
+      }
+
+      // Quick tactile bounce on reacting character when not running a full-body skunk gag
+      const group = chars[reaction.speaker];
+      if (group && !reaction.skunkGag) {
+        group.classList.remove('react');
+        void group.offsetWidth;
+        group.classList.add('react');
+        setTimeout(() => group.classList.remove('react'), 480);
+      }
+
+      showBubble(reaction.speaker, reaction.text);
+      playbackStatus.textContent = `${CHARACTER_NAMES[reaction.speaker]} reacts!`;
+
+      VoiceManager.speak(
+        {
+          speaker: reaction.speaker,
+          text: reaction.text,
+          audioFile: reaction.audioFile
+        },
+        (spokeAudio) => {
+          const postDelay = spokeAudio ? 950 : 3400;
+          clearTimeout(reactionCleanupTimerId);
+          reactionCleanupTimerId = setTimeout(() => {
+            if (wasPlayingStory && isPlaying && !storyFinished) {
+              // Seamlessly resume the main story right where it left off
+              if (currentIndex + 1 >= DIALOGUE.length) {
+                finishStoryCleanly();
+              } else {
+                renderLine(currentIndex + 1);
+              }
+            } else {
+              // Story already finished (or paused) — return cleanly to interactive free-play without restarting!
+              hideAllBubbles();
+              clearAllCharacterStates();
+              playbackStatus.textContent = storyFinished
+                ? 'Story complete — explore the room or press Replay'
+                : 'Paused';
+            }
+          }, postDelay);
+        }
+      );
     }
 
     function unlockAudio() {
@@ -2236,17 +4176,27 @@
 
     function stepTo(index) {
       unlockAudio();
-      renderLine(index);
+      storyFinished = false;
+      const clamped = ((index % DIALOGUE.length) + DIALOGUE.length) % DIALOGUE.length;
+      renderLine(clamped);
     }
 
     function togglePlayback() {
       unlockAudio();
+      if (storyFinished) {
+        storyFinished = false;
+        isPlaying = true;
+        btnToggle.textContent = 'Pause';
+        renderLine(0);
+        return;
+      }
       isPlaying = !isPlaying;
       btnToggle.textContent = isPlaying ? 'Pause' : 'Play';
       if (isPlaying) {
         renderLine(currentIndex);
       } else {
         clearTimeout(timerId);
+        clearTimeout(reactionCleanupTimerId);
         VoiceManager.stop();
         playbackStatus.textContent = 'Paused';
       }
@@ -2259,39 +4209,430 @@
       btnVoice.classList.toggle('muted', !voicesEnabled);
       if (!voicesEnabled) {
         VoiceManager.stop();
-      } else if (isPlaying) {
+      } else if (isPlaying && !storyFinished) {
         renderLine(currentIndex);
       }
     }
 
+    // ==================== 6 INTERACTIVE PROPS & DRAG-AND-DROP DRINKS ====================
+
+    // --- 1. DRAGGABLE & TWO-TAP SODA CUPS ---
+    let activeDrinkEl = null;
+    let isDraggingDrink = false;
+    let dragPointerId = null;
+    let dragStartClient = { x: 0, y: 0 };
+    let dragOffsetSvg = { x: 0, y: 0 };
+    let hoveredCharKey = null;
+
+    const CHAR_DROP_ZONES = [
+      { key: 'fox', cx: 332, cy: 405, rx: 112, ry: 132, serveX: 392, serveY: 425 },
+      { key: 'bat', cx: 605, cy: 245, rx: 122, ry: 105, serveX: 605, serveY: 295 },
+      { key: 'skunk', cx: 856, cy: 415, rx: 115, ry: 134, serveX: 806, serveY: 422 }
+    ];
+
+    function clientToSvgPoint(clientX, clientY) {
+      const ctm = sceneSvg.getScreenCTM();
+      if (!ctm) return { x: 600, y: 370 };
+      const pt = sceneSvg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const svgPt = pt.matrixTransform(ctm.inverse());
+      return { x: svgPt.x, y: svgPt.y };
+    }
+
+    function findTargetCharacterAt(svgX, svgY) {
+      for (const zone of CHAR_DROP_ZONES) {
+        const dx = (svgX - zone.cx) / zone.rx;
+        const dy = (svgY - zone.cy) / zone.ry;
+        if (dx * dx + dy * dy <= 1.0) return zone;
+      }
+      return null;
+    }
+
+    function setDrinkTransform(el, x, y, rotDeg = 0, scale = 1) {
+      el.setAttribute('transform', `translate(${x.toFixed(1)}, ${y.toFixed(1)}) rotate(${rotDeg}) scale(${scale})`);
+    }
+
+    function resetDrinkHome(el) {
+      const hx = parseFloat(el.dataset.homeX);
+      const hy = parseFloat(el.dataset.homeY);
+      el.classList.remove('dragging', 'selected', 'serving');
+      el.classList.add('returning');
+      setDrinkTransform(el, hx, hy, 0, 1);
+      setTimeout(() => el.classList.remove('returning'), 500);
+    }
+
+    function updateDropHalos(targetKey) {
+      hoveredCharKey = targetKey;
+      Object.entries(halos).forEach(([k, h]) => {
+        if (h) h.classList.toggle('hover-target', k === targetKey);
+      });
+    }
+
+    function clearDrinkSelection(returnHome = true) {
+      if (activeDrinkEl && returnHome) {
+        resetDrinkHome(activeDrinkEl);
+      }
+      activeDrinkEl = null;
+      isDraggingDrink = false;
+      dragPointerId = null;
+      sceneCard.classList.remove('drink-active');
+      dragHint.classList.remove('visible');
+      updateDropHalos(null);
+    }
+
+    function serveDrinkToCharacter(drinkEl, charKey) {
+      const zone = CHAR_DROP_ZONES.find((z) => z.key === charKey);
+      if (!zone || !drinkEl) return;
+
+      sceneCard.classList.remove('drink-active');
+      dragHint.classList.remove('visible');
+      updateDropHalos(null);
+
+      // Animate cup tipping joyfully toward recipient, then glide back to coffee table
+      drinkEl.classList.remove('dragging', 'selected', 'returning');
+      drinkEl.classList.add('serving');
+      const tilt = charKey === 'skunk' ? 22 : -22;
+      setDrinkTransform(drinkEl, zone.serveX, zone.serveY, tilt, 1.08);
+
+      activeDrinkEl = null;
+      isDraggingDrink = false;
+      dragPointerId = null;
+
+      // Deterministic flavor mapping so kids can repeat their favorite gag on demand!
+      // Red Berry Fizz ('berry') -> index 0 (PoppyDash's Mega Skunk Toot!)
+      // Blue-Razz ('razz') -> index 1 (PoppyDash's Super Bubble Burp!)
+      const list = PROP_REACTIONS.drink[charKey];
+      const flavorIdx = drinkEl.dataset.drink === 'razz' ? 1 : 0;
+      const reaction = list[flavorIdx % list.length];
+      const counterKey = charKey === 'fox' ? 'drinkFox' : charKey === 'bat' ? 'drinkBat' : 'drinkSkunk';
+      counters[counterKey] += 1;
+
+      playPropReaction(reaction);
+
+      setTimeout(() => {
+        resetDrinkHome(drinkEl);
+      }, 950);
+    }
+
+    drinkEls.forEach((drinkEl) => {
+      if (!drinkEl) return;
+
+      let wasSelectedOnDown = false;
+
+      drinkEl.addEventListener('click', (e) => {
+        // Prevent synthetic click after pointerup from bubbling to sceneSvg's cancel-selection listener
+        e.stopPropagation();
+      });
+
+      drinkEl.addEventListener('pointerdown', (e) => {
+        if (e.button && e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        unlockAudio();
+
+        wasSelectedOnDown = activeDrinkEl === drinkEl && drinkEl.classList.contains('selected');
+
+        // If another drink was selected via two-tap, return it home first
+        if (activeDrinkEl && activeDrinkEl !== drinkEl) {
+          resetDrinkHome(activeDrinkEl);
+        }
+
+        activeDrinkEl = drinkEl;
+        isDraggingDrink = true;
+        dragPointerId = e.pointerId;
+        dragStartClient = { x: e.clientX, y: e.clientY };
+
+        const hx = parseFloat(drinkEl.dataset.homeX);
+        const hy = parseFloat(drinkEl.dataset.homeY);
+        const svgPt = clientToSvgPoint(e.clientX, e.clientY);
+        dragOffsetSvg = { x: svgPt.x - hx, y: svgPt.y - hy };
+
+        drinkEl.classList.remove('returning', 'serving');
+        drinkEl.classList.add('dragging');
+        sceneCard.classList.add('drink-active');
+        dragHint.textContent = 'Drop soda on Sunny Fox, Luna Bat, or PoppyDash!';
+        dragHint.classList.add('visible');
+
+        try { drinkEl.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      drinkEl.addEventListener('pointermove', (e) => {
+        if (!isDraggingDrink || activeDrinkEl !== drinkEl || e.pointerId !== dragPointerId) return;
+        e.preventDefault();
+        const svgPt = clientToSvgPoint(e.clientX, e.clientY);
+        const nx = Math.max(40, Math.min(1160, svgPt.x - dragOffsetSvg.x));
+        const ny = Math.max(80, Math.min(710, svgPt.y - dragOffsetSvg.y));
+        setDrinkTransform(drinkEl, nx, ny, -8, 1.12);
+
+        const target = findTargetCharacterAt(nx, ny - 20);
+        updateDropHalos(target ? target.key : null);
+      });
+
+      const handlePointerEnd = (e) => {
+        if (!isDraggingDrink || activeDrinkEl !== drinkEl || e.pointerId !== dragPointerId) return;
+        isDraggingDrink = false;
+        dragPointerId = null;
+        try { drinkEl.releasePointerCapture(e.pointerId); } catch (_) {}
+
+        const movedDist = Math.hypot(e.clientX - dragStartClient.x, e.clientY - dragStartClient.y);
+        if (movedDist < 10) {
+          // If already selected and tapped again without dragging, put it back down
+          if (wasSelectedOnDown) {
+            clearDrinkSelection(true);
+            return;
+          }
+          // Short tap/click -> enter Two-Tap Serve mode!
+          const hx = parseFloat(drinkEl.dataset.homeX);
+          const hy = parseFloat(drinkEl.dataset.homeY);
+          drinkEl.classList.remove('dragging');
+          drinkEl.classList.add('selected');
+          setDrinkTransform(drinkEl, hx, hy - 18, -6, 1.12);
+          dragHint.textContent = 'Now click Sunny Fox, Luna Bat, or PoppyDash to hand them the drink!';
+          dragHint.classList.add('visible');
+          return;
+        }
+
+        const svgPt = clientToSvgPoint(e.clientX, e.clientY);
+        const nx = svgPt.x - dragOffsetSvg.x;
+        const ny = svgPt.y - dragOffsetSvg.y;
+        const target = findTargetCharacterAt(nx, ny - 20);
+        if (target) {
+          serveDrinkToCharacter(drinkEl, target.key);
+        } else {
+          clearDrinkSelection(true);
+        }
+      };
+
+      drinkEl.addEventListener('pointerup', handlePointerEnd);
+      drinkEl.addEventListener('pointercancel', () => clearDrinkSelection(true));
+
+      // Keyboard accessibility: Enter/Space cycles serving to next character
+      drinkEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          unlockAudio();
+          const order = ['skunk', 'fox', 'bat'];
+          const idx = (counters.drinkFox + counters.drinkBat + counters.drinkSkunk) % order.length;
+          serveDrinkToCharacter(drinkEl, order[idx]);
+        }
+      });
+    });
+
+    // --- 2. CORNER FLOOR LAMP ---
+    function handleLampToggle() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      lampOn = !lampOn;
+      sceneCard.classList.toggle('lamp-off', !lampOn);
+      if (hudLamp) hudLamp.textContent = lampOn ? 'Lamp: On' : 'Lamp: Dark';
+
+      propLamp.classList.add('pulling');
+      setTimeout(() => propLamp.classList.remove('pulling'), 210);
+      playLampClickSfx(lampOn);
+
+      if (!lampOn) {
+        const list = PROP_REACTIONS.lampOff;
+        const reaction = list[counters.lampOff % list.length];
+        counters.lampOff += 1;
+        playPropReaction(reaction);
+      } else {
+        const list = PROP_REACTIONS.lampOn;
+        const reaction = list[counters.lampOn % list.length];
+        counters.lampOn += 1;
+        playPropReaction(reaction);
+      }
+    }
+
+    // --- 3. TV REMOTE CONTROL (4 Movie Genres) ---
+    function handleRemoteClick() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      genreIdx = (genreIdx + 1) % MOVIE_GENRES.length;
+      const genre = MOVIE_GENRES[genreIdx];
+
+      propRemote.classList.remove('zapping');
+      void propRemote.offsetWidth;
+      propRemote.classList.add('zapping');
+      setTimeout(() => propRemote.classList.remove('zapping'), 520);
+
+      playRemoteZapSfx();
+      MovieLightEngine.switchGenre();
+
+      const reaction = PROP_REACTIONS.remote[genre.id];
+      if (reaction) playPropReaction(reaction);
+    }
+
+    // --- 4. STRING FAIRY LIGHTS (Cozy -> Party -> Off) ---
+    function handleFairyLightsClick() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      fairyModeIdx = (fairyModeIdx + 1) % FAIRY_MODES.length;
+      const mode = FAIRY_MODES[fairyModeIdx];
+      propFairyLights.classList.remove('mode-cozy', 'mode-party', 'mode-off');
+      propFairyLights.classList.add(`mode-${mode}`);
+
+      const reaction = PROP_REACTIONS.fairy[mode];
+      if (reaction) playPropReaction(reaction);
+    }
+
+    // --- 5. COUCH THROW PILLOWS ---
+    function handlePillowLeftClick() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      propPillowLeft.classList.remove('fluffing');
+      void propPillowLeft.offsetWidth;
+      propPillowLeft.classList.add('fluffing');
+      setTimeout(() => propPillowLeft.classList.remove('fluffing'), 560);
+      playPropReaction(PROP_REACTIONS.pillowLeft);
+    }
+
+    function handlePillowRightClick() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      const list = PROP_REACTIONS.pillowRight;
+      const reaction = list[counters.pillowRight % list.length];
+      counters.pillowRight += 1;
+
+      if (!reaction.pillowAmbush) {
+        propPillowRight.classList.remove('fluffing');
+        void propPillowRight.offsetWidth;
+        propPillowRight.classList.add('fluffing');
+        setTimeout(() => propPillowRight.classList.remove('fluffing'), 560);
+      }
+      playPropReaction(reaction);
+    }
+
+    // --- 6. VINTAGE 35MM FILM REEL & BONUS WALL POSTER ---
+    function handleReelClick() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      propReel.classList.remove('spinning');
+      void propReel.offsetWidth;
+      propReel.classList.add('spinning');
+      setTimeout(() => propReel.classList.remove('spinning'), 1400);
+
+      if (vintageFlicker) {
+        vintageFlicker.classList.remove('active');
+        void vintageFlicker.offsetWidth;
+        vintageFlicker.classList.add('active');
+        setTimeout(() => vintageFlicker.classList.remove('active'), 1550);
+      }
+
+      const list = PROP_REACTIONS.reel;
+      const reaction = list[counters.reel % list.length];
+      counters.reel += 1;
+      playPropReaction(reaction);
+    }
+
+    function handlePosterClick() {
+      unlockAudio();
+      clearDrinkSelection(true);
+      posterIdx = (posterIdx + 1) % 3;
+      propPoster.querySelectorAll('.poster-art').forEach((g) => {
+        g.style.display = Number(g.getAttribute('data-poster')) === posterIdx ? '' : 'none';
+      });
+      propPoster.classList.remove('flipping');
+      void propPoster.offsetWidth;
+      propPoster.classList.add('flipping');
+      setTimeout(() => propPoster.classList.remove('flipping'), 480);
+
+      playPropReaction(PROP_REACTIONS.poster);
+    }
+
+    function bindPropActivate(el, handler) {
+      if (!el) return;
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handler();
+      });
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handler();
+        }
+      });
+    }
+
+    bindPropActivate(propLamp, handleLampToggle);
+    bindPropActivate(propRemote, handleRemoteClick);
+    bindPropActivate(propFairyLights, handleFairyLightsClick);
+    bindPropActivate(propPillowLeft, handlePillowLeftClick);
+    bindPropActivate(propPillowRight, handlePillowRightClick);
+    bindPropActivate(propReel, handleReelClick);
+    bindPropActivate(propPoster, handlePosterClick);
+
+    // --- CHARACTER CLICK HANDLERS (Two-Tap Drink Target + PoppyDash Non-Popcorn Slapstick Stunts!) ---
     function triggerCharacterReaction(charKey) {
       unlockAudio();
+
+      // If a drink is currently selected via two-tap mode, serve it to this character!
+      if (activeDrinkEl && !isDraggingDrink) {
+        serveDrinkToCharacter(activeDrinkEl, charKey);
+        return;
+      }
+
+      if (charKey === 'skunk') {
+        // Clicking PoppyDash triggers his rotating non-popcorn physical comedy stunts!
+        const stunts = PROP_REACTIONS.skunkStunts;
+        const stunt = stunts[counters.skunkStunt % stunts.length];
+        counters.skunkStunt += 1;
+        playPropReaction(stunt);
+        return;
+      }
+
       const group = chars[charKey];
       if (group) {
         group.classList.remove('react');
         void group.offsetWidth;
         group.classList.add('react');
+        setTimeout(() => group.classList.remove('react'), 480);
       }
-      if (charKey === 'skunk') {
-        // Clicking PoppyDash jumps directly to his popcorn-spill tumble!
-        stepTo(3);
-        return;
-      }
+
+      // Play next story line for Sunny or Luna without restarting a finished loop unexpectedly
       const nextForSpeaker = DIALOGUE.findIndex((item, idx) => idx > currentIndex && item.speaker === charKey);
       const fallbackForSpeaker = DIALOGUE.findIndex((item) => item.speaker === charKey);
-      stepTo(nextForSpeaker !== -1 ? nextForSpeaker : fallbackForSpeaker);
+      const chosen = DIALOGUE[nextForSpeaker !== -1 ? nextForSpeaker : fallbackForSpeaker];
+      if (storyFinished) {
+        playPropReaction(chosen);
+      } else {
+        stepTo(nextForSpeaker !== -1 ? nextForSpeaker : fallbackForSpeaker);
+      }
     }
 
+    bindPropActivate(chars.fox, () => triggerCharacterReaction('fox'));
+    bindPropActivate(chars.bat, () => triggerCharacterReaction('bat'));
+    bindPropActivate(chars.skunk, () => triggerCharacterReaction('skunk'));
+
+    // Clicking empty background cancels a two-tap selected drink cleanly
+    sceneSvg.addEventListener('click', () => {
+      if (activeDrinkEl && !isDraggingDrink) {
+        clearDrinkSelection(true);
+      }
+    });
+
+    // ==================== TOOLBAR CONTROLS ====================
     btnStartSound.addEventListener('click', () => {
       unlockAudio();
+      storyFinished = false;
       isPlaying = true;
       btnToggle.textContent = 'Pause';
       renderLine(0);
     });
 
     btnPrev.addEventListener('click', () => stepTo(currentIndex - 1));
-    btnNext.addEventListener('click', () => stepTo(currentIndex + 1));
-    btnSpill.addEventListener('click', () => stepTo(3));
+    btnNext.addEventListener('click', () => {
+      if (storyFinished) {
+        stepTo(0);
+      } else {
+        stepTo(currentIndex + 1);
+      }
+    });
+    btnSpill.addEventListener('click', () => {
+      unlockAudio();
+      clearDrinkSelection(true);
+      stepTo(3);
+    });
     btnVoice.addEventListener('click', toggleVoices);
     btnCast.addEventListener('click', () => {
       voicePanel.classList.toggle('open');
@@ -2299,6 +4640,8 @@
     btnToggle.addEventListener('click', togglePlayback);
     btnReplay.addEventListener('click', () => {
       unlockAudio();
+      clearDrinkSelection(true);
+      storyFinished = false;
       isPlaying = true;
       btnToggle.textContent = 'Pause';
       renderLine(0);
@@ -2307,7 +4650,7 @@
     if (voiceEngineSelect) {
       voiceEngineSelect.addEventListener('change', (e) => {
         VoiceManager.setMode(e.target.value);
-        if (audioUnlocked && voicesEnabled && isPlaying) {
+        if (audioUnlocked && voicesEnabled && isPlaying && !storyFinished) {
           renderLine(currentIndex);
         }
       });
@@ -2327,33 +4670,44 @@
         const sample = DIALOGUE.find((d) => d.speaker === role);
         if (sample) {
           clearTimeout(timerId);
+          clearTimeout(reactionCleanupTimerId);
           VoiceManager.speak(sample, () => {});
         }
       });
     });
 
     Object.values(bubbles).forEach((el) => {
-      el.addEventListener('click', () => stepTo(currentIndex + 1));
+      el.addEventListener('click', () => {
+        if (storyFinished) {
+          hideAllBubbles();
+          clearAllCharacterStates();
+        } else {
+          stepTo(currentIndex + 1);
+        }
+      });
     });
 
-    chars.fox.addEventListener('click', () => triggerCharacterReaction('fox'));
-    chars.bat.addEventListener('click', () => triggerCharacterReaction('bat'));
-    chars.skunk.addEventListener('click', () => triggerCharacterReaction('skunk'));
-
-    // Cleanly pause when backgrounding on mobile/iPad so WebKit/mobile audio sessions never wedge
+    // Cleanly pause audio & rAF lighting when tab backgrounds on mobile/iPad
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && audioUnlocked && isPlaying) {
-        clearTimeout(timerId);
-        VoiceManager.stop();
-        isPlaying = false;
-        btnToggle.textContent = 'Play';
-        playbackStatus.textContent = 'Paused';
+      if (document.hidden) {
+        MovieLightEngine.stop();
+        if (audioUnlocked && isPlaying) {
+          clearTimeout(timerId);
+          clearTimeout(reactionCleanupTimerId);
+          VoiceManager.stop();
+          isPlaying = false;
+          btnToggle.textContent = 'Play';
+          playbackStatus.textContent = 'Paused';
+        }
+      } else {
+        MovieLightEngine.start();
       }
     });
 
-    // Initialize Cast Voices UI, warm up Studio audio buffers in background, and start visual animation cleanly
+    // Initialize Cast Voices UI, warm up Studio audio buffers, launch organic Movie Light Engine, and start story
     syncVoicePanelUi();
     VoiceManager.preloadStudioAudio();
+    MovieLightEngine.start();
     renderLine(0);
   </script>
 </body>
