@@ -64,7 +64,7 @@ python3 scripts/generate_voices.py --all
 
 ### Adding a New Spoken Line
 
-1. Add a `(clip_id, speaker_key, text)` tuple to `CLIPS` in [`scripts/generate_voices.py`](scripts/generate_voices.py).
+1. Add a `(clip_id, speaker_key, text)` tuple to `CLIPS` in [`scripts/generate_voices.py`](scripts/generate_voices.py). *(Tip: use natural casing like `Whoa!` or `Achoo!` instead of ALL-CAPS like `WHOA!` so neural TTS pronounces them as words rather than spelling them out as acronyms.)*
 2. Run `python3 scripts/generate_voices.py` to generate `audio/<clip_id>.mp3`.
 3. Reference `'audio/<clip_id>.mp3'` in `DIALOGUE` or `PROP_REACTIONS` (and add it to `ALL_REACTION_AUDIO_FILES` for background warm-up) in [`index.html`](index.html).
 4. Commit the updated script, HTML, and `.mp3` file together.

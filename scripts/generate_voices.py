@@ -83,17 +83,19 @@ CLIPS: list[tuple[str, str, str]] = [
     ("react-drink-fox-2", "fox", "Chilled to perfection. Cheers, movie crew!"),
     ("react-drink-bat-1", "bat", "Sluuurp! Fizzy bubbles tickle my fangs! Wheee!"),
     ("react-drink-bat-2", "bat", "Zoom-juice! Watch me do a double loop-de-loop!"),
-    ("react-drink-skunk-1", "skunk", "Ooh, icy... WHOA, BRAIN FREEZE! Tell my fluffy tail I loved it!"),
-    ("react-drink-skunk-2", "skunk", "Hic! Excuse me, hic! Totally dignified! Completely under... HIC! ...control!"),
+    # Note: Avoid ALL-CAPS words (e.g. use "Whoa!" instead of "WHOA!") so neural TTS
+    # pronounces them naturally instead of spelling them out letter by letter.
+    ("react-drink-skunk-1", "skunk", "Ooh, icy... Whoa, brain freeze! Tell my fluffy tail I loved it!"),
+    ("react-drink-skunk-2", "skunk", "Hic! Excuse me, hic! Totally dignified! Completely under... hic! ...control!"),
 
     # ---------- Corner Floor Lamp ----------
-    ("react-lamp-off-skunk", "skunk", "WHOA! Nobody move! Whose giant fuzzy tail am I holding?! Oh, wait, it's mine."),
+    ("react-lamp-off-skunk", "skunk", "Whoa! Nobody move! Whose giant fuzzy tail am I holding?! Oh, wait, it's mine."),
     ("react-lamp-off-bat", "bat", "Yesss! Full bat-vision mode! Now it feels like a real theater!"),
     ("react-lamp-on-bat", "bat", "Ack, my nocturnal eyes! Too bright, too bright!"),
     ("react-lamp-on-fox", "fox", "Back to golden hour. Honestly, it's my best lighting anyway."),
 
     # ---------- TV Remote (4 Movie Genres) ----------
-    ("react-remote-scifi-skunk", "skunk", "Engage hyperdrive! Pew-pew... WHOA, armrest! Totally meant to park sideways."),
+    ("react-remote-scifi-skunk", "skunk", "Engage hyperdrive! Pew-pew... whoa, armrest! Totally meant to park sideways."),
     ("react-remote-spooky-skunk", "skunk", "Nope! Nope-nope-nope! That spooky hallway definitely just blinked at me!"),
     ("react-remote-action-bat", "bat", "Boom! Did you see that mega-flip?! Rewind it, rewind it!"),
     ("react-remote-romcom-fox", "fox", "Finally, a film with proper wardrobe and golden sunset lighting."),
@@ -110,12 +112,12 @@ CLIPS: list[tuple[str, str, str]] = [
 
     # ---------- Shelf Film Reel & Wall Poster ----------
     ("react-reel-fox", "fox", "Classic thirty-five millimeter reel! Now that is true cinema appreciation."),
-    ("react-reel-skunk", "skunk", "Ah yes, exquisite vintage cinema... WHOA, cushion abyss! Send a rescue rope!"),
+    ("react-reel-skunk", "skunk", "Ah yes, exquisite vintage cinema... whoa, cushion abyss! Send a rescue rope!"),
     ("react-poster-bat", "bat", "Ooh, put up the Midnight Wings poster! That one's my favorite!"),
 
     # ---------- PoppyDash Direct-Click Physical Comedy Stunts ----------
-    ("react-click-skunk-sneeze", "skunk", "Ah... ah... ACHOO! Whoa! Note to self: never sniff my own fluffy tail mid-movie."),
-    ("react-click-skunk-bounce", "skunk", "Watch me stick this landing... WHOA, extra springy cushion! Ten out of ten recovery!"),
+    ("react-click-skunk-sneeze", "skunk", "Ah... ah... achoo! Whoa! Note to self: never sniff my own fluffy tail mid-movie."),
+    ("react-click-skunk-bounce", "skunk", "Watch me stick this landing... whoa, extra springy cushion! Ten out of ten recovery!"),
     ("react-click-skunk-dodge", "skunk", "Slow-motion ninja dodge! Hiyah... oof, tripped over my own tail again. Smooth."),
 ]
 

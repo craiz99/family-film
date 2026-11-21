@@ -3140,6 +3140,7 @@
 
       function normalizeTextForSpeech(text) {
         return String(text || '')
+          .replace(/\b([A-Z]{2,})\b/g, (word) => word[0] + word.slice(1).toLowerCase())
           .replace(/—/g, ', ')
           .replace(/…/g, '...')
           .replace(/\s+/g, ' ')
