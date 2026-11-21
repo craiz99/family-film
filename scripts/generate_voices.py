@@ -79,46 +79,46 @@ CLIPS: list[tuple[str, str, str]] = [
     ("line-7", "fox", "Alright, crew, eyes on the screen. Best movie night yet!"),
 
     # ---------- Interactive Drinks (Soda Cups) ----------
-    ("react-drink-fox-1", "fox", "Ooh, berry fizz? Now that is five-star lounge service."),
-    ("react-drink-fox-2", "fox", "Chilled to perfection. Cheers, movie crew!"),
-    ("react-drink-bat-1", "bat", "Sluuurp! Fizzy bubbles tickle my fangs! Wheee!"),
-    ("react-drink-bat-2", "bat", "Zoom-juice! Watch me do a double loop-de-loop!"),
     # Note: Avoid ALL-CAPS words (e.g. use "Whoa!" instead of "WHOA!") so neural TTS
     # pronounces them naturally instead of spelling them out letter by letter.
-    ("react-drink-skunk-1", "skunk", "Ooh, icy... Whoa, brain freeze! Tell my fluffy tail I loved it!"),
-    ("react-drink-skunk-2", "skunk", "Hic! Excuse me, hic! Totally dignified! Completely under... hic! ...control!"),
+    ("react-drink-fox-1", "fox", "Mmm, yummy berry bubbles! Thanks, buddy!"),
+    ("react-drink-fox-2", "fox", "Ooh, icy cold! Careful not to spill it on my fluffy tail!"),
+    ("react-drink-bat-1", "bat", "Slurp! Fizzy bubbles are tickling my nose! Hehehe! Zoom zoom!"),
+    ("react-drink-bat-2", "bat", "Whoa, super rocket juice! Look at me spin like a purple tornado! Wheee!"),
+    ("react-drink-skunk-1", "skunk", "Uh oh, bubbly tummy... Oops, toot! Excuse me! That wasn't me, it was the couch cushion!"),
+    ("react-drink-skunk-2", "skunk", "Burp! Oopsie! That blue soda gave me super bubble burps! Hic! Hehe!"),
 
     # ---------- Corner Floor Lamp ----------
-    ("react-lamp-off-skunk", "skunk", "Whoa! Nobody move! Whose giant fuzzy tail am I holding?! Oh, wait, it's mine."),
-    ("react-lamp-off-bat", "bat", "Yesss! Full bat-vision mode! Now it feels like a real theater!"),
-    ("react-lamp-on-bat", "bat", "Ack, my nocturnal eyes! Too bright, too bright!"),
-    ("react-lamp-on-fox", "fox", "Back to golden hour. Honestly, it's my best lighting anyway."),
+    ("react-lamp-off-skunk", "skunk", "Eek! Who turned out the lights?! Something fluffy touched me! Oh, wait, that's my own butt!"),
+    ("react-lamp-off-bat", "bat", "Yay, dark time! My sparkly bat eyes can see everything! Peek-a-boo!"),
+    ("react-lamp-on-bat", "bat", "Whoa, too bright! My bat eyes are blinking like crazy! Bloop bloop!"),
+    ("react-lamp-on-fox", "fox", "Phew, lights back on! Now we can see PoppyDash's silly face!"),
 
     # ---------- TV Remote (4 Movie Genres) ----------
-    ("react-remote-scifi-skunk", "skunk", "Engage hyperdrive! Pew-pew... whoa, armrest! Totally meant to park sideways."),
-    ("react-remote-spooky-skunk", "skunk", "Nope! Nope-nope-nope! That spooky hallway definitely just blinked at me!"),
-    ("react-remote-action-bat", "bat", "Boom! Did you see that mega-flip?! Rewind it, rewind it!"),
-    ("react-remote-romcom-fox", "fox", "Finally, a film with proper wardrobe and golden sunset lighting."),
+    ("react-remote-scifi-skunk", "skunk", "Blast off! Pew pew! Whoa, crash landing on the squishy armrest!"),
+    ("react-remote-spooky-skunk", "skunk", "Yikes! A tickle monster! Hide me! Hide my toes!"),
+    ("react-remote-action-bat", "bat", "Kaboom! Super bat flip! Watch me do it again, wheee!"),
+    ("react-remote-romcom-fox", "fox", "Aww, look at the cute fluffy puppies on TV! Best channel ever!"),
 
     # ---------- String Fairy Lights ----------
-    ("react-fairy-party-skunk", "skunk", "Oh yeah, watch the funky skunk groove! Woo! Wait, too funky, room is spinning!"),
-    ("react-fairy-off-fox", "fox", "Ultra-cozy theater mode. Very chic, very dramatic."),
-    ("react-fairy-cozy-bat", "bat", "Ooh, twinkly stars indoors! Way prettier than the cave ceiling!"),
+    ("react-fairy-party-skunk", "skunk", "Wiggle wiggle! Watch my silly skunk dance! Whoa, too wiggly, my head is spinning!"),
+    ("react-fairy-off-fox", "fox", "Ooh, super secret movie fort! Shhh, the movie is starting!"),
+    ("react-fairy-cozy-bat", "bat", "Ooh, pretty rainbow stars! Like fireflies in our living room!"),
 
     # ---------- Couch Throw Pillows ----------
-    ("react-pillow-fox", "fox", "Mmm, freshly fluffed. Nobody steals the corner seat."),
-    ("react-pillow-skunk", "skunk", "Hey! The couch just fought back! Did everyone see that pillow ambush me?!"),
-    ("react-pillow-bat", "bat", "Boing! Best bat trampoline in the entire house!"),
+    ("react-pillow-fox", "fox", "Poof! Super squishy! Hey, no pillow fights until after the movie!"),
+    ("react-pillow-skunk", "skunk", "Bonk! Hey, the pillow jumped on my head! Do I look like a silly pillow king?"),
+    ("react-pillow-bat", "bat", "Boing, boing, boing! Best bouncy pillow trampoline ever!"),
 
     # ---------- Shelf Film Reel & Wall Poster ----------
-    ("react-reel-fox", "fox", "Classic thirty-five millimeter reel! Now that is true cinema appreciation."),
-    ("react-reel-skunk", "skunk", "Ah yes, exquisite vintage cinema... whoa, cushion abyss! Send a rescue rope!"),
-    ("react-poster-bat", "bat", "Ooh, put up the Midnight Wings poster! That one's my favorite!"),
+    ("react-reel-fox", "fox", "Spin, spin, spin! That's how old-timey cartoons used to play!"),
+    ("react-reel-skunk", "skunk", "Whoa, spinny wheel! Help, the couch is eating me! Blub blub blub!"),
+    ("react-poster-bat", "bat", "Ooh, the purple bat poster! Look, that looks just like me! Hehe!"),
 
     # ---------- PoppyDash Direct-Click Physical Comedy Stunts ----------
-    ("react-click-skunk-sneeze", "skunk", "Ah... ah... achoo! Whoa! Note to self: never sniff my own fluffy tail mid-movie."),
-    ("react-click-skunk-bounce", "skunk", "Watch me stick this landing... whoa, extra springy cushion! Ten out of ten recovery!"),
-    ("react-click-skunk-dodge", "skunk", "Slow-motion ninja dodge! Hiyah... oof, tripped over my own tail again. Smooth."),
+    ("react-click-skunk-sneeze", "skunk", "Ah... ah... achoo! Whoa! My fluffy tail tickled my nose! Hehehe!"),
+    ("react-click-skunk-bounce", "skunk", "Boing! Look how high I can bounce... oops! Squeaky landing! Hehe!"),
+    ("react-click-skunk-dodge", "skunk", "Hi-yah! Super skunk spin! Oops, I bonked myself with my own tail!"),
 ]
 
 

@@ -808,8 +808,14 @@
     .fox-group,
     .bat-anchor,
     .skunk-group {
+      outline: none;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+    }
+    .fox-group:focus-visible,
+    .bat-anchor:focus-visible,
+    .skunk-group:focus-visible {
+      filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.85));
     }
 
     /* ---------- SUNNY FOX (WOMAN) ---------- */
@@ -823,6 +829,9 @@
     }
     .fox-group.state-wave {
       transform: translate(-4px, -4px) rotate(-2deg);
+    }
+    .fox-group.state-stink-lean {
+      transform: translate(-34px, -4px) rotate(-14deg);
     }
 
     .fox-inner {
@@ -881,9 +890,16 @@
     .fox-group.state-wave .fox-gesture-arm {
       animation: foxArmGesture 0.85s ease-in-out infinite alternate;
     }
+    .fox-group.state-stink-lean .fox-gesture-arm {
+      animation: foxWaveStink 0.2s ease-in-out infinite alternate;
+    }
     @keyframes foxArmGesture {
       0% { transform: rotate(-4deg); }
       100% { transform: rotate(-22deg) translateY(-4px); }
+    }
+    @keyframes foxWaveStink {
+      0% { transform: rotate(-52deg) translate(-12px, -22px); }
+      100% { transform: rotate(-78deg) translate(-18px, -28px); }
     }
     .fox-mouth-talk-origin { transform-origin: 332px 390px; }
 
@@ -1059,7 +1075,52 @@
     }
 
     /* === POPPYDASH NON-POPCORN PHYSICAL COMEDY GAGS === */
-    /* 1. Brain Freeze Shake */
+    /* 1. Mega Skunk Toot (Rocket-Hop + Giant Cartoon Green Toot Cloud!) */
+    .skunk-toot-cloud {
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: 940px 465px;
+    }
+    .skunk-group.gag-toot .skunk-toot-cloud {
+      animation: tootCloudPuff 2.6s cubic-bezier(0.22, 0.86, 0.36, 1) forwards;
+    }
+    .skunk-group.gag-bounce-fail .skunk-toot-cloud {
+      animation: miniTootPuff 1.6s ease-out 0.95s forwards;
+    }
+    .skunk-group.gag-toot .skunk-inner {
+      animation: poppyTootRocket 2.1s cubic-bezier(0.28, 0.9, 0.36, 1) forwards;
+    }
+    .skunk-group.gag-toot .skunk-tail {
+      animation: poppyTootTailFlip 2.1s ease-in-out forwards;
+    }
+    @keyframes poppyTootRocket {
+      0% { transform: translateY(0) scale(1, 1); }
+      14% { transform: translateY(6px) scale(1.13, 0.9); }
+      28% { transform: translateY(-38px) scale(0.92, 1.12) rotate(-8deg); }
+      46% { transform: translateY(-28px) scale(0.96, 1.06) rotate(6deg); }
+      64% { transform: translateY(8px) scale(1.08, 0.92) rotate(-4deg); }
+      82% { transform: translateY(-6px) rotate(3deg); }
+      100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
+    }
+    @keyframes poppyTootTailFlip {
+      0% { transform: rotate(0deg); }
+      22% { transform: rotate(-28deg) scale(1.14); }
+      65% { transform: rotate(-16deg) scale(1.08); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    @keyframes tootCloudPuff {
+      0%, 10% { opacity: 0; transform: translate(-24px, 12px) scale(0.25); }
+      24% { opacity: 0.96; transform: translate(18px, -12px) scale(1.08); }
+      58% { opacity: 0.9; transform: translate(42px, -68px) scale(1.38) rotate(8deg); }
+      100% { opacity: 0; transform: translate(62px, -135px) scale(1.65) rotate(14deg); }
+    }
+    @keyframes miniTootPuff {
+      0% { opacity: 0; transform: translate(-18px, 14px) scale(0.2); }
+      24% { opacity: 0.86; transform: translate(14px, -6px) scale(0.75); }
+      100% { opacity: 0; transform: translate(34px, -74px) scale(1.1); }
+    }
+
+    /* 1b. Brain Freeze Shake (kept for compatibility) */
     .skunk-frost {
       opacity: 0;
       pointer-events: none;
@@ -1076,26 +1137,29 @@
       100% { transform: translate(5px, -5px) rotate(3.5deg) scale(0.98, 1.03); }
     }
 
-    /* 2. Soda Hiccup Bounces */
+    /* 2. Super Bubble Burp + Hiccup Bounces */
     .skunk-hiccup-bubbles {
       opacity: 0;
       pointer-events: none;
     }
-    .skunk-group.gag-hiccup .skunk-hiccup-bubbles {
-      animation: hiccupBubblesFloat 2.4s ease-out forwards;
+    .skunk-group.gag-hiccup .skunk-hiccup-bubbles,
+    .skunk-group.gag-burp-hiccup .skunk-hiccup-bubbles {
+      animation: hiccupBubblesFloat 2.5s ease-out forwards;
     }
-    .skunk-group.gag-hiccup .skunk-inner {
-      animation: poppyHiccup 0.78s cubic-bezier(0.34, 1.56, 0.64, 1) 3;
+    .skunk-group.gag-hiccup .skunk-inner,
+    .skunk-group.gag-burp-hiccup .skunk-inner {
+      animation: poppyHiccup 0.76s cubic-bezier(0.34, 1.56, 0.64, 1) 3;
     }
     @keyframes poppyHiccup {
       0%, 100% { transform: translateY(0) scale(1, 1); }
-      28% { transform: translateY(-24px) scale(0.92, 1.12) rotate(-3deg); }
-      58% { transform: translateY(4px) scale(1.07, 0.94) rotate(2deg); }
+      26% { transform: translateY(-28px) scale(0.92, 1.14) rotate(-4deg); }
+      56% { transform: translateY(6px) scale(1.1, 0.92) rotate(3deg); }
     }
     @keyframes hiccupBubblesFloat {
-      0% { opacity: 0; transform: translateY(8px) scale(0.7); }
-      18% { opacity: 1; }
-      100% { opacity: 0; transform: translateY(-62px) scale(1.25); }
+      0% { opacity: 0; transform: translateY(10px) scale(0.5); }
+      18% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+      72% { opacity: 0.92; transform: translateY(-64px) scale(1.32); }
+      100% { opacity: 0; transform: translateY(-98px) scale(1.48); }
     }
 
     /* 3. Darkness Panic + Bottle-Brush Puffed Tail */
@@ -1970,11 +2034,15 @@
                 <path d="M850,294 L862,294 M856,288 L856,300" stroke="#90e0ef" stroke-width="2.5" stroke-linecap="round" />
               </g>
 
-              <!-- Soda Hiccup Floating Bubbles -->
+              <!-- Super Bubble Burp & Hiccup Floating Bubbles -->
               <g class="skunk-hiccup-bubbles">
-                <circle cx="838" cy="378" r="8" fill="#ff9ebb" fill-opacity="0.72" stroke="#ffffff" stroke-width="2" />
-                <circle cx="868" cy="364" r="11" fill="#5ce1e6" fill-opacity="0.65" stroke="#ffffff" stroke-width="2" />
-                <circle cx="852" cy="348" r="6" fill="#ffd166" fill-opacity="0.75" stroke="#ffffff" stroke-width="1.8" />
+                <circle cx="834" cy="378" r="11" fill="#5ce1e6" fill-opacity="0.78" stroke="#ffffff" stroke-width="2.2" />
+                <circle cx="830" cy="374" r="3" fill="#ffffff" />
+                <circle cx="872" cy="362" r="15" fill="#9bf6ff" fill-opacity="0.74" stroke="#ffffff" stroke-width="2.4" />
+                <circle cx="867" cy="356" r="4" fill="#ffffff" />
+                <circle cx="852" cy="342" r="9" fill="#ff9ebb" fill-opacity="0.78" stroke="#ffffff" stroke-width="2" />
+                <circle cx="888" cy="336" r="7" fill="#ffd166" fill-opacity="0.82" stroke="#ffffff" stroke-width="1.8" />
+                <circle cx="820" cy="350" r="8" fill="#c77dff" fill-opacity="0.72" stroke="#ffffff" stroke-width="1.8" />
               </g>
 
               <!-- Giant Cartoon Sneeze Gust Puff -->
@@ -1995,6 +2063,19 @@
                 <polygon points="888,288 891,294 898,295 893,299 894,306 888,302 882,306 883,299 878,295 885,294" fill="#5ce1e6" stroke="#1e1b2e" stroke-width="2" />
                 <polygon points="855,274 858,280 865,281 860,285 861,292 855,288 849,292 850,285 845,281 852,280" fill="#ff758f" stroke="#1e1b2e" stroke-width="2" />
               </g>
+            </g>
+
+            <!-- Silly Cartoon Lime-Green Skunk Toot Cloud! -->
+            <g id="skunk-toot-cloud" class="skunk-toot-cloud">
+              <circle cx="944" cy="466" r="24" fill="#80ed99" fill-opacity="0.88" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="972" cy="450" r="30" fill="#b5e48c" fill-opacity="0.9" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="998" cy="468" r="22" fill="#80ed99" fill-opacity="0.88" stroke="#1e1b2e" stroke-width="3" />
+              <circle cx="968" cy="476" r="22" fill="#99e2b4" fill-opacity="0.92" />
+              <circle cx="956" cy="452" r="14" fill="#d9ed92" fill-opacity="0.85" />
+              <!-- Wiggly Cartoon Stink Lines -->
+              <path d="M950,420 Q942,404 952,390 Q960,378 952,366" fill="none" stroke="#80ed99" stroke-width="4.5" stroke-linecap="round" />
+              <path d="M976,412 Q986,396 976,380 Q968,368 978,354" fill="none" stroke="#d9ed92" stroke-width="4.5" stroke-linecap="round" />
+              <path d="M1002,430 Q1012,414 1002,400" fill="none" stroke="#b5e48c" stroke-width="4" stroke-linecap="round" />
             </g>
 
             <!-- Juggled Striped Popcorn Bucket -->
@@ -2274,7 +2355,7 @@
         fox: [
           {
             speaker: 'fox',
-            text: 'Ooh, berry fizz? Now that is five-star lounge service.',
+            text: 'Mmm, yummy berry bubbles! Thanks, buddy!',
             audioFile: 'audio/react-drink-fox-1.mp3',
             foxState: 'state-wave',
             sfx: 'slurp',
@@ -2282,7 +2363,7 @@
           },
           {
             speaker: 'fox',
-            text: 'Chilled to perfection. Cheers, movie crew!',
+            text: 'Ooh, icy cold! Careful not to spill it on my fluffy tail!',
             audioFile: 'audio/react-drink-fox-2.mp3',
             foxState: 'state-wave',
             sfx: 'slurp',
@@ -2292,7 +2373,7 @@
         bat: [
           {
             speaker: 'bat',
-            text: 'Sluuurp! Fizzy bubbles tickle my fangs—wheee!',
+            text: 'Slurp! Fizzy bubbles are tickling my nose! Hehehe! Zoom zoom!',
             audioFile: 'audio/react-drink-bat-1.mp3',
             batState: 'state-flip',
             sfx: 'slurp',
@@ -2300,7 +2381,7 @@
           },
           {
             speaker: 'bat',
-            text: 'Zoom-juice! Watch me do a double loop-de-loop!',
+            text: 'Whoa, super rocket juice! Look at me spin like a purple tornado! Wheee!',
             audioFile: 'audio/react-drink-bat-2.mp3',
             batState: 'state-double-flip',
             sfx: 'slurp',
@@ -2310,20 +2391,21 @@
         skunk: [
           {
             speaker: 'skunk',
-            text: 'Ooh, icy—WHOA, BRAIN FREEZE! Tell my fluffy tail I loved it!',
+            text: "Uh oh, bubbly tummy… Oops, toot! Excuse me! That wasn't me, it was the couch cushion!",
             audioFile: 'audio/react-drink-skunk-1.mp3',
-            skunkGag: 'gag-brainfreeze',
-            foxState: 'state-peek',
-            sfx: 'brainfreeze',
-            burst: { x: 855, y: 315 }
+            skunkGag: 'gag-toot',
+            foxState: 'state-stink-lean',
+            batState: 'state-flip',
+            sfx: 'toot',
+            burst: { x: 965, y: 440 }
           },
           {
             speaker: 'skunk',
-            text: 'Hic! Excuse me—hic! Totally dignified! Completely under—HIC!—control!',
+            text: 'Burp! Oopsie! That blue soda gave me super bubble burps! Hic! Hehe!',
             audioFile: 'audio/react-drink-skunk-2.mp3',
-            skunkGag: 'gag-hiccup',
+            skunkGag: 'gag-burp-hiccup',
             foxState: 'state-peek',
-            sfx: 'hiccup',
+            sfx: 'burp',
             burst: { x: 855, y: 330 }
           }
         ]
@@ -2331,7 +2413,7 @@
       lampOff: [
         {
           speaker: 'skunk',
-          text: "WHOA! Nobody move! Whose giant fuzzy tail am I holding?! Oh—wait, it's mine.",
+          text: "Eek! Who turned out the lights?! Something fluffy touched me! Oh, wait—that's my own butt!",
           audioFile: 'audio/react-lamp-off-skunk.mp3',
           skunkGag: 'gag-dark-panic',
           foxState: 'state-peek',
@@ -2339,7 +2421,7 @@
         },
         {
           speaker: 'bat',
-          text: 'Yesss! Full bat-vision mode! Now it feels like a real theater!',
+          text: 'Yay, dark time! My sparkly bat eyes can see everything! Peek-a-boo!',
           audioFile: 'audio/react-lamp-off-bat.mp3',
           batState: 'state-flip',
           sfx: 'flutter'
@@ -2348,14 +2430,14 @@
       lampOn: [
         {
           speaker: 'bat',
-          text: 'Ack, my nocturnal eyes! Too bright, too bright!',
+          text: 'Whoa, too bright! My bat eyes are blinking like crazy! Bloop bloop!',
           audioFile: 'audio/react-lamp-on-bat.mp3',
           batState: 'state-squint',
           sfx: 'flutter'
         },
         {
           speaker: 'fox',
-          text: "Back to golden hour. Honestly, it's my best lighting anyway.",
+          text: "Phew, lights back on! Now we can see PoppyDash's silly face!",
           audioFile: 'audio/react-lamp-on-fox.mp3',
           foxState: 'state-wave'
         }
@@ -2363,7 +2445,7 @@
       remote: {
         scifi: {
           speaker: 'skunk',
-          text: 'Engage hyperdrive! Pew-pew—WHOA, armrest! Totally meant to park sideways.',
+          text: 'Blast off! Pew pew! Whoa, crash landing on the squishy armrest!',
           audioFile: 'audio/react-remote-scifi-skunk.mp3',
           skunkGag: 'gag-hero-flop',
           foxState: 'state-peek',
@@ -2371,7 +2453,7 @@
         },
         spooky: {
           speaker: 'skunk',
-          text: 'Nope! Nope-nope-nope! That spooky hallway definitely just blinked at me!',
+          text: 'Yikes! A tickle monster! Hide me! Hide my toes!',
           audioFile: 'audio/react-remote-spooky-skunk.mp3',
           skunkGag: 'gag-spooked',
           batState: 'state-perch',
@@ -2379,14 +2461,14 @@
         },
         action: {
           speaker: 'bat',
-          text: 'Boom! Did you see that mega-flip?! Rewind it, rewind it!',
+          text: 'Kaboom! Super bat flip! Watch me do it again, wheee!',
           audioFile: 'audio/react-remote-action-bat.mp3',
           batState: 'state-double-flip',
           sfx: 'flutter'
         },
         romcom: {
           speaker: 'fox',
-          text: 'Finally, a film with proper wardrobe and golden sunset lighting.',
+          text: 'Aww, look at the cute fluffy puppies on TV! Best channel ever!',
           audioFile: 'audio/react-remote-romcom-fox.mp3',
           foxState: 'state-wave'
         }
@@ -2394,7 +2476,7 @@
       fairy: {
         party: {
           speaker: 'skunk',
-          text: 'Oh yeah, watch the funky skunk groove—woo! Wait, too funky, room is spinning!',
+          text: 'Wiggle wiggle! Watch my silly skunk dance! Whoa, too wiggly, my head is spinning!',
           audioFile: 'audio/react-fairy-party-skunk.mp3',
           skunkGag: 'gag-disco-dizzy',
           batState: 'state-flip',
@@ -2402,14 +2484,14 @@
         },
         off: {
           speaker: 'fox',
-          text: 'Ultra-cozy theater mode. Very chic, very dramatic.',
+          text: 'Ooh, super secret movie fort! Shhh, the movie is starting!',
           audioFile: 'audio/react-fairy-off-fox.mp3',
           foxState: 'state-wave',
           sfx: 'chime'
         },
         cozy: {
           speaker: 'bat',
-          text: 'Ooh, twinkly stars indoors! Way prettier than the cave ceiling!',
+          text: 'Ooh, pretty rainbow stars! Like fireflies in our living room!',
           audioFile: 'audio/react-fairy-cozy-bat.mp3',
           batState: 'state-perch',
           sfx: 'chime'
@@ -2417,7 +2499,7 @@
       },
       pillowLeft: {
         speaker: 'fox',
-        text: 'Mmm, freshly fluffed. Nobody steals the corner seat.',
+        text: 'Poof! Super squishy! Hey, no pillow fights until after the movie!',
         audioFile: 'audio/react-pillow-fox.mp3',
         foxState: 'state-wave',
         sfx: 'pillow',
@@ -2426,7 +2508,7 @@
       pillowRight: [
         {
           speaker: 'skunk',
-          text: 'Hey! The couch just fought back! Did everyone see that pillow ambush me?!',
+          text: 'Bonk! Hey, the pillow jumped on my head! Do I look like a silly pillow king?',
           audioFile: 'audio/react-pillow-skunk.mp3',
           skunkGag: 'gag-pillow-bonk',
           foxState: 'state-peek',
@@ -2436,7 +2518,7 @@
         },
         {
           speaker: 'bat',
-          text: 'Boing! Best bat trampoline in the entire house!',
+          text: 'Boing, boing, boing! Best bouncy pillow trampoline ever!',
           audioFile: 'audio/react-pillow-bat.mp3',
           batState: 'state-pillow-bounce',
           sfx: 'pillow',
@@ -2446,7 +2528,7 @@
       reel: [
         {
           speaker: 'skunk',
-          text: 'Ah yes, exquisite vintage cinema—WHOA, cushion abyss! Send a rescue rope!',
+          text: 'Whoa, spinny wheel! Help, the couch is eating me! Blub blub blub!',
           audioFile: 'audio/react-reel-skunk.mp3',
           skunkGag: 'gag-cushion-sink',
           foxState: 'state-peek',
@@ -2454,7 +2536,7 @@
         },
         {
           speaker: 'fox',
-          text: 'Classic thirty-five millimeter reel! Now that is true cinema appreciation.',
+          text: "Spin, spin, spin! That's how old-timey cartoons used to play!",
           audioFile: 'audio/react-reel-fox.mp3',
           foxState: 'state-wave',
           sfx: 'reel'
@@ -2462,7 +2544,7 @@
       ],
       poster: {
         speaker: 'bat',
-        text: "Ooh, put up the Midnight Wings poster! That one's my favorite!",
+        text: 'Ooh, the purple bat poster! Look, that looks just like me! Hehe!',
         audioFile: 'audio/react-poster-bat.mp3',
         batState: 'state-poster-look',
         sfx: 'poster'
@@ -2470,7 +2552,7 @@
       skunkStunts: [
         {
           speaker: 'skunk',
-          text: 'Ah—ah—ACHOO! Whoa! Note to self: never sniff my own fluffy tail mid-movie.',
+          text: 'Ah… ah… achoo! Whoa! My fluffy tail tickled my nose! Hehehe!',
           audioFile: 'audio/react-click-skunk-sneeze.mp3',
           skunkGag: 'gag-sneeze',
           foxState: 'state-peek',
@@ -2478,15 +2560,15 @@
         },
         {
           speaker: 'skunk',
-          text: 'Watch me stick this landing—WHOA, extra springy cushion! Ten out of ten recovery!',
+          text: 'Boing! Look how high I can bounce… oops! Squeaky landing! Hehe!',
           audioFile: 'audio/react-click-skunk-bounce.mp3',
           skunkGag: 'gag-bounce-fail',
           batState: 'state-flip',
-          sfx: 'boing'
+          sfx: 'boingToot'
         },
         {
           speaker: 'skunk',
-          text: 'Slow-motion ninja dodge! Hiyah—oof, tripped over my own tail again. Smooth.',
+          text: 'Hi-yah! Super skunk spin! Oops, I bonked myself with my own tail!',
           audioFile: 'audio/react-click-skunk-dodge.mp3',
           skunkGag: 'gag-dodge-tangle',
           foxState: 'state-peek',
@@ -2540,7 +2622,7 @@
       },
       {
         id: 'romcom',
-        label: 'Rom-Com',
+        label: 'Puppies',
         palettes: [
           [255, 196, 128],
           [255, 146, 178],
@@ -2656,6 +2738,8 @@
     })();
 
     const SKUNK_GAG_CLASSES = [
+      'gag-toot',
+      'gag-burp-hiccup',
       'gag-brainfreeze',
       'gag-hiccup',
       'gag-dark-panic',
@@ -2914,6 +2998,113 @@
           b.start(now + offset);
           b.stop(now + offset + 0.06);
         });
+      } else if (kind === 'toot') {
+        // Silly cartoon raspberry fart: fluttering sawtooth pitch-drop + cheeky high squeak!
+        const startT = now + 0.14;
+        const osc = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(155, startT);
+        osc.frequency.exponentialRampToValueAtTime(92, startT + 0.28);
+        osc.frequency.exponentialRampToValueAtTime(58, startT + 0.62);
+
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(28, startT);
+        lfo.frequency.linearRampToValueAtTime(16, startT + 0.62);
+        lfoGain.gain.setValueAtTime(34, startT);
+        lfo.connect(lfoGain).connect(osc.frequency);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(540, startT);
+        filter.Q.setValueAtTime(4.5, startT);
+
+        gain.gain.setValueAtTime(0.001, startT);
+        gain.gain.linearRampToValueAtTime(0.24, startT + 0.04);
+        gain.gain.setValueAtTime(0.22, startT + 0.45);
+        gain.gain.exponentialRampToValueAtTime(0.001, startT + 0.66);
+
+        osc.connect(filter).connect(gain).connect(ctx.destination);
+        osc.start(startT);
+        lfo.start(startT);
+        osc.stop(startT + 0.68);
+        lfo.stop(startT + 0.68);
+
+        // Cheeky high cartoon squeak at the tail end!
+        const sq = ctx.createOscillator();
+        const sqGain = ctx.createGain();
+        sq.type = 'triangle';
+        sq.frequency.setValueAtTime(420, startT + 0.54);
+        sq.frequency.exponentialRampToValueAtTime(760, startT + 0.65);
+        sqGain.gain.setValueAtTime(0.09, startT + 0.54);
+        sqGain.gain.exponentialRampToValueAtTime(0.001, startT + 0.68);
+        sq.connect(sqGain).connect(ctx.destination);
+        sq.start(startT + 0.54);
+        sq.stop(startT + 0.7);
+      } else if (kind === 'burp') {
+        // Goofy bubbly cartoon burp + two squeaky hiccup pops
+        const osc = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(128, now);
+        osc.frequency.exponentialRampToValueAtTime(78, now + 0.42);
+        lfo.frequency.setValueAtTime(19, now);
+        lfoGain.gain.setValueAtTime(22, now);
+        lfo.connect(lfoGain).connect(osc.frequency);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(340, now);
+        filter.Q.setValueAtTime(3.2, now);
+
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.46);
+        osc.connect(filter).connect(gain).connect(ctx.destination);
+        osc.start(now);
+        lfo.start(now);
+        osc.stop(now + 0.48);
+        lfo.stop(now + 0.48);
+
+        [0.62, 1.38].forEach((offset) => {
+          const t = now + offset;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(330, t);
+          o.frequency.exponentialRampToValueAtTime(820, t + 0.085);
+          g.gain.setValueAtTime(0.11, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + 0.12);
+        });
+      } else if (kind === 'boingToot') {
+        // Big trampoline bounce + cheeky squeaky landing toot!
+        playPropSfx('boing');
+        const sqT = now + 0.92;
+        const sq = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const sqGain = ctx.createGain();
+        sq.type = 'sawtooth';
+        sq.frequency.setValueAtTime(240, sqT);
+        sq.frequency.exponentialRampToValueAtTime(490, sqT + 0.18);
+        lfo.frequency.setValueAtTime(32, sqT);
+        lfoGain.gain.setValueAtTime(28, sqT);
+        lfo.connect(lfoGain).connect(sq.frequency);
+        sqGain.gain.setValueAtTime(0.11, sqT);
+        sqGain.gain.exponentialRampToValueAtTime(0.001, sqT + 0.22);
+        sq.connect(sqGain).connect(ctx.destination);
+        sq.start(sqT);
+        lfo.start(sqT);
+        sq.stop(sqT + 0.24);
+        lfo.stop(sqT + 0.24);
       } else if (kind === 'brainfreeze') {
         // Fast slurp -> crystalline shivering freeze chimes
         playPropSfx('slurp');
@@ -3809,7 +4000,7 @@
     }
 
     function clearAllCharacterStates() {
-      chars.fox.classList.remove('state-peek', 'state-wave');
+      chars.fox.classList.remove('state-peek', 'state-wave', 'state-stink-lean');
       chars.bat.classList.remove(...BAT_STATE_CLASSES);
       chars.skunk.classList.remove('state-wobble', 'state-fall', 'state-recover', ...SKUNK_GAG_CLASSES);
       bubbles.skunk.classList.remove('low-pose');
@@ -4108,10 +4299,13 @@
       isDraggingDrink = false;
       dragPointerId = null;
 
-      // Pick rotating character-specific drink reaction
+      // Deterministic flavor mapping so kids can repeat their favorite gag on demand!
+      // Red Berry Fizz ('berry') -> index 0 (PoppyDash's Mega Skunk Toot!)
+      // Blue-Razz ('razz') -> index 1 (PoppyDash's Super Bubble Burp!)
       const list = PROP_REACTIONS.drink[charKey];
+      const flavorIdx = drinkEl.dataset.drink === 'razz' ? 1 : 0;
+      const reaction = list[flavorIdx % list.length];
       const counterKey = charKey === 'fox' ? 'drinkFox' : charKey === 'bat' ? 'drinkBat' : 'drinkSkunk';
-      const reaction = list[counters[counterKey] % list.length];
       counters[counterKey] += 1;
 
       playPropReaction(reaction);
