@@ -89,6 +89,8 @@
       padding: 7px 14px;
       border-radius: 999px;
       cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
       box-shadow: 0 3px 0 var(--ink);
       transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
     }
@@ -188,11 +190,14 @@
       background: var(--gold);
       color: var(--ink);
       font-family: 'Fredoka', system-ui, sans-serif;
-      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
       font-weight: 700;
       padding: 12px 24px;
+      max-width: 92%;
       border-radius: 999px;
       cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
       box-shadow: 0 6px 0 var(--ink), 0 12px 28px rgba(0, 0, 0, 0.45);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       animation: ctaPulse 2.2s ease-in-out infinite;
@@ -238,6 +243,8 @@
       transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.4s ease, left 0.4s ease;
       pointer-events: auto;
       cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .speech-bubble.visible {
@@ -319,6 +326,46 @@
       display: grid;
     }
 
+    .voice-engine-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .voice-engine-row label {
+      font-family: 'Fredoka', system-ui, sans-serif;
+      font-size: 0.86rem;
+      color: var(--cream);
+    }
+
+    .voice-engine-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .voice-engine-controls select {
+      padding: 5px 10px;
+      border-radius: 10px;
+      border: 2px solid var(--ink);
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Fredoka', system-ui, sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .voice-engine-note {
+      font-size: 0.78rem;
+      color: #c8c2e6;
+    }
+
     .voice-row {
       display: flex;
       flex-direction: column;
@@ -350,9 +397,26 @@
       font-weight: 700;
     }
 
+    .voice-row select:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
     .btn-mini {
       padding: 5px 10px;
       font-size: 0.78rem;
+    }
+
+    .audio-tip {
+      display: none;
+      font-size: 0.78rem;
+      color: #ffd166;
+      padding: 2px 4px 0;
+      text-align: center;
+    }
+
+    .audio-tip.visible {
+      display: block;
     }
 
     /* ==================== SCENE & CHARACTER ANIMATIONS ==================== */
@@ -377,6 +441,13 @@
     @keyframes mouthChatter {
       0% { transform: scaleY(0.55); }
       100% { transform: scaleY(1.15); }
+    }
+
+    .fox-group,
+    .bat-group,
+    .skunk-group {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ---------- SUNNY FOX (WOMAN) ---------- */
@@ -1139,11 +1210,22 @@
 
     <footer class="dialogue-progress">
       <span id="line-counter">Line 1 of 8</span>
-      <span id="voice-cast" class="voice-Cast">Voices: Sunny Fox (Woman) · Luna Bat (Girl) · PoppyDash (Man)</span>
+      <span id="voice-cast" class="voice-Cast">Voices: Studio Cast (Universal) · Sunny Fox · Luna Bat · PoppyDash</span>
       <span id="playback-status">Ready</span>
     </footer>
+    <p id="audio-tip" class="audio-tip" aria-live="polite"></p>
 
     <section id="voice-panel" class="voice-panel" aria-label="Character Voice Cast Selector">
+      <div class="voice-engine-row">
+        <label for="select-voice-engine">Voice Engine</label>
+        <div class="voice-engine-controls">
+          <select id="select-voice-engine">
+            <option value="studio">Studio Voices (Universal — Recommended)</option>
+            <option value="browser">Browser Voices (Device TTS)</option>
+          </select>
+          <span id="voice-engine-note" class="voice-engine-note">Works across iPhone, iPad, Android &amp; Desktop</span>
+        </div>
+      </div>
       <div class="voice-row">
         <label for="select-voice-fox">Sunny Fox (Woman)</label>
         <div class="voice-row-controls">
@@ -1174,6 +1256,7 @@
         speaker: 'bat',
         name: 'Luna Bat',
         text: 'Ooh! The trailers are starting! Turn it up, turn it up!',
+        audioFile: 'audio/line-0.mp3',
         foxState: 'state-wave',
         batState: 'state-perch',
         skunkState: ''
@@ -1182,6 +1265,7 @@
         speaker: 'fox',
         name: 'Sunny Fox',
         text: 'Relax, Luna. Every great film deserves a stylish entrance.',
+        audioFile: 'audio/line-1.mp3',
         foxState: 'state-wave',
         batState: '',
         skunkState: ''
@@ -1190,6 +1274,7 @@
         speaker: 'skunk',
         name: 'PoppyDash',
         text: 'I brought extra buttered popcorn! Wait—whoa, slippery bucket!',
+        audioFile: 'audio/line-2.mp3',
         foxState: '',
         batState: '',
         skunkState: 'state-wobble'
@@ -1198,6 +1283,7 @@
         speaker: 'skunk',
         name: 'PoppyDash',
         text: 'Whoooa—look out below! My popcorn! My dignity!',
+        audioFile: 'audio/line-3.mp3',
         foxState: 'state-peek',
         batState: 'state-chase',
         skunkState: 'state-fall',
@@ -1207,6 +1293,7 @@
         speaker: 'bat',
         name: 'Luna Bat',
         text: 'Wheee! Airborne popcorn! Catching it mid-flight counts as dinner!',
+        audioFile: 'audio/line-4.mp3',
         foxState: 'state-peek',
         batState: 'state-flip',
         skunkState: 'state-fall'
@@ -1215,6 +1302,7 @@
         speaker: 'fox',
         name: 'Sunny Fox',
         text: 'Ten out of ten for the tumble, PoppyDash. Zero for balance.',
+        audioFile: 'audio/line-5.mp3',
         foxState: 'state-peek',
         batState: 'state-chase',
         skunkState: 'state-recover'
@@ -1223,6 +1311,7 @@
         speaker: 'skunk',
         name: 'PoppyDash',
         text: 'Hey! At least there is a kernel on my nose for later… right?',
+        audioFile: 'audio/line-6.mp3',
         foxState: '',
         batState: '',
         skunkState: 'state-recover'
@@ -1231,6 +1320,7 @@
         speaker: 'fox',
         name: 'Sunny Fox',
         text: 'Alright, crew—eyes on the screen. Best movie night yet!',
+        audioFile: 'audio/line-7.mp3',
         foxState: 'state-wave',
         batState: 'state-perch',
         skunkState: ''
@@ -1260,6 +1350,10 @@
     const btnToggle = document.getElementById('btn-toggle');
     const btnReplay = document.getElementById('btn-replay');
     const voicePanel = document.getElementById('voice-panel');
+    const voiceEngineSelect = document.getElementById('select-voice-engine');
+    const voiceEngineNote = document.getElementById('voice-engine-note');
+    const voiceCastLabel = document.getElementById('voice-cast');
+    const audioTipEl = document.getElementById('audio-tip');
     const voiceSelects = {
       fox: document.getElementById('select-voice-fox'),
       bat: document.getElementById('select-voice-bat'),
@@ -1268,23 +1362,121 @@
     const lineCounter = document.getElementById('line-counter');
     const playbackStatus = document.getElementById('playback-status');
 
+    // Minimal valid silent PCM WAV (used synchronously on tap to unlock iOS/iPadOS playback audio session)
+    const SILENT_WAV_DATA_URI = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+    const isAppleMobile = (() => {
+      const ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+      const platform = (typeof navigator !== 'undefined' && navigator.platform) || '';
+      const maxTouch = (typeof navigator !== 'undefined' && navigator.maxTouchPoints) || 0;
+      return /iPad|iPhone|iPod/i.test(ua) || (platform === 'MacIntel' && maxTouch > 1);
+    })();
+
     let currentIndex = 0;
     let isPlaying = true;
     let voicesEnabled = true;
     let audioUnlocked = false;
     let timerId = null;
     let audioCtx = null;
+    let sharedAudioEl = null;
 
-    // ==================== PROCEDURAL WEB AUDIO SFX ====================
+    function setAudioTip(message) {
+      if (!audioTipEl) return;
+      if (message) {
+        audioTipEl.textContent = message;
+        audioTipEl.classList.add('visible');
+      } else {
+        audioTipEl.textContent = '';
+        audioTipEl.classList.remove('visible');
+      }
+    }
+
+    // ==================== UNIVERSAL AUDIO SESSION & WEB AUDIO SFX ====================
+    function setPlaybackAudioSession() {
+      try {
+        if (typeof navigator !== 'undefined' && 'audioSession' in navigator && navigator.audioSession) {
+          navigator.audioSession.type = 'playback';
+        }
+      } catch (_) {
+        // Ignore on browsers that do not support mutable navigator.audioSession.type
+      }
+    }
+
+    function getSharedAudioEl() {
+      if (!sharedAudioEl && typeof Audio !== 'undefined') {
+        sharedAudioEl = new Audio();
+        sharedAudioEl.setAttribute('playsinline', '');
+        sharedAudioEl.playsInline = true;
+        sharedAudioEl.preload = 'auto';
+      }
+      return sharedAudioEl;
+    }
+
     function ensureAudioCtx() {
       if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
         const Ctx = window.AudioContext || window.webkitAudioContext;
         audioCtx = new Ctx();
       }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(() => {});
+      if (audioCtx && (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted')) {
+        try {
+          const p = audioCtx.resume();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        } catch (_) {}
       }
       return audioCtx;
+    }
+
+    async function ensureAudioCtxRunning() {
+      const ctx = ensureAudioCtx();
+      if (!ctx) return null;
+      if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+        try {
+          await Promise.race([
+            ctx.resume(),
+            new Promise((resolve) => setTimeout(resolve, 600))
+          ]);
+        } catch (_) {}
+      }
+      return ctx;
+    }
+
+    function primeAudioHardware() {
+      setPlaybackAudioSession();
+      const ctx = ensureAudioCtx();
+      if (ctx) {
+        try {
+          const silentBuf = ctx.createBuffer(1, 1, 22050);
+          const src = ctx.createBufferSource();
+          src.buffer = silentBuf;
+          src.connect(ctx.destination);
+          src.start(0);
+        } catch (_) {}
+      }
+      const el = getSharedAudioEl();
+      if (el && !el.src) {
+        try {
+          el.src = SILENT_WAV_DATA_URI;
+          el.volume = 0.01;
+          const playPromise = el.play();
+          if (playPromise && typeof playPromise.then === 'function') {
+            playPromise
+              .then(() => {
+                if (el.src === SILENT_WAV_DATA_URI) {
+                  el.pause();
+                  el.currentTime = 0;
+                  el.volume = 1;
+                }
+              })
+              .catch(() => {
+                el.volume = 1;
+              });
+          } else {
+            el.volume = 1;
+          }
+        } catch (_) {
+          el.volume = 1;
+        }
+      }
     }
 
     function playPopcornSpillSfx() {
@@ -1351,15 +1543,57 @@
       });
     }
 
-    // ==================== CHARACTER VOICE ACTING (WEB SPEECH API) ====================
+    // ==================== DUAL-ENGINE CHARACTER VOICE MANAGER ====================
+    // Primary: Pre-rendered neural Studio Voices via unlocked Web Audio / HTML5 <audio> (universal across iPhone, iPad, Android & Desktop)
+    // Secondary / Fallback: Cross-platform hardened Web Speech API (speechSynthesis)
     const VoiceManager = (() => {
+      let mode = 'studio'; // 'studio' | 'browser'
       let availableVoices = [];
       const overrides = { fox: '', bat: '', skunk: '' };
 
-      const FEMALE_PATTERN = /\b(female|woman|girl|samantha|victoria|karen|moira|tessa|fiona|kate|serena|zira|hazel|susan|aria|jenny|sara|michelle|emma|olivia|allison|ava|nicky|kathy|shelley|sandy|flo|grandma|google us english)\b/i;
+      let speakToken = 0;
+      let activeSource = null;
+      let activeUtterance = null;
+      let pendingSpeakTimerId = null;
+      let startWatchdogId = null;
+      let maxDurationWatchdogId = null;
+      let mouthFallbackTimerId = null;
+
+      const rawBufferCache = new Map();
+      const decodedBufferCache = new Map();
+      const rawFetchInFlight = new Map();
+
+      const NOVELTY_PATTERN = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|eddy|flo|fred|good news|grandma|grandpa|jester|kathy|organ|ralph|reed|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)\b/i;
+      const FEMALE_PRIORITY = [
+        'samantha',
+        'aria',
+        'jenny',
+        'karen',
+        'moira',
+        'tessa',
+        'ava',
+        'allison',
+        'serena',
+        'kate',
+        'victoria',
+        'nicky',
+        'zoe',
+        'susan',
+        'google uk english female',
+        'google us english',
+        'zira',
+        'hazel',
+        'michelle',
+        'emma',
+        'olivia',
+        'sara',
+        'fiona'
+      ];
+      const FEMALE_PATTERN = new RegExp(`\\b(female|woman|girl|${FEMALE_PRIORITY.map((n) => n.replace(/\s+/g, '\\s+')).join('|')})\\b`, 'i');
+
       const MALE_PRIORITY = [
-        'google uk english male',
         'daniel',
+        'google uk english male',
         'microsoft andrew',
         'microsoft brian',
         'microsoft guy',
@@ -1369,24 +1603,18 @@
         'microsoft eric',
         'microsoft ryan',
         'microsoft george',
-        'alex',
         'aaron',
-        'matthew',
-        'oliver',
         'arthur',
-        'fred',
-        'tom',
         'rishi',
+        'gordon',
+        'oliver',
+        'alex',
+        'matthew',
+        'tom',
         'evan',
         'liam',
         'nathan',
-        'gordon',
-        'reed',
-        'eddy',
-        'grandpa',
         'malcolm',
-        'ralph',
-        'bruce',
         'davis',
         'jason',
         'tony',
@@ -1397,28 +1625,117 @@
       ];
       const MALE_PATTERN = new RegExp(`\\b(male|man|${MALE_PRIORITY.map((n) => n.replace(/\s+/g, '\\s+')).join('|')})\\b`, 'i');
 
+      function normalizeLang(lang) {
+        return lang ? String(lang).replace(/_/g, '-') : 'en-US';
+      }
+
+      function normalizeTextForSpeech(text) {
+        return String(text || '')
+          .replace(/—/g, ', ')
+          .replace(/…/g, '...')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function resolveAssetUrl(relativePath) {
+        try {
+          const base = (typeof document !== 'undefined' && document.baseURI) || window.location.href;
+          return new URL(relativePath, base).href;
+        } catch (_) {
+          return relativePath;
+        }
+      }
+
+      function decodeAudioBufferCompat(ctx, arrayBuffer) {
+        return new Promise((resolve, reject) => {
+          try {
+            const copy = arrayBuffer.slice(0);
+            const result = ctx.decodeAudioData(copy, resolve, reject);
+            if (result && typeof result.then === 'function') {
+              result.then(resolve, reject);
+            }
+          } catch (err) {
+            reject(err);
+          }
+        });
+      }
+
+      async function fetchStudioArrayBuffer(audioFile) {
+        if (rawBufferCache.has(audioFile)) {
+          return rawBufferCache.get(audioFile);
+        }
+        if (rawFetchInFlight.has(audioFile)) {
+          return rawFetchInFlight.get(audioFile);
+        }
+        if (typeof fetch !== 'function' || (window.location && window.location.protocol === 'file:')) {
+          throw new Error('fetch unavailable for local file');
+        }
+        const url = resolveAssetUrl(audioFile);
+        const req = fetch(url)
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.arrayBuffer();
+          })
+          .then((buf) => {
+            rawBufferCache.set(audioFile, buf);
+            rawFetchInFlight.delete(audioFile);
+            return buf;
+          })
+          .catch((err) => {
+            rawFetchInFlight.delete(audioFile);
+            throw err;
+          });
+        rawFetchInFlight.set(audioFile, req);
+        return req;
+      }
+
+      function preloadStudioAudio() {
+        if (typeof fetch !== 'function' || (window.location && window.location.protocol === 'file:')) {
+          return;
+        }
+        DIALOGUE.forEach((entry) => {
+          if (entry.audioFile && !rawBufferCache.has(entry.audioFile)) {
+            fetchStudioArrayBuffer(entry.audioFile).catch(() => {});
+          }
+        });
+      }
+
       function getEnglishPool(voices) {
-        const english = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
+        const english = voices.filter((v) => v.lang && normalizeLang(v.lang).toLowerCase().startsWith('en'));
         return english.length ? english : voices;
+      }
+
+      function sortByPriority(list, priorityList) {
+        return [...list].sort((a, b) => {
+          const aLocal = isAppleMobile && a.localService === false ? 1 : 0;
+          const bLocal = isAppleMobile && b.localService === false ? 1 : 0;
+          if (aLocal !== bLocal) return aLocal - bLocal;
+          const aIdx = priorityList.findIndex((p) => a.name.toLowerCase().includes(p));
+          const bIdx = priorityList.findIndex((p) => b.name.toLowerCase().includes(p));
+          return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+        });
       }
 
       function pickVoiceFromList(voices, role) {
         if (!voices || !voices.length) return { voice: null, isTrueMatch: false };
-        const pool = getEnglishPool(voices);
+        const fullPool = getEnglishPool(voices);
 
         if (overrides[role]) {
           const custom = voices.find((v) => v.name === overrides[role]);
           if (custom) return { voice: custom, isTrueMatch: true };
         }
 
-        const femaleVoices = pool.filter((v) => FEMALE_PATTERN.test(v.name));
-        const maleVoices = pool
-          .filter((v) => !FEMALE_PATTERN.test(v.name) && MALE_PATTERN.test(v.name))
-          .sort((a, b) => {
-            const aIdx = MALE_PRIORITY.findIndex((p) => a.name.toLowerCase().includes(p));
-            const bIdx = MALE_PRIORITY.findIndex((p) => b.name.toLowerCase().includes(p));
-            return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
-          });
+        const naturalPool = fullPool.filter((v) => !NOVELTY_PATTERN.test(v.name));
+        const pool = naturalPool.length ? naturalPool : fullPool;
+
+        const femaleVoices = sortByPriority(
+          pool.filter((v) => FEMALE_PATTERN.test(v.name)),
+          FEMALE_PRIORITY
+        );
+        const maleVoices = sortByPriority(
+          pool.filter((v) => !FEMALE_PATTERN.test(v.name) && MALE_PATTERN.test(v.name)),
+          MALE_PRIORITY
+        );
 
         if (role === 'fox') {
           const v = femaleVoices[0] || pool[0];
@@ -1455,7 +1772,7 @@
           pool.forEach((v) => {
             const opt = document.createElement('option');
             opt.value = v.name;
-            opt.textContent = `${v.name} (${v.lang})`;
+            opt.textContent = `${v.name} (${normalizeLang(v.lang)})`;
             if (picked && v.name === picked.name) opt.selected = true;
             select.appendChild(opt);
           });
@@ -1463,33 +1780,99 @@
       }
 
       function refreshVoices() {
-        if (!('speechSynthesis' in window)) return;
-        availableVoices = window.speechSynthesis.getVoices() || [];
+        if (!('speechSynthesis' in window) || !window.speechSynthesis) return;
+        try {
+          availableVoices = window.speechSynthesis.getVoices() || [];
+        } catch (_) {
+          availableVoices = [];
+        }
         populateVoiceSelects();
       }
 
-      if ('speechSynthesis' in window) {
+      if ('speechSynthesis' in window && window.speechSynthesis) {
         refreshVoices();
-        window.speechSynthesis.addEventListener('voiceschanged', refreshVoices);
+        if (typeof window.speechSynthesis.addEventListener === 'function') {
+          window.speechSynthesis.addEventListener('voiceschanged', refreshVoices);
+        } else {
+          window.speechSynthesis.onvoiceschanged = refreshVoices;
+        }
+      }
+
+      function clearTimers() {
+        clearTimeout(pendingSpeakTimerId);
+        clearTimeout(startWatchdogId);
+        clearTimeout(maxDurationWatchdogId);
+        clearTimeout(mouthFallbackTimerId);
+        pendingSpeakTimerId = null;
+        startWatchdogId = null;
+        maxDurationWatchdogId = null;
+        mouthFallbackTimerId = null;
+      }
+
+      function isSpeechActive() {
+        if (!('speechSynthesis' in window) || !window.speechSynthesis) return false;
+        return Boolean(window.speechSynthesis.speaking || window.speechSynthesis.pending);
+      }
+
+      function stop(options = {}) {
+        const { cancelSpeechIfActive = true } = options;
+        speakToken += 1;
+        clearTimers();
+
+        if (activeSource) {
+          try {
+            activeSource.onended = null;
+            activeSource.stop();
+          } catch (_) {}
+          activeSource = null;
+        }
+
+        if (sharedAudioEl) {
+          sharedAudioEl.onplaying = null;
+          sharedAudioEl.onended = null;
+          sharedAudioEl.onerror = null;
+          try {
+            if (!sharedAudioEl.paused && sharedAudioEl.src !== SILENT_WAV_DATA_URI) {
+              sharedAudioEl.pause();
+            }
+          } catch (_) {}
+        }
+
+        if (activeUtterance) {
+          activeUtterance.onstart = null;
+          activeUtterance.onend = null;
+          activeUtterance.onerror = null;
+          activeUtterance = null;
+        }
+
+        // Only cancel speechSynthesis when it is actually active (avoids Safari < 27 & Chrome cancel-eats-speak bug)
+        if (cancelSpeechIfActive && audioUnlocked && isSpeechActive()) {
+          try {
+            window.speechSynthesis.cancel();
+          } catch (_) {}
+        }
+
+        Object.values(chars).forEach((el) => el && el.classList.remove('is-talking'));
+      }
+
+      function setMode(nextMode) {
+        mode = nextMode === 'browser' ? 'browser' : 'studio';
+        syncVoicePanelUi();
+      }
+
+      function getMode() {
+        return mode;
       }
 
       function setOverride(role, voiceName) {
         overrides[role] = voiceName;
       }
 
-      function stop() {
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-        }
-        Object.values(chars).forEach((el) => el.classList.remove('is-talking'));
-      }
-
-      function speak(speaker, text, onDone) {
-        stop();
+      function speakViaSpeechSynthesis(speaker, text, myToken, wasSpeechActive, onDone) {
         const charEl = chars[speaker];
-        if (!voicesEnabled || !audioUnlocked || !('speechSynthesis' in window)) {
+        if (!('speechSynthesis' in window) || !window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') {
           if (charEl) charEl.classList.add('is-talking');
-          setTimeout(() => {
+          mouthFallbackTimerId = setTimeout(() => {
             if (charEl) charEl.classList.remove('is-talking');
           }, 1600);
           onDone(false);
@@ -1497,47 +1880,282 @@
         }
 
         if (!availableVoices.length) refreshVoices();
-        const utterance = new SpeechSynthesisUtterance(text);
+        const spokenText = normalizeTextForSpeech(text);
         const { voice: selectedVoice, isTrueMatch } = pickVoiceFromList(availableVoices, speaker);
-        if (selectedVoice) utterance.voice = selectedVoice;
-
-        if (speaker === 'fox') {
-          // Woman: warm, poised, confident
-          utterance.pitch = 1.06;
-          utterance.rate = 0.96;
-        } else if (speaker === 'bat') {
-          // Girl: bright, youthful, bubbly
-          utterance.pitch = 1.54;
-          utterance.rate = 1.14;
-        } else if (speaker === 'skunk') {
-          // Man: deeper, clearly masculine comedic delivery
-          utterance.pitch = isTrueMatch ? 0.72 : 0.52;
-          utterance.rate = 0.95;
-        }
 
         let finished = false;
-        const finish = () => {
-          if (finished) return;
+        const finish = (spokeAudio) => {
+          if (finished || myToken !== speakToken) return;
           finished = true;
+          clearTimers();
+          activeUtterance = null;
           if (charEl) charEl.classList.remove('is-talking');
-          onDone(true);
+          onDone(spokeAudio);
         };
 
-        utterance.onstart = () => {
-          if (charEl) charEl.classList.add('is-talking');
-        };
-        utterance.onend = finish;
-        utterance.onerror = finish;
+        const queueUtterance = (useDefaultVoice) => {
+          if (finished || myToken !== speakToken) return;
 
-        try {
-          window.speechSynthesis.speak(utterance);
-        } catch (err) {
-          finish();
+          const utterance = new SpeechSynthesisUtterance(spokenText);
+          utterance.volume = 1;
+
+          if (!useDefaultVoice && selectedVoice) {
+            utterance.voice = selectedVoice;
+            utterance.lang = normalizeLang(selectedVoice.lang);
+          } else {
+            utterance.lang = 'en-US';
+          }
+
+          if (speaker === 'fox') {
+            // Woman: warm, poised, confident
+            utterance.pitch = 1.06;
+            utterance.rate = 0.96;
+          } else if (speaker === 'bat') {
+            // Girl: bright, youthful, bubbly
+            utterance.pitch = 1.48;
+            utterance.rate = 1.12;
+          } else if (speaker === 'skunk') {
+            // Man: deeper, clearly masculine comedic delivery
+            utterance.pitch = (!useDefaultVoice && isTrueMatch) ? 0.75 : 0.58;
+            utterance.rate = 0.95;
+          }
+
+          let started = false;
+          activeUtterance = utterance;
+
+          utterance.onstart = () => {
+            if (myToken !== speakToken) return;
+            started = true;
+            clearTimeout(startWatchdogId);
+            startWatchdogId = null;
+            if (charEl) charEl.classList.add('is-talking');
+            const maxMs = Math.max(8000, spokenText.length * 180);
+            maxDurationWatchdogId = setTimeout(() => finish(true), maxMs);
+          };
+
+          utterance.onend = () => finish(true);
+
+          utterance.onerror = (evt) => {
+            if (myToken !== speakToken) return;
+            const errType = evt && evt.error;
+            if (errType === 'canceled' || errType === 'interrupted') return;
+            if (!useDefaultVoice && !started && selectedVoice) {
+              clearTimeout(startWatchdogId);
+              queueUtterance(true);
+              return;
+            }
+            finish(false);
+          };
+
+          startWatchdogId = setTimeout(() => {
+            if (finished || started || myToken !== speakToken) return;
+            if (window.speechSynthesis.speaking) {
+              // Some mobile WebKit builds speak without firing onstart promptly
+              started = true;
+              if (charEl) charEl.classList.add('is-talking');
+              maxDurationWatchdogId = setTimeout(() => finish(true), Math.max(8000, spokenText.length * 180));
+              return;
+            }
+            if (!useDefaultVoice && selectedVoice) {
+              queueUtterance(true);
+            } else {
+              if (isAppleMobile) {
+                setAudioTip('Tip: Switch to Studio Voices in Cast Voices (or turn off Silent Mode) to hear voices on iOS/iPadOS.');
+              }
+              finish(false);
+            }
+          }, 1400);
+
+          try {
+            if (window.speechSynthesis.paused) {
+              window.speechSynthesis.resume();
+            }
+            window.speechSynthesis.speak(utterance);
+          } catch (_) {
+            if (!useDefaultVoice && selectedVoice) {
+              queueUtterance(true);
+            } else {
+              finish(false);
+            }
+          }
+        };
+
+        if (wasSpeechActive) {
+          // Wait briefly for WebKit/Chrome async cancel to settle before queueing the next utterance
+          pendingSpeakTimerId = setTimeout(() => {
+            pendingSpeakTimerId = null;
+            queueUtterance(false);
+          }, 100);
+        } else {
+          // Speak synchronously inside the user gesture / onend flow with zero cancel() call
+          queueUtterance(false);
         }
       }
 
-      return { speak, stop, setOverride, pickVoiceFromList };
+      function playStudioViaHtmlAudio(audioFile, speaker, text, myToken, onDone) {
+        const el = getSharedAudioEl();
+        const charEl = chars[speaker];
+        if (!el) {
+          speakViaSpeechSynthesis(speaker, text, myToken, false, onDone);
+          return;
+        }
+
+        let finished = false;
+        const finish = (spokeAudio) => {
+          if (finished || myToken !== speakToken) return;
+          finished = true;
+          clearTimers();
+          el.onplaying = null;
+          el.onended = null;
+          el.onerror = null;
+          if (charEl) charEl.classList.remove('is-talking');
+          onDone(spokeAudio);
+        };
+
+        el.onplaying = () => {
+          if (myToken !== speakToken) return;
+          if (charEl) charEl.classList.add('is-talking');
+        };
+        el.onended = () => finish(true);
+        el.onerror = () => {
+          if (finished || myToken !== speakToken) return;
+          finished = true;
+          clearTimers();
+          el.onplaying = null;
+          el.onended = null;
+          el.onerror = null;
+          if (charEl) charEl.classList.remove('is-talking');
+          speakViaSpeechSynthesis(speaker, text, myToken, false, onDone);
+        };
+
+        el.volume = 1;
+        el.src = resolveAssetUrl(audioFile);
+        try {
+          el.currentTime = 0;
+        } catch (_) {}
+
+        maxDurationWatchdogId = setTimeout(() => finish(true), 12000);
+        const playPromise = el.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            if (el.onerror) el.onerror();
+          });
+        }
+      }
+
+      async function playStudioViaWebAudio(audioFile, speaker, text, myToken, onDone) {
+        const charEl = chars[speaker];
+        try {
+          const ctx = await ensureAudioCtxRunning();
+          if (myToken !== speakToken) return;
+          if (!ctx) throw new Error('AudioContext unavailable');
+
+          let audioBuffer = decodedBufferCache.get(audioFile);
+          if (!audioBuffer) {
+            const raw = await fetchStudioArrayBuffer(audioFile);
+            if (myToken !== speakToken) return;
+            audioBuffer = await decodeAudioBufferCompat(ctx, raw);
+            if (myToken !== speakToken) return;
+            decodedBufferCache.set(audioFile, audioBuffer);
+          }
+
+          if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+            await ctx.resume().catch(() => {});
+            if (myToken !== speakToken) return;
+          }
+
+          const source = ctx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(ctx.destination);
+          activeSource = source;
+
+          let finished = false;
+          const finish = () => {
+            if (finished || myToken !== speakToken) return;
+            finished = true;
+            clearTimers();
+            if (activeSource === source) activeSource = null;
+            if (charEl) charEl.classList.remove('is-talking');
+            onDone(true);
+          };
+
+          source.onended = finish;
+          if (charEl) charEl.classList.add('is-talking');
+          source.start(0);
+
+          const durationMs = Math.ceil(((audioBuffer && audioBuffer.duration) || 6) * 1000) + 2000;
+          maxDurationWatchdogId = setTimeout(finish, durationMs);
+        } catch (_) {
+          if (myToken !== speakToken) return;
+          playStudioViaHtmlAudio(audioFile, speaker, text, myToken, onDone);
+        }
+      }
+
+      function speak(entryOrSpeaker, textArg, onDoneArg) {
+        const isEntryObj = entryOrSpeaker && typeof entryOrSpeaker === 'object';
+        const speaker = isEntryObj ? entryOrSpeaker.speaker : entryOrSpeaker;
+        const text = isEntryObj ? entryOrSpeaker.text : textArg;
+        const audioFile = isEntryObj ? entryOrSpeaker.audioFile : null;
+        const onDone = isEntryObj ? textArg : onDoneArg;
+
+        const wasSpeechActive = audioUnlocked && isSpeechActive();
+        stop({ cancelSpeechIfActive: wasSpeechActive });
+
+        const myToken = speakToken;
+        const charEl = chars[speaker];
+
+        if (!voicesEnabled || !audioUnlocked) {
+          if (charEl) charEl.classList.add('is-talking');
+          mouthFallbackTimerId = setTimeout(() => {
+            if (charEl) charEl.classList.remove('is-talking');
+          }, 1600);
+          onDone(false);
+          return;
+        }
+
+        if (mode === 'studio' && audioFile) {
+          playStudioViaWebAudio(audioFile, speaker, text, myToken, onDone);
+          return;
+        }
+
+        speakViaSpeechSynthesis(speaker, text, myToken, wasSpeechActive, onDone);
+      }
+
+      return {
+        speak,
+        stop,
+        setMode,
+        getMode,
+        setOverride,
+        pickVoiceFromList,
+        preloadStudioAudio,
+        normalizeLang,
+        normalizeTextForSpeech
+      };
     })();
+
+    function syncVoicePanelUi() {
+      const isStudio = VoiceManager.getMode() === 'studio';
+      if (voiceEngineSelect) voiceEngineSelect.value = VoiceManager.getMode();
+      Object.values(voiceSelects).forEach((select) => {
+        if (select) select.disabled = isStudio;
+      });
+      if (voiceEngineNote) {
+        voiceEngineNote.textContent = isStudio
+          ? 'Universal pre-rendered cast — works across iPhone, iPad (even Silent Mode), Android & Desktop'
+          : 'Using your device browser voices (dropdowns below)';
+      }
+      if (voiceCastLabel) {
+        voiceCastLabel.textContent = isStudio
+          ? 'Voices: Studio Cast (Universal) · Sunny Fox · Luna Bat · PoppyDash'
+          : 'Voices: Browser Cast (Device TTS) · Sunny Fox · Luna Bat · PoppyDash';
+      }
+      if (!isStudio && isAppleMobile) {
+        setAudioTip('iOS/iPadOS tip: Turn off Silent Mode (ringer switch / Control Center bell) when using Browser Voices.');
+      } else {
+        setAudioTip('');
+      }
+    }
 
     // ==================== SCENE CHOREOGRAPHY ====================
     function triggerSpillBurst() {
@@ -1594,9 +2212,9 @@
         ? (voicesEnabled && audioUnlocked ? 'Speaking' : 'Auto-playing')
         : 'Paused';
 
-      VoiceManager.speak(entry.speaker, entry.text, (spokeAudio) => {
+      VoiceManager.speak(entry, (spokeAudio) => {
         if (!isPlaying) return;
-        const delayMs = spokeAudio ? 950 : 4200;
+        const delayMs = spokeAudio ? 900 : 4200;
         clearTimeout(timerId);
         timerId = setTimeout(() => {
           renderLine(currentIndex + 1);
@@ -1607,8 +2225,12 @@
     function unlockAudio() {
       if (!audioUnlocked) {
         audioUnlocked = true;
-        ensureAudioCtx();
+        primeAudioHardware();
         startOverlay.classList.add('hidden');
+        VoiceManager.preloadStudioAudio();
+      } else {
+        setPlaybackAudioSession();
+        ensureAudioCtx();
       }
     }
 
@@ -1682,6 +2304,15 @@
       renderLine(0);
     });
 
+    if (voiceEngineSelect) {
+      voiceEngineSelect.addEventListener('change', (e) => {
+        VoiceManager.setMode(e.target.value);
+        if (audioUnlocked && voicesEnabled && isPlaying) {
+          renderLine(currentIndex);
+        }
+      });
+    }
+
     Object.entries(voiceSelects).forEach(([role, select]) => {
       if (!select) return;
       select.addEventListener('change', (e) => {
@@ -1696,7 +2327,7 @@
         const sample = DIALOGUE.find((d) => d.speaker === role);
         if (sample) {
           clearTimeout(timerId);
-          VoiceManager.speak(role, sample.text, () => {});
+          VoiceManager.speak(sample, () => {});
         }
       });
     });
@@ -1709,7 +2340,20 @@
     chars.bat.addEventListener('click', () => triggerCharacterReaction('bat'));
     chars.skunk.addEventListener('click', () => triggerCharacterReaction('skunk'));
 
-    // Start visual animation cleanly (voices begin on first click via browser policy)
+    // Cleanly pause when backgrounding on mobile/iPad so WebKit/mobile audio sessions never wedge
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && audioUnlocked && isPlaying) {
+        clearTimeout(timerId);
+        VoiceManager.stop();
+        isPlaying = false;
+        btnToggle.textContent = 'Play';
+        playbackStatus.textContent = 'Paused';
+      }
+    });
+
+    // Initialize Cast Voices UI, warm up Studio audio buffers in background, and start visual animation cleanly
+    syncVoicePanelUi();
+    VoiceManager.preloadStudioAudio();
     renderLine(0);
   </script>
 </body>
